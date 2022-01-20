@@ -84,7 +84,7 @@ export const preProcess = async ({frames}) => {
   // return frames.slice(1000, 1005).map((frame) => {
   return {
     framesPerPerson: frames
-      .slice(4127, 4129)
+      // .slice(4127, 4129)
       .map(frame => processFrame({frame, personIndices}))
       .filter(notEmptyFrame),
     personIndices

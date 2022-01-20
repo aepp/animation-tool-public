@@ -1,7 +1,7 @@
 import {put, takeLatest, fork} from 'redux-saga/effects';
-import {ADD_DATASET_FILE, SET_DATASET_FILE_URL} from '../actions';
+import {SET_DATASET_FILE, SET_DATASET_FILE_URL} from '../actions';
 
-function* handleFileUpload(action) {
+function* handleSelectDataSetFile(action) {
   const {
     payload: {file}
   } = action;
@@ -12,12 +12,12 @@ function* handleFileUpload(action) {
   });
 }
 
-function* watchAddDataSetSaga() {
-  yield takeLatest(ADD_DATASET_FILE, handleFileUpload);
+function* watchSelectDataSetSaga() {
+  yield takeLatest(SET_DATASET_FILE, handleSelectDataSetFile);
 }
 
 function* rootSaga() {
-  yield fork(watchAddDataSetSaga);
+  yield fork(watchSelectDataSetSaga);
 }
 
 export default rootSaga;

@@ -48,6 +48,8 @@ export class ThreeModelRenderer {
     this._camera.lookAt(50, 0, 0);
 
     this._renderer = new WebGLRenderer();
+    this._renderer.dispose();
+    this._renderer.clear();
     this._renderer.setSize(this._threeModel._width, this._threeModel._height);
     this._rootElement.appendChild(this._renderer.domElement);
     this._renderer.setPixelRatio(window.devicePixelRatio);

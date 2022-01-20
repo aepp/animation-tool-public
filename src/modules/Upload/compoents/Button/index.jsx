@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, styled} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
-import {ADD_DATASET_FILE} from '../../actions';
+import {SET_DATASET_FILE} from '../../actions';
 import {selectDataSetFileUrl} from '../../reducers';
 
 const ID = 'upload-file__button';
@@ -22,7 +22,7 @@ export const UploadButton = () => {
         id={ID}
         type='file'
         onChange={e =>
-          dispatch({type: ADD_DATASET_FILE, payload: {file: e.target.files[0]}})
+          dispatch({type: SET_DATASET_FILE, payload: {file: e.target.files[0]}})
         }
       />
       <Button variant={'outlined'} component='span' color={'inherit'}>

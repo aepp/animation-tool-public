@@ -5,6 +5,7 @@ import {startVisualization} from '../../three';
 import {selectDataSetFileUrl} from '../Upload/reducers';
 import {FINISH_VISUALIZATION_INIT, SET_THREE_INSTANCE} from './actions';
 import {selectIsVisualizationInitialized} from './reducers';
+import {LOCAL_STORAGE_THREE_INSTANCE} from '../../constants';
 
 export const Visualization = () => {
   const dataSetFileUrl = useSelector(selectDataSetFileUrl);
@@ -13,15 +14,17 @@ export const Visualization = () => {
   const isInitialized = useSelector(selectIsVisualizationInitialized);
 
   useEffect(() => {
-    if (!isInitialized && ref.current && dataSetFileUrl) {
-      startVisualization({rootElement: ref.current, dataSetFileUrl}).then(
-        threeInstance => {
-          dispatch({type: SET_THREE_INSTANCE, payload: {threeInstance}});
-          return dispatch({type: FINISH_VISUALIZATION_INIT});
-        }
-      );
+    if (ref.current && dataSetFileUrl) {
+      startVisualization({
+        rootElement: ref.current,
+        dataSetFileUrl,
+        threeInstance: window[LOCAL_STORAGE_THREE_INSTANCE]
+      }).then(threeInstance => {
+        dispatch({type: SET_THREE_INSTANCE, payload: {threeInstance}});
+        return dispatch({type: FINISH_VISUALIZATION_INIT});
+      });
     }
-  }, [dispatch, isInitialized, dataSetFileUrl]);
+  }, [dispatch, dataSetFileUrl]);
 
   return (
     <Box

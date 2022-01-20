@@ -1,17 +1,21 @@
 import * as PropTypes from 'prop-types';
-import dataSet1 from './data/cpr.json';
-import dataSet2 from './data/table_tennis.json';
 import {preProcess} from './util/preProcess';
 import {ThreeModelRenderer} from './controller/ThreeModelRenderer';
 
-async function main({dataSet, rootElement}) {
+async function main({dataSet, rootElement, threeInstance}) {
   const frames = dataSet.Frames || dataSet.frames;
-  console.log('dataSet loaded, beginning pre-process...');
+  console.log('dataset loaded, beginning pre-process...');
   return preProcess({frames}).then(({framesPerPerson, personIndices}) => {
     console.log('pre-process finished! rendering...');
     // console.log(data);
-    const threeInstance = new ThreeModelRenderer({rootElement});
+    // const threeInstance = threeInstance || new ThreeModelRenderer({rootElement});
 
+    if (threeInstance) {
+      rootElement.innerHTML = '';
+    } else {
+      threeInstance = new ThreeModelRenderer({rootElement});
+    }
+    console.log(threeInstance);
     return threeInstance
       .init()
       .initFrames({
@@ -28,14 +32,16 @@ main.propTypes = {
   }).isRequired
 };
 
-// main({ dataSet: dataSet1 });
-export const startVisualization = async ({rootElement, dataSetFileUrl}) => {
+export const startVisualization = async ({
+  rootElement,
+  dataSetFileUrl,
+  threeInstance = null
+}) => {
   const dataSet = await fetch(dataSetFileUrl).then(r => r.json());
-  console.log(dataSet);
-  return main({dataSet, rootElement})
+  return main({dataSet, rootElement, threeInstance})
     .then(threeInstance => {
       console.log('visualization finished!', threeInstance);
-      return threeInstance._threeModel;
+      return threeInstance;
     })
     .catch(error => console.error('Visualization failed:', error));
 };
