@@ -1,0 +1,17 @@
+yarn.lock
+yarn-error.log
+.prettierignore
+*.eot
+*.ttf
+*.woff
+*.woff2
+dist
+.gitignore
+*.ico
+*.png
+*.txt
+*.svg
+*.md
+.idea
+.DS_Store
+src/three/data
