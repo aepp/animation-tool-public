@@ -37,7 +37,9 @@ export const Visualization = () => {
         justifyContent: 'center',
         '& canvas': {height: 'calc(100% - 64px)'}
       }}>
-      {!isInitialized && <Typography>Upload dataset...</Typography>}
+      {!isInitialized && (
+        <Typography sx={{position: 'absolute'}}>Upload dataset...</Typography>
+      )}
     </Box>
   );
 };

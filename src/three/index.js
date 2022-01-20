@@ -7,15 +7,13 @@ async function main({dataSet, rootElement, threeInstance}) {
   console.log('dataset loaded, beginning pre-process...');
   return preProcess({frames}).then(({framesPerPerson, personIndices}) => {
     console.log('pre-process finished! rendering...');
-    // console.log(data);
-    // const threeInstance = threeInstance || new ThreeModelRenderer({rootElement});
 
     if (threeInstance) {
-      rootElement.innerHTML = '';
+      threeInstance._renderer.resetState();
     } else {
       threeInstance = new ThreeModelRenderer({rootElement});
     }
-    console.log(threeInstance);
+
     return threeInstance
       .init()
       .initFrames({
@@ -40,7 +38,7 @@ export const startVisualization = async ({
   const dataSet = await fetch(dataSetFileUrl).then(r => r.json());
   return main({dataSet, rootElement, threeInstance})
     .then(threeInstance => {
-      console.log('visualization finished!', threeInstance);
+      console.log('visualization creation finished!', threeInstance);
       return threeInstance;
     })
     .catch(error => console.error('Visualization failed:', error));
