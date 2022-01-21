@@ -2,11 +2,14 @@ import {eventChannel} from 'redux-saga';
 import {takeLatest, take, fork, select, call, put} from 'redux-saga/effects';
 import {FINISH_ANIMATION_INIT, START_ANIMATION_INIT} from '../actions';
 import {LOCAL_STORAGE_THREE_INSTANCE} from '../../../constants';
-import {startVisualization} from '../../../three';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
-import {UPDATE_CURRENT_FRAME_IDX, UPDATE_MAX_FRAMES_COUNT} from '../actions/uiChannel';
+import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
+import {preProcess} from '../../../three/util/preProcess';
+import {ThreeModelRenderer} from '../../../three/controller/ThreeModelRenderer';
 
 const START_UI_CHANNEL = 'START_UI_CHANNEL';
+
+const fetchDataSet = async url => fetch(url).then(r => r.json());
 
 function* handleStartUiChannel() {
   const threeInstance = window[LOCAL_STORAGE_THREE_INSTANCE];
@@ -37,28 +40,42 @@ function* handleStartAnimationInit(action) {
   const {
     payload: {rootElement}
   } = action;
-  const threeInstance = yield call(startVisualization, {
-    rootElement,
-    dataSetFileUrl,
-    threeInstance: window[LOCAL_STORAGE_THREE_INSTANCE]
+
+  console.log('begin loading dataset...');
+  const dataSet = yield call(fetchDataSet, dataSetFileUrl);
+
+  const frames = dataSet.Frames || dataSet.frames;
+  console.log('dataset loaded, beginning pre-process...');
+
+  const {framesPerPerson, personIndices} = yield call(preProcess, {frames});
+  console.log('pre-process finished! rendering...');
+
+  yield put({
+    type: UPDATE_FRAMES_COUNT,
+    payload: {framesCount: framesPerPerson.length}
   });
+
+  const threeInstance =
+    window[LOCAL_STORAGE_THREE_INSTANCE] ||
+    new ThreeModelRenderer({rootElement});
+
+  threeInstance
+    .reset()
+    .init()
+    .initFrames({
+      framesPerPerson,
+      framesCount: framesPerPerson.length,
+      personIndices
+    })
+    .animationLoop();
+
   window[LOCAL_STORAGE_THREE_INSTANCE] = threeInstance;
 
   yield put({type: START_UI_CHANNEL});
-
-  threeInstance.animateFrames();
-
   yield put({type: FINISH_ANIMATION_INIT});
-}
-
-function* handleX(action){
-  console.log(action);
 }
 function* watchStartAnimationInit() {
   yield takeLatest(START_ANIMATION_INIT, handleStartAnimationInit);
-}
-function* watchX() {
-  yield takeLatest(UPDATE_MAX_FRAMES_COUNT, handleX);
 }
 function* watchStartUiChannel() {
   yield takeLatest(START_UI_CHANNEL, handleStartUiChannel);
@@ -67,7 +84,6 @@ function* watchStartUiChannel() {
 function* rootSaga() {
   yield fork(watchStartAnimationInit);
   yield fork(watchStartUiChannel);
-  yield fork(watchX);
 }
 
 export default rootSaga;

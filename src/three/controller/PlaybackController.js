@@ -68,4 +68,9 @@ export class PlaybackController {
   set framesAmountToSkip(value) {
     this._framesAmountToSkip = value;
   }
+
+  resetPlayback() {
+    this.playbackDirection = PLAYBACK_DIRECTION_DEFAULT;
+    this.playbackSpeed = PLAYBACK_SPEED_DEFAULT;
+  }
 }

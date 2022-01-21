@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Grid} from '@mui/material';
+import {Box} from '@mui/material';
 import Visualization from '../Animation';
 import AppDrawer from './components/Drawer';
 import {AppBar} from './components/AppBar';

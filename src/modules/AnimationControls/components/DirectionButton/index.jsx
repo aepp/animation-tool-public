@@ -36,7 +36,8 @@ export const DirectionButton = ({playbackDirection}) => {
           payload: {playbackDirection}
         })
       }
-      disabled={!isPlaying || !isInitialized}>
+      disabled={!isPlaying || !isInitialized}
+    >
       {playbackDirection === PLAYBACK_DIRECTION_DEFAULT ? (
         <FastForwardIcon />
       ) : (
@@ -59,7 +60,8 @@ export const DirectionButton = ({playbackDirection}) => {
           horizontal:
             playbackDirection === PLAYBACK_DIRECTION_DEFAULT ? 'right' : 'left'
         }}
-        badgeContent={`x${PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx]}`}>
+        badgeContent={`x${PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx]}`}
+      >
         {button}
       </Badge>
     );

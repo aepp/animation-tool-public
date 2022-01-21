@@ -23,7 +23,7 @@
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
-    "prettier": "^2.4.1"
+    "prettier": "^2.5.1"
   },
   "scripts": {
     "dev": "NODE_ENV=development react-scripts start",

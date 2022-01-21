@@ -30,7 +30,8 @@ export const Visualization = () => {
         alignItems: 'center',
         justifyContent: 'center',
         '& canvas': {height: 'calc(100% - 64px)'}
-      }}>
+      }}
+    >
       {!isInitialized && (
         <Typography sx={{position: 'absolute'}}>Upload dataset...</Typography>
       )}

@@ -9,7 +9,8 @@ export const LoadingIndicator = () => (
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'
-    }}>
+    }}
+  >
     <CircularProgress color={'primary'} />
   </Box>
 );

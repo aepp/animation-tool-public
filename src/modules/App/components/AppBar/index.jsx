@@ -27,7 +27,8 @@ export const AppBar = () => {
               dispatch({type: SET_DRAWER_STATE, payload: {isDrawerOpen: true}})
             }
             edge='start'
-            sx={{mr: 2}}>
+            sx={{mr: 2}}
+          >
             <MenuIcon />
           </IconButton>
         )}
@@ -41,7 +42,8 @@ export const AppBar = () => {
             alignItems: 'center',
             justifyContent: 'center',
             width: '100%'
-          }}>
+          }}
+        >
           <PlaybackControls />
         </Box>
         <Box sx={{ml: 'auto'}}>

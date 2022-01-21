@@ -19,17 +19,6 @@ export class ThreeModel {
 
   _currentFrameIdx;
 
-  // feedback to the ui over redux-saga channel
-  _sendToUi = () => {};
-
-  get sendToUi() {
-    return this._sendToUi;
-  }
-
-  set sendToUi(value) {
-    this._sendToUi = value;
-  }
-
   set personsLineColor({personIdx, lineColor}) {
     this._colorsPerPerson[personIdx] = lineColor;
   }
@@ -43,7 +32,6 @@ export class ThreeModel {
       rootElement: document.body
     }
   ) {
-
     this._width = rootElement.clientWidth;
     this._height = rootElement.clientHeight;
   }

@@ -1,5 +1,5 @@
 import {createTheme} from '@mui/material/styles';
-import {BACKGROUND_COLOR, PRIMARY_COLOR, SECONDARY_COLOR} from './constants';
+import {PRIMARY_COLOR, SECONDARY_COLOR} from './constants';
 
 export const theme = createTheme({
   palette: {

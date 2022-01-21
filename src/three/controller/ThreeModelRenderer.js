@@ -14,15 +14,9 @@ import {
 import {ThreeModel} from './ThreeModel';
 import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls';
 import {PlaybackController} from './PlaybackController';
-import {
-  PLAYBACK_SPEED_DEFAULT,
-  PLAYBACK_DIRECTION_DEFAULT
-} from '../../constants';
+import {PLAYBACK_DIRECTION_DEFAULT} from '../../constants';
 import {BACKGROUND_COLOR} from '../../theme/constants';
-import {
-  UPDATE_CURRENT_FRAME_IDX,
-  UPDATE_MAX_FRAMES_COUNT
-} from '../../modules/Animation/actions/uiChannel';
+import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../modules/Animation/actions/uiChannel';
 
 export class ThreeModelRenderer extends PlaybackController {
   _rootElement;
@@ -91,17 +85,12 @@ export class ThreeModelRenderer extends PlaybackController {
 
   initFrames({framesPerPerson, framesCount, personIndices}) {
     this._threeModel.initFrames({framesPerPerson, framesCount, personIndices});
-    this.sendToUi({
-      type: UPDATE_MAX_FRAMES_COUNT,
-      payload: {maxFramesCount: framesCount}
-    });
-
     return this;
   }
 
   asPoints() {
     for (const person of this._threeModel._framesPerPerson[
-      this._threeModel._currentFrameIdx
+      this.currentFrameIdx
     ]) {
       const vertices = person['points'].flat;
 
@@ -123,8 +112,7 @@ export class ThreeModelRenderer extends PlaybackController {
     return this;
   }
   asLines() {
-    const frame =
-      this._threeModel._framesPerPerson[this._threeModel._currentFrameIdx];
+    const frame = this._threeModel._framesPerPerson[this.currentFrameIdx];
     for (const person of frame) {
       const bodyLines = person['points'].bodyLines;
 
@@ -146,47 +134,57 @@ export class ThreeModelRenderer extends PlaybackController {
     return this;
   }
 
-  async animateFrames() {
+  async animationLoop() {
     await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
-    requestAnimationFrame(this.animateFrames.bind(this));
+    requestAnimationFrame(this.animationLoop.bind(this));
     this._controls.update();
-    this.renderFrame.call(this);
+    this.playAnimation.call(this);
     return this;
   }
 
-  renderFrame() {
+  playAnimation() {
     if (this.isPlaying) {
       if (this.playbackDirection === PLAYBACK_DIRECTION_DEFAULT) {
-        if (
-          this._threeModel._currentFrameIdx ===
-          this._threeModel._maxFramesCount - 1
-        ) {
-          this._threeModel._currentFrameIdx = -1;
+        if (this.currentFrameIdx === this._threeModel._maxFramesCount - 1) {
+          this.currentFrameIdx = -1;
         }
-        this._threeModel._currentFrameIdx += 1;
+        this.currentFrameIdx += 1;
       } else {
-        if (this._threeModel._currentFrameIdx === 0) {
-          this._threeModel._currentFrameIdx = this._threeModel._maxFramesCount;
+        if (this.currentFrameIdx === 0) {
+          this.currentFrameIdx = this._threeModel._maxFramesCount;
         }
-        this._threeModel._currentFrameIdx -= 1;
+        this.currentFrameIdx -= 1;
       }
 
-      this._scene.clear();
-      this.asLines();
-      this.asPoints();
-
-      this.sendToUi({
-        type: UPDATE_CURRENT_FRAME_IDX,
-        payload: {currentFrameIdx: this._threeModel._currentFrameIdx}
-      });
+      this.renderCurrentFrame();
     }
+    return this;
+  }
+
+  renderCurrentFrame() {
+    this._scene.clear();
+    this.asLines();
+    this.asPoints();
+
+    this.sendToUi({
+      type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
+      payload: {currentFrameIdx: this.currentFrameIdx}
+    });
     this._renderer.render(this._scene, this._camera);
     return this;
   }
 
   reset() {
     this._renderer.resetState();
-    this.playbackDirection = PLAYBACK_DIRECTION_DEFAULT;
-    this.playbackSpeed = PLAYBACK_SPEED_DEFAULT;
+    this.resetPlayback();
+    return this;
+  }
+
+  set currentFrameIdx(frameIdx) {
+    this._threeModel._currentFrameIdx = frameIdx;
+  }
+
+  get currentFrameIdx() {
+    return this._threeModel._currentFrameIdx;
   }
 }
