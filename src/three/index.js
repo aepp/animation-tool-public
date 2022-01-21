@@ -9,7 +9,7 @@ async function main({dataSet, rootElement, threeInstance}) {
     console.log('pre-process finished! rendering...');
 
     if (threeInstance) {
-      threeInstance._renderer.resetState();
+      threeInstance.reset();
     } else {
       threeInstance = new ThreeModelRenderer({rootElement});
     }
@@ -20,8 +20,7 @@ async function main({dataSet, rootElement, threeInstance}) {
         framesPerPerson,
         framesCount: framesPerPerson.length,
         personIndices
-      })
-      .animateFrames();
+      });
   });
 }
 main.propTypes = {

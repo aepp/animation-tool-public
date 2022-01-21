@@ -9,12 +9,13 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import MenuIcon from '@mui/icons-material/Menu';
 import AppControls from '../../../AppControls';
-import {selectIsVisualizationInitialized} from '../../../Visualization/reducers';
+import {selectIsAnimationInitialized} from '../../../Animation/reducers';
 import {SET_DRAWER_STATE} from '../../actions';
+import PlaybackControls from '../../../AnimationControls/components/Playback';
 
 export const AppBar = () => {
   const dispatch = useDispatch();
-  const isInitialized = useSelector(selectIsVisualizationInitialized);
+  const isInitialized = useSelector(selectIsAnimationInitialized);
   return (
     <MuiAppBar>
       <Toolbar>
@@ -33,7 +34,17 @@ export const AppBar = () => {
         <Typography variant='h6' noWrap component='div'>
           Animation tool
         </Typography>
-        <Box sx={{marginLeft: 'auto'}}>
+        <Box
+          sx={{
+            position: 'absolute',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%'
+          }}>
+          <PlaybackControls />
+        </Box>
+        <Box sx={{ml: 'auto'}}>
           <AppControls />
         </Box>
       </Toolbar>

@@ -1,14 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
+import {GlobalStyles} from '@mui/material';
+import {ThemeProvider} from '@mui/material/styles';
 import App from './modules/App';
 import {store, sagaMiddleware} from './store';
 import rootSaga from './rootSaga';
+import {theme} from './theme/muiTheme';
+import {BACKGROUND_COLOR} from './theme/constants';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <ThemeProvider theme={theme}>
+        <GlobalStyles styles={{body: {backgroundColor: BACKGROUND_COLOR}}} />
+        <App />
+      </ThemeProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
