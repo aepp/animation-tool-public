@@ -19,6 +19,55 @@ export class ThreeModel {
 
   _currentFrameIdx;
 
+  constructor(
+    {rootElement} = {
+      rootElement: document.body
+    }
+  ) {
+    this.width = rootElement.clientWidth;
+    this.height = rootElement.clientHeight;
+  }
+
+  get framesPerPerson() {
+    return this._framesPerPerson;
+  }
+
+  set framesPerPerson(value) {
+    this._framesPerPerson = value;
+  }
+
+  get maxFramesCount() {
+    return this._maxFramesCount;
+  }
+
+  set maxFramesCount(value) {
+    this._maxFramesCount = value;
+  }
+
+  get currentFrameIdx() {
+    return this._currentFrameIdx;
+  }
+
+  set currentFrameIdx(value) {
+    this._currentFrameIdx = value;
+  }
+
+  get width() {
+    return this._width;
+  }
+
+  set width(value) {
+    this._width = value;
+  }
+
+  get height() {
+    return this._height;
+  }
+
+  set height(value) {
+    this._height = value;
+  }
+
   set personsLineColor({personIdx, lineColor}) {
     this._colorsPerPerson[personIdx] = lineColor;
   }
@@ -27,21 +76,24 @@ export class ThreeModel {
     return this._personIndices;
   }
 
-  constructor(
-    {rootElement} = {
-      rootElement: document.body
-    }
-  ) {
-    this._width = rootElement.clientWidth;
-    this._height = rootElement.clientHeight;
+  set personIndices(value) {
+    this._personIndices = value;
+  }
+
+  get colorsPerPerson() {
+    return this._colorsPerPerson;
+  }
+
+  set colorsPerPerson(value) {
+    this._colorsPerPerson = value;
   }
 
   initFrames({framesPerPerson, framesCount, personIndices}) {
-    this._framesPerPerson = framesPerPerson;
-    this._currentFrameIdx = -1;
-    this._maxFramesCount = framesCount;
-    this._personIndices = personIndices;
-    this._colorsPerPerson = personIndices.reduce(
+    this.framesPerPerson = framesPerPerson;
+    this.currentFrameIdx = -1;
+    this.maxFramesCount = framesCount;
+    this.personIndices = personIndices;
+    this.colorsPerPerson = personIndices.reduce(
       (colors, personIdx) => ({...colors, [personIdx]: getRandomColor()}),
       {}
     );

@@ -36,6 +36,69 @@ export class ThreeModelRenderer extends PlaybackController {
   // feedback to the ui over redux-saga channel
   _sendToUi = () => {};
 
+  constructor(
+    {rootElement} = {
+      rootElement: document.body
+    }
+  ) {
+    super();
+    this.rootElement = rootElement;
+    this.threeModel = new ThreeModel({rootElement});
+
+    this.renderer = new WebGLRenderer();
+    this.renderer.setSize(this.threeModel.width, this.threeModel.height);
+    this.rootElement.appendChild(this.renderer.domElement);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+  }
+
+  get scene() {
+    return this._scene;
+  }
+
+  set scene(value) {
+    this._scene = value;
+  }
+
+  get camera() {
+    return this._camera;
+  }
+
+  set camera(value) {
+    this._camera = value;
+  }
+
+  get controls() {
+    return this._controls;
+  }
+
+  set controls(value) {
+    this._controls = value;
+  }
+
+  get rootElement() {
+    return this._rootElement;
+  }
+
+  set rootElement(value) {
+    this._rootElement = value;
+  }
+
+  get renderer() {
+    return this._renderer;
+  }
+
+  set renderer(value) {
+    this._renderer = value;
+  }
+
+  get threeModel() {
+    return this._threeModel;
+  }
+
+  set threeModel(value) {
+    this._threeModel = value;
+  }
+
   get sendToUi() {
     return this._sendToUi;
   }
@@ -44,52 +107,37 @@ export class ThreeModelRenderer extends PlaybackController {
     this._sendToUi = value;
   }
 
-  constructor(
-    {rootElement} = {
-      rootElement: document.body
-    }
-  ) {
-    super();
-    this._rootElement = rootElement;
-    this._threeModel = new ThreeModel({rootElement});
-
-    this._renderer = new WebGLRenderer();
-    this._renderer.setSize(this._threeModel._width, this._threeModel._height);
-    this._rootElement.appendChild(this._renderer.domElement);
-    this._renderer.setPixelRatio(window.devicePixelRatio);
-  }
-
   init() {
-    this._scene = new Scene();
-    this._scene.background = new Color(BACKGROUND_COLOR);
+    this.scene = new Scene();
+    this.scene.background = new Color(BACKGROUND_COLOR);
 
-    this._camera = new PerspectiveCamera(
+    this.camera = new PerspectiveCamera(
       75,
-      this._threeModel._width / this._threeModel._height,
+      this.threeModel.width / this.threeModel.height,
       1,
       500
     );
-    this._camera.position.set(20, 0, 100);
-    this._camera.lookAt(50, 0, 0);
+    this.camera.position.set(20, 0, 100);
+    this.camera.lookAt(50, 0, 0);
 
-    this._controls = new TrackballControls(
-      this._camera,
-      this._renderer.domElement
+    this.controls = new TrackballControls(
+      this.camera,
+      this.renderer.domElement
     );
-    this._controls.rotateSpeed = 10;
-    this._controls.minDistance = 100;
-    this._controls.maxDistance = 500;
+    this.controls.rotateSpeed = 10;
+    this.controls.minDistance = 100;
+    this.controls.maxDistance = 500;
 
     return this;
   }
 
   initFrames({framesPerPerson, framesCount, personIndices}) {
-    this._threeModel.initFrames({framesPerPerson, framesCount, personIndices});
+    this.threeModel.initFrames({framesPerPerson, framesCount, personIndices});
     return this;
   }
 
   asPoints() {
-    for (const person of this._threeModel._framesPerPerson[
+    for (const person of this.threeModel.framesPerPerson[
       this.currentFrameIdx
     ]) {
       const vertices = person['points'].flat;
@@ -107,17 +155,17 @@ export class ThreeModelRenderer extends PlaybackController {
 
       const points = new Points(geometry, material);
 
-      this._scene.add(points);
+      this.scene.add(points);
     }
     return this;
   }
   asLines() {
-    const frame = this._threeModel._framesPerPerson[this.currentFrameIdx];
+    const frame = this.threeModel.framesPerPerson[this.currentFrameIdx];
     for (const person of frame) {
       const bodyLines = person['points'].bodyLines;
 
       const material = new LineBasicMaterial({
-        color: this._threeModel._colorsPerPerson[person.personIdx]
+        color: this.threeModel.colorsPerPerson[person.personIdx]
       });
 
       for (const bodyLine of bodyLines) {
@@ -128,7 +176,7 @@ export class ThreeModelRenderer extends PlaybackController {
         }
         geometry.setFromPoints(points);
         const line = new Line(geometry, material);
-        this._scene.add(line);
+        this.scene.add(line);
       }
     }
     return this;
@@ -137,7 +185,7 @@ export class ThreeModelRenderer extends PlaybackController {
   async animationLoop() {
     await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
     requestAnimationFrame(this.animationLoop.bind(this));
-    this._controls.update();
+    this.controls.update();
     this.playAnimation.call(this);
     return this;
   }
@@ -145,13 +193,13 @@ export class ThreeModelRenderer extends PlaybackController {
   playAnimation() {
     if (this.isPlaying) {
       if (this.playbackDirection === PLAYBACK_DIRECTION_DEFAULT) {
-        if (this.currentFrameIdx === this._threeModel._maxFramesCount - 1) {
+        if (this.currentFrameIdx === this.threeModel.maxFramesCount - 1) {
           this.currentFrameIdx = -1;
         }
         this.currentFrameIdx += 1;
       } else {
         if (this.currentFrameIdx === 0) {
-          this.currentFrameIdx = this._threeModel._maxFramesCount;
+          this.currentFrameIdx = this.threeModel.maxFramesCount;
         }
         this.currentFrameIdx -= 1;
       }
@@ -162,7 +210,7 @@ export class ThreeModelRenderer extends PlaybackController {
   }
 
   renderCurrentFrame() {
-    this._scene.clear();
+    this.scene.clear();
     this.asLines();
     this.asPoints();
 
@@ -170,21 +218,21 @@ export class ThreeModelRenderer extends PlaybackController {
       type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
       payload: {currentFrameIdx: this.currentFrameIdx}
     });
-    this._renderer.render(this._scene, this._camera);
+    this.renderer.render(this.scene, this.camera);
     return this;
   }
 
   reset() {
-    this._renderer.resetState();
+    this.renderer.resetState();
     this.resetPlayback();
     return this;
   }
 
   set currentFrameIdx(frameIdx) {
-    this._threeModel._currentFrameIdx = frameIdx;
+    this.threeModel.currentFrameIdx = frameIdx;
   }
 
   get currentFrameIdx() {
-    return this._threeModel._currentFrameIdx;
+    return this.threeModel.currentFrameIdx;
   }
 }
