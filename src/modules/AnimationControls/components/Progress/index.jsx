@@ -7,9 +7,7 @@ import {
 } from '../../../Animation/reducers';
 import {UPDATE_CURRENT_FRAME_IDX_TO_THREE} from '../../actions';
 
-function valuetext(value) {
-  return value; //`${value}°C`;
-}
+const valuetext = frameIdx => `Frame ${frameIdx}`;
 
 export const Progress = () => {
   const dispatch = useDispatch();
@@ -21,15 +19,18 @@ export const Progress = () => {
       display={'flex'}
       alignItems={'center'}
       justifyContent={'center'}
-      sx={{mx: 2}}
-    >
+      sx={{mx: 2}}>
       <Divider orientation={'vertical'} sx={{mr: 2}} flexItem />
       <Box sx={{width: 300}} display={'flex'} flexDirection={'column'}>
+        <FormHelperText sx={{ml: 'auto'}}>
+          Frame&nbsp;{currentFrameIdx}&nbsp;of&nbsp;{framesCount - 1}
+        </FormHelperText>
         <Slider
           color={'secondary'}
           aria-label='Animation progress'
           getAriaValueText={valuetext}
           valueLabelDisplay='auto'
+          valueLabelFormat={valuetext}
           step={Math.floor(framesCount / 200)}
           min={0}
           max={framesCount - 1}
@@ -41,9 +42,6 @@ export const Progress = () => {
             })
           }
         />
-        <FormHelperText>
-          Frame&nbsp;{currentFrameIdx}&nbsp;of&nbsp;{framesCount - 1}
-        </FormHelperText>
       </Box>
     </Box>
   );
