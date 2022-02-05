@@ -1,0 +1,18 @@
+export const BEGIN_WARM_UP_MODEL = 'recording/BEGIN_WARM_UP_MODEL';
+export const FINISH_WARM_UP_MODEL = 'recording/FINISH_WARM_UP_MODEL';
+
+export const SET_HAS_DETECTION_STARTED = 'recording/SET_HAS_DETECTION_STARTED';
+export const SET_DETECTION_STATUS = 'recording/SET_DETECTION_STATUS';
+export const START_DETECTION = 'recording/START_DETECTION';
+export const PAUSE_DETECTION = 'recording/PAUSE_DETECTION';
+export const END_DETECTION = 'recording/END_DETECTION';
+export const ADD_DETECTED_POSE = 'recording/ADD_DETECTED_POSE';
+
+export const VIDEO_PLAYBACK_START = 'recording/VIDEO_PLAYBACK_START';
+export const VIDEO_PLAYBACK_PAUSE = 'recording/VIDEO_PLAYBACK_PAUSE';
+export const VIDEO_PLAYBACK_END = 'recording/VIDEO_PLAYBACK_ENDED';
+export const SET_IS_VIDEO_PLAYING = 'recording/SET_IS_VIDEO_PLAYING';
+export const SET_RECORDING_INTERVAL_ID = 'recording/SET_RECORDING_INTERVAL_ID';
+
+export const DOWNLOAD_DETECTION_RESULTS =
+  'recording/DOWNLOAD_DETECTION_RESULTS';

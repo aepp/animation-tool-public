@@ -4,7 +4,7 @@ import {
   SET_IS_PLAYING,
   RESET_PLAYBACK_SPEED_AND_DIRECTION
 } from '../actions';
-import {PLAYBACK_DIRECTION_DEFAULT} from '../../../constants';
+import {PLAYBACK_DIRECTION_DEFAULT} from '../../../../../constants';
 
 export const reducerKey = 'animationControls';
 

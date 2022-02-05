@@ -10,7 +10,7 @@ import {
   PLAYBACK_DIRECTION_DEFAULT,
   PLAYBACK_DIRECTION_REVERSE,
   PLAYBACK_SPEEDS
-} from '../../../../constants';
+} from '../../../../../../constants';
 import {selectIsAnimationInitialized} from '../../../Animation/reducers';
 import {CHANGE_PLAYBACK_SPEED} from '../../actions';
 import {

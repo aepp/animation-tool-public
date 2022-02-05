@@ -1,8 +1,8 @@
 import React from 'react';
 import {Drawer} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
-import AnimationControls from '../../../AnimationControls';
-import {selectIsAnimationInitialized} from '../../../Animation/reducers';
+import AnimationControls from '../../../../views/Animation/modules/AnimationControls';
+import {selectIsAnimationInitialized} from '../../../../views/Animation/modules/Animation/reducers';
 import {selectIsDrawerOpen} from '../../reducers';
 import {SET_DRAWER_STATE} from '../../actions';
 
@@ -17,9 +17,7 @@ export const AppDrawer = () => {
       onClose={() =>
         dispatch({type: SET_DRAWER_STATE, payload: {isDrawerOpen: false}})
       }
-    >
-      {isInitialized && <AnimationControls />}
-    </Drawer>
+    ></Drawer>
   );
 };
 

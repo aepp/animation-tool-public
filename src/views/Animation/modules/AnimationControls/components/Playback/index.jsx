@@ -11,7 +11,7 @@ import {selectIsPlaying} from '../../reducers';
 import {
   PLAYBACK_DIRECTION_DEFAULT,
   PLAYBACK_DIRECTION_REVERSE
-} from '../../../../constants';
+} from '../../../../../../constants';
 import DirectionButton from '../DirectionButton';
 import Progress from '../Progress';
 

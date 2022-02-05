@@ -3,6 +3,7 @@ import {SET_DRAWER_STATE} from '../actions';
 export const reducerKey = 'app';
 
 const defaultState = {
+  withAppBar: true,
   isDrawerOpen: false
 };
 const r = (state = defaultState, action) => {
@@ -20,3 +21,4 @@ const r = (state = defaultState, action) => {
 export default r;
 
 export const selectIsDrawerOpen = state => state[reducerKey].isDrawerOpen;
+export const selectWithAppBar = state => state[reducerKey].withAppBar;

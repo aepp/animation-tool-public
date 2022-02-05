@@ -16,7 +16,7 @@ import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls';
 import {PlaybackController} from './PlaybackController';
 import {PLAYBACK_DIRECTION_DEFAULT} from '../../constants';
 import {BACKGROUND_COLOR} from '../../theme/constants';
-import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../modules/Animation/actions/uiChannel';
+import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../views/Animation/modules/Animation/actions/uiChannel';
 
 export class ThreeModelRenderer extends PlaybackController {
   _rootElement;

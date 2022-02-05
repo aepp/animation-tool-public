@@ -1,8 +1,8 @@
 import React from 'react';
 import {Button, styled} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
-import {SET_DATASET_FILE} from '../../actions';
-import {selectDataSetFileUrl} from '../../reducers';
+import {SET_DATASET_FILE} from './actions';
+import {selectDataSetFileUrl} from './reducers';
 
 const ID = 'upload-file__button';
 

@@ -14,7 +14,7 @@ import {
   PLAYBACK_DIRECTION_DEFAULT,
   PLAYBACK_DIRECTION_REVERSE,
   PLAYBACK_SPEEDS
-} from '../../../constants';
+} from '../../../../../constants';
 import {
   selectIsPlaying,
   selectPlaybackDirection,

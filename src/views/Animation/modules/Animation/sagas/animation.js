@@ -1,11 +1,11 @@
 import {eventChannel} from 'redux-saga';
 import {takeLatest, take, fork, select, call, put} from 'redux-saga/effects';
 import {FINISH_ANIMATION_INIT, START_ANIMATION_INIT} from '../actions';
-import {LOCAL_STORAGE_THREE_INSTANCE} from '../../../constants';
+import {LOCAL_STORAGE_THREE_INSTANCE} from '../../../../../constants';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
 import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
-import {preProcess} from '../../../three/util/preProcess';
-import {ThreeModelRenderer} from '../../../three/controller/ThreeModelRenderer';
+import {preProcess} from '../../../../../three/util/preProcess';
+import {ThreeModelRenderer} from '../../../../../three/controller/ThreeModelRenderer';
 
 const START_UI_CHANNEL = 'START_UI_CHANNEL';
 
