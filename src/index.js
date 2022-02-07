@@ -5,11 +5,11 @@ import {HashRouter} from 'react-router-dom';
 
 import {GlobalStyles} from '@mui/material';
 import {ThemeProvider} from '@mui/material/styles';
-import App from './modules/App';
-import {store, sagaMiddleware} from './store';
-import rootSaga from './rootSaga';
-import {theme} from './theme/muiTheme';
-import {BACKGROUND_COLOR} from './theme/constants';
+import App from './react/modules/App';
+import {store, sagaMiddleware} from './react/store';
+import rootSaga from './react/rootSaga';
+import {theme} from './react/theme/muiTheme';
+import {BACKGROUND_COLOR} from './react/theme/constants';
 
 ReactDOM.render(
   <React.StrictMode>
