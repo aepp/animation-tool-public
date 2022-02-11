@@ -1,20 +1,18 @@
 import {eventChannel} from 'redux-saga';
 import {takeLatest, take, fork, select, call, put} from 'redux-saga/effects';
-import {FINISH_ANIMATION_INIT, START_ANIMATION_INIT} from '../actions';
 import {
   DATA_SOURCE_KINECT,
   DATA_SOURCE_TF,
   LOCAL_STORAGE_THREE_INSTANCE
 } from '../../../../../../constants';
-import {selectDataSetFileUrl} from '../../Upload/reducers';
-import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
-import {preProcess} from '../../../../../../business/util/preProcess';
 import {AnimationController} from '../../../../../../business/controller/AnimationController';
 import {UNKNOWN_DATA_SOURCE} from '../../../../../../messages';
-import {RenderService3D} from '../../../../../../business/service/RenderService3D';
-import {RenderService2D} from '../../../../../../business/service/RenderService2D';
 import {LHLegacyProcessor} from '../../../../../../business/processor/LHLegacyProcessor';
 import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
+import {selectDataSetFileUrl} from '../../Upload/reducers';
+import {FINISH_ANIMATION_INIT, START_ANIMATION_INIT} from '../actions';
+
+import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
 
 const START_UI_CHANNEL = 'START_UI_CHANNEL';
 
@@ -73,7 +71,7 @@ function* handleStartAnimationInit(action) {
     default:
       throw new Error(UNKNOWN_DATA_SOURCE);
   }
-  const {framesPerPerson, personIndices} = yield call({
+  const {framesPerPerson, personIndices, extremes, normalization} = yield call({
     context: ProcessorInstance,
     fn: ProcessorInstance.preProcess
   });
@@ -87,10 +85,10 @@ function* handleStartAnimationInit(action) {
 
   const AnimationControllerInstance =
     window[LOCAL_STORAGE_THREE_INSTANCE] ||
-    new AnimationController({rootElement, dataSource});
+    new AnimationController({rootElement});
 
   AnimationControllerInstance.reset()
-    .init()
+    .init({dataSource, extremes, normalization})
     .initFrames({
       framesPerPerson,
       framesCount: framesPerPerson.length,

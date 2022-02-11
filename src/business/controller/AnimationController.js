@@ -1,18 +1,13 @@
 import {
-  LineBasicMaterial,
+  LineDashedMaterial,
   BufferGeometry,
   Line,
-  Points,
-  Float32BufferAttribute,
-  PointsMaterial,
   WebGLRenderer,
   Scene,
   Color,
-  PerspectiveCamera, Vector3
+  PerspectiveCamera,
+  Vector2
 } from 'three';
-import {ThreeModel} from './ThreeModel';
-import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls';
-import {PlaybackController} from './PlaybackController';
 import {
   DATA_SOURCE_KINECT,
   DATA_SOURCE_TF,
@@ -20,54 +15,189 @@ import {
 } from '../../constants';
 import {BACKGROUND_COLOR} from '../../react/theme/constants';
 import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../react/views/Animation/modules/Animation/actions/uiChannel';
+import {UNKNOWN_DATA_SOURCE} from '../../messages';
 import {RenderService3D} from '../service/RenderService3D';
 import {RenderService2D} from '../service/RenderService2D';
-import {UNKNOWN_DATA_SOURCE} from '../../messages';
+import {DatasetHelper} from './DatasetHelper';
+import {PlaybackController} from './PlaybackController';
 
 export class AnimationController extends PlaybackController {
   _rootElement;
 
   // three.js
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  _fov = 45;
+
   _renderer;
 
   _scene;
 
   _camera;
 
-  _controls;
+  /**
+   *
+   * @type {[]}
+   * @private
+   */
+  _currentFrameObjects = [];
 
-  // data
-  _threeModel;
+  // helper classes
+  _datasetHelper;
 
-  // helper class
   _renderService;
 
   // feedback to the ui over redux-saga channel
   _sendToUi = () => {};
 
   constructor(
-    {dataSource, rootElement} = {
+    {rootElement = document.body} = {
       rootElement: document.body
     }
   ) {
     super();
     this.rootElement = rootElement;
-    this.threeModel = new ThreeModel({rootElement});
+    this.datasetHelper = new DatasetHelper();
 
     this.renderer = new WebGLRenderer();
-    this.renderer.setSize(this.threeModel.width, this.threeModel.height);
+    this.renderer.setSize(rootElement.clientWidth, rootElement.clientHeight);
     this.rootElement.appendChild(this.renderer.domElement);
     this.renderer.setPixelRatio(window.devicePixelRatio);
+  }
+
+  init({dataSource, extremes, normalization}) {
+    this.scene = new Scene();
+    this.scene.background = new Color(BACKGROUND_COLOR);
+
+    console.log('normalization', normalization);
+    console.log('extremes', extremes);
+    const serviceParameters = {rootElement: this.rootElement, extremes, normalization};
     switch (dataSource) {
       case DATA_SOURCE_KINECT:
-        this._renderService = new RenderService3D();
+        this._renderService = new RenderService3D(serviceParameters);
         break;
       case DATA_SOURCE_TF:
-        this._renderService = new RenderService2D();
+        this._renderService = new RenderService2D(serviceParameters);
         break;
       default:
         throw new Error(UNKNOWN_DATA_SOURCE);
     }
+
+    this.camera = new PerspectiveCamera(
+      this.fov,
+      this.rootElement.clientWidth / this.rootElement.clientHeight,
+      0.1,
+      2
+    );
+    const camPos = this.renderService.getDefaultCameraPosition({fov: this.fov});
+console.log('camPos', camPos);
+    this.camera.position.set(...camPos);
+    this.camera.lookAt(...this.renderService.getDefaultCameraLookAt({fov: this.fov}));
+
+    const geometryFrame = new BufferGeometry();
+    const materialFrame = new LineDashedMaterial({
+      color: 0xff0000,
+      linewidth: 0.2,
+      scale: 1,
+      dashSize: 0.01,
+      gapSize: 0.01
+    });
+
+    const pointsFrame = [];
+
+    const BOTTOM_LEFT = [-1, -1];
+    const BOTTOM_RIGHT = [1, -1];
+    const TOP_RIGHT = [1, 1];
+    const TOP_LEFT = [-1, 1];
+
+    pointsFrame.push(new Vector2(...BOTTOM_LEFT));
+    pointsFrame.push(new Vector2(...BOTTOM_RIGHT));
+    pointsFrame.push(new Vector2(...TOP_RIGHT));
+    pointsFrame.push(new Vector2(...TOP_LEFT));
+    pointsFrame.push(new Vector2(...BOTTOM_LEFT));
+
+    geometryFrame.setFromPoints(pointsFrame);
+    const lineFrame = new Line(geometryFrame, materialFrame);
+    lineFrame.computeLineDistances();
+    this.scene.add(lineFrame);
+
+    return this;
+  }
+
+  initFrames({framesPerPerson, framesCount, personIndices}) {
+    this.datasetHelper.initFrames({
+      framesPerPerson,
+      framesCount,
+      personIndices
+    });
+    return this;
+  }
+
+  generateAnimationObjectsFromCurrentFrame() {
+    this.currentFrameObjects =
+      this.renderService.generateAnimationObjectsFromFrame({
+        frame: this.datasetHelper.framesPerPerson[this.currentFrameIdx]
+      });
+    return this;
+  }
+
+  async animationLoop() {
+    await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
+    requestAnimationFrame(this.animationLoop.bind(this));
+    this.playAnimation.call(this);
+    return this;
+  }
+
+  playAnimation() {
+    if (this.isPlaying) {
+      if (this.playbackDirection === PLAYBACK_DIRECTION_DEFAULT) {
+        if (this.currentFrameIdx === this.datasetHelper.maxFramesCount - 1) {
+          this.currentFrameIdx = -1;
+        }
+        this.currentFrameIdx += 1;
+      } else {
+        if (this.currentFrameIdx === 0) {
+          this.currentFrameIdx = this.datasetHelper.maxFramesCount;
+        }
+        this.currentFrameIdx -= 1;
+      }
+
+      this.renderCurrentFrame();
+    }
+    return this;
+  }
+
+  renderCurrentFrame() {
+    this.currentFrameObjects.forEach(o => this.scene.remove(o));
+    this.currentFrameObjects = [];
+
+    this.generateAnimationObjectsFromCurrentFrame();
+
+    this.currentFrameObjects.forEach(o => this.scene.add(o));
+
+    this.sendToUi({
+      type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
+      payload: {currentFrameIdx: this.currentFrameIdx}
+    });
+    this.renderer.render(this.scene, this.camera);
+    return this;
+  }
+
+  reset() {
+    this.renderer.resetState();
+    this.resetPlayback();
+    return this;
+  }
+
+  set currentFrameIdx(frameIdx) {
+    this.datasetHelper.currentFrameIdx = frameIdx;
+  }
+
+  get currentFrameIdx() {
+    return this.datasetHelper.currentFrameIdx;
   }
 
   get renderService() {
@@ -94,14 +224,6 @@ export class AnimationController extends PlaybackController {
     this._camera = value;
   }
 
-  get controls() {
-    return this._controls;
-  }
-
-  set controls(value) {
-    this._controls = value;
-  }
-
   get rootElement() {
     return this._rootElement;
   }
@@ -118,12 +240,12 @@ export class AnimationController extends PlaybackController {
     this._renderer = value;
   }
 
-  get threeModel() {
-    return this._threeModel;
+  get datasetHelper() {
+    return this._datasetHelper;
   }
 
-  set threeModel(value) {
-    this._threeModel = value;
+  set datasetHelper(value) {
+    this._datasetHelper = value;
   }
 
   get sendToUi() {
@@ -134,129 +256,19 @@ export class AnimationController extends PlaybackController {
     this._sendToUi = value;
   }
 
-  init() {
-    this.scene = new Scene();
-    this.scene.background = new Color(BACKGROUND_COLOR);
-
-    this.camera = new PerspectiveCamera(
-      75,
-      this.threeModel.width / this.threeModel.height,
-      1,
-      500
-    );
-    this.camera.position.set(20, 0, 100);
-    this.camera.lookAt(50, 0, 0);
-
-    this.controls = new TrackballControls(
-      this.camera,
-      this.renderer.domElement
-    );
-    this.controls.rotateSpeed = 10;
-    this.controls.minDistance = 100;
-    this.controls.maxDistance = 500;
-
-    return this;
+  get currentFrameObjects() {
+    return this._currentFrameObjects;
   }
 
-  initFrames({framesPerPerson, framesCount, personIndices}) {
-    this.threeModel.initFrames({framesPerPerson, framesCount, personIndices});
-    return this;
+  set currentFrameObjects(value) {
+    this._currentFrameObjects = value;
   }
 
-  asPoints() {
-    for (const person of this.threeModel.framesPerPerson[
-      this.currentFrameIdx
-    ]) {
-      const vertices = person['points'].flat;
-
-      const geometry = new BufferGeometry();
-
-      this.renderService.createPoint({geometry, vertices});
-
-      const material = new PointsMaterial({size: 1, color: 0xff3333});
-
-      // const mesh = new Mesh( geometry, material );
-
-      const points = new Points(geometry, material);
-
-      this.scene.add(points);
-    }
-    return this;
-  }
-  asLines() {
-    const frame = this.threeModel.framesPerPerson[this.currentFrameIdx];
-    for (const person of frame) {
-      const bodyLines = person['points'].bodyLines;
-
-      const material = new LineBasicMaterial({
-        color: this.threeModel.colorsPerPerson[person.personIdx]
-      });
-
-      for (const bodyLine of bodyLines) {
-        const geometry = new BufferGeometry();
-        const points = [];
-        for (const point of bodyLine) {
-          points.push(new Vector3(point.x, point.y, point.z));
-        }
-        geometry.setFromPoints(points);
-        const line = new Line(geometry, material);
-        this.scene.add(line);
-      }
-    }
-    return this;
+  get fov() {
+    return this._fov;
   }
 
-  async animationLoop() {
-    await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
-    requestAnimationFrame(this.animationLoop.bind(this));
-    this.controls.update();
-    this.playAnimation.call(this);
-    return this;
-  }
-
-  playAnimation() {
-    if (this.isPlaying) {
-      if (this.playbackDirection === PLAYBACK_DIRECTION_DEFAULT) {
-        if (this.currentFrameIdx === this.threeModel.maxFramesCount - 1) {
-          this.currentFrameIdx = -1;
-        }
-        this.currentFrameIdx += 1;
-      } else {
-        if (this.currentFrameIdx === 0) {
-          this.currentFrameIdx = this.threeModel.maxFramesCount;
-        }
-        this.currentFrameIdx -= 1;
-      }
-
-      this.renderCurrentFrame();
-    }
-    return this;
-  }
-
-  renderCurrentFrame() {
-    this.scene.clear();
-    this.asLines();
-    this.asPoints();
-
-    this.sendToUi({
-      type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
-      payload: {currentFrameIdx: this.currentFrameIdx}
-    });
-    this.renderer.render(this.scene, this.camera);
-    return this;
-  }
-
-  reset() {
-    this.renderer.resetState();
-    this.resetPlayback();
-    return this;
-  }
-
-  set currentFrameIdx(frameIdx) {
-    this.threeModel.currentFrameIdx = frameIdx;
-  }
-
-  get currentFrameIdx() {
-    return this.threeModel.currentFrameIdx;
+  set fov(value) {
+    this._fov = value;
   }
 }

@@ -1,15 +1,15 @@
 import {IDataSetProcessor} from './IDataSetProcessor';
 
 export class LHLegacyProcessor extends IDataSetProcessor {
-  _frames;
+  _personIndices = [];
 
-  _suffixes = {
-    x: '_X',
-    y: '_Y',
-    z: '_Z'
+  _vectorComponents = {
+    x: 'X',
+    y: 'Y',
+    z: 'Z'
   };
 
-  _keyPoints = {
+  _jointNames = {
     AnkleRight: 'Ankle_Right',
     AnkleLeft: 'Ankle_Left',
     ElbowRight: 'Elbow_Right',
@@ -30,71 +30,45 @@ export class LHLegacyProcessor extends IDataSetProcessor {
 
   _bodyLinesScheme = [
     [
-      this.keyPoints.AnkleLeft,
-      this.keyPoints.AnkleLeft.replaceAll('_', ''),
-      this.keyPoints.HipLeft,
-      this.keyPoints.HipLeft.replaceAll('_', ''),
-      this.keyPoints.HipRight,
-      this.keyPoints.HipRight.replaceAll('_', ''),
-      this.keyPoints.AnkleRight,
-      this.keyPoints.AnkleRight.replaceAll('_', '')
+      this.jointNames.AnkleLeft,
+      this.jointNames.AnkleLeft.replaceAll('_', ''),
+      this.jointNames.HipLeft,
+      this.jointNames.HipLeft.replaceAll('_', ''),
+      this.jointNames.HipRight,
+      this.jointNames.HipRight.replaceAll('_', ''),
+      this.jointNames.AnkleRight,
+      this.jointNames.AnkleRight.replaceAll('_', '')
     ],
     [
-      this.keyPoints.HandLeftTip,
-      this.keyPoints.HandLeftTip.replaceAll('_', ''),
-      this.keyPoints.HandLeft,
-      this.keyPoints.HandLeft.replaceAll('_', ''),
-      this.keyPoints.ElbowLeft,
-      this.keyPoints.ElbowLeft.replaceAll('_', ''),
-      this.keyPoints.ShoulderLeft,
-      this.keyPoints.ShoulderLeft.replaceAll('_', ''),
-      this.keyPoints.SpineShoulder,
-      this.keyPoints.SpineShoulder.replaceAll('_', ''),
-      this.keyPoints.ShoulderRight,
-      this.keyPoints.ShoulderRight.replaceAll('_', ''),
-      this.keyPoints.ElbowRight,
-      this.keyPoints.ElbowRight.replaceAll('_', ''),
-      this.keyPoints.HandRight,
-      this.keyPoints.HandRight.replaceAll('_', ''),
-      this.keyPoints.HandRightTip,
-      this.keyPoints.HandRightTip.replaceAll('_', '')
+      this.jointNames.HandLeftTip,
+      this.jointNames.HandLeftTip.replaceAll('_', ''),
+      this.jointNames.HandLeft,
+      this.jointNames.HandLeft.replaceAll('_', ''),
+      this.jointNames.ElbowLeft,
+      this.jointNames.ElbowLeft.replaceAll('_', ''),
+      this.jointNames.ShoulderLeft,
+      this.jointNames.ShoulderLeft.replaceAll('_', ''),
+      this.jointNames.SpineShoulder,
+      this.jointNames.SpineShoulder.replaceAll('_', ''),
+      this.jointNames.ShoulderRight,
+      this.jointNames.ShoulderRight.replaceAll('_', ''),
+      this.jointNames.ElbowRight,
+      this.jointNames.ElbowRight.replaceAll('_', ''),
+      this.jointNames.HandRight,
+      this.jointNames.HandRight.replaceAll('_', ''),
+      this.jointNames.HandRightTip,
+      this.jointNames.HandRightTip.replaceAll('_', '')
     ],
     [
-      this.keyPoints.Head,
-      this.keyPoints.SpineShoulder,
-      this.keyPoints.SpineShoulder.replaceAll('_', ''),
-      this.keyPoints.SpineMid,
-      this.keyPoints.SpineMid.replaceAll('_', ''),
-      this.keyPoints.HipMid,
-      this.keyPoints.HipMid.replaceAll('_', '')
+      this.jointNames.Head,
+      this.jointNames.SpineShoulder,
+      this.jointNames.SpineShoulder.replaceAll('_', ''),
+      this.jointNames.SpineMid,
+      this.jointNames.SpineMid.replaceAll('_', ''),
+      this.jointNames.HipMid,
+      this.jointNames.HipMid.replaceAll('_', '')
     ]
   ];
-
-
-  constructor({frames}) {
-    super();
-    this._frames = frames;
-  }
-
-  get keyPoints() {
-    return this._keyPoints;
-  }
-
-  get bodyLinesScheme() {
-    return this._bodyLinesScheme;
-  }
-
-  get suffixes() {
-    return this._suffixes;
-  }
-
-  get frames() {
-    return this._frames;
-  }
-
-  set frames(value) {
-    this._frames = value;
-  }
 
   notEmptyFrame = allPersonsPoints => {
     // e.g. allPersonsPoints = [{...points of person 1}, {...points of person 2}, ...]
@@ -106,43 +80,68 @@ export class LHLegacyProcessor extends IDataSetProcessor {
         false
       )
     );
-  }
+  };
 
   preProcess = () => {
-    console.log('personIndices');
-    const personIndices = this.getPersonIndices();
-    // return frames.slice(1000, 1005).map((frame) => {
-    return new Promise(resolve => resolve({
-      framesPerPerson: this.frames
-        // .slice(4127, 4129)
-        .map(frame => this.processFrame({frame, personIndices}))
-        .filter(this.notEmptyFrame),
-      personIndices
-    }));
-  }
+    this.determinePersonIndices();
+    let framesPerPerson = this.frames
+      .map(this.processFrame)
+      .filter(this.notEmptyFrame);
 
-  getPersonIndices() {
-    const personIndices = [];
+    this.calculateNormalScaleFactor3D();
+    this.calculateTranslations();
+
+    framesPerPerson = framesPerPerson.map(personsFrames =>
+      personsFrames.map(frame => {
+        return {
+          ...frame,
+          points: {
+            ...frame.points,
+            bodyLines: frame.points.bodyLines.map(bodyLine =>
+              bodyLine.map(point => {
+                return {
+                  ...point,
+                  x: (point.x - this.translateX) / this.normalScaleFactor - 0.5,
+                  y: (point.y - this.translateY) / this.normalScaleFactor - 0.5,
+                  z: (point.z - this.translateZ) / this.normalScaleFactor
+                };
+              })
+            )
+          }
+        };
+      })
+    );
+    return new Promise(resolve =>
+      resolve({
+        framesPerPerson,
+        personIndices: this.personIndices,
+        extremes: this.extremes,
+        normalization: {
+          scaleFactor: this.normalScaleFactor,
+          translateX: this.translateX,
+          translateY: this.translateY,
+          translateZ: this.translateZ
+        }
+      })
+    );
+  };
+
+  determinePersonIndices() {
     this.frames.map(f =>
       Object.keys(f.frameAttributes).forEach(attributeKey => {
         const idx = Number((attributeKey.match(/^[\d]/) || [])[0] || 0);
-        personIndices[idx] = idx;
+        this.personIndices[idx] = idx;
       })
     );
-    return personIndices;
   }
 
-  filterAttributes(l) {
-    l.toLowerCase().localeCompare('Volume'.toLowerCase());
-  }
+  filterAttributes = l => l.toLowerCase().localeCompare('Volume'.toLowerCase());
 
-  scale = n => n * 30;
+  processFrame = frame => {
+    const frameJoints = frame.frameAttributes;
+    this.setHipMidPoint({frameJoints});
 
-  processFrame({frame, personIndices}) {
-    const attributes = frame.frameAttributes;
-    this.setHipMidPoint({attributes, personIndices});
-
-    const pointLabels = Object.keys(attributes)
+    const jointNames = Object.keys(frameJoints)
       .map(l =>
         l
           .replace(this.endsWithSingleCharacterAndUnderscoreRegex, '')
@@ -157,10 +156,10 @@ export class LHLegacyProcessor extends IDataSetProcessor {
       }, []);
 
     const pointsPerPerson = [];
-    for (const personIdx of personIndices) {
+    for (const personIdx of this.personIndices) {
       const points = this.getSingleFramePointsForPerson({
-        attributes,
-        pointLabels,
+        frameJoints,
+        jointNames,
         personIdx
       });
 
@@ -170,81 +169,107 @@ export class LHLegacyProcessor extends IDataSetProcessor {
         points
       });
     }
-    // console.log(attributes);
-    return pointsPerPerson;
-  }
 
-  setHipMidPoint({attributes, personIndices}) {
-    for (const personIdx of personIndices) {
-      attributes[`${personIdx}_${this.keyPoints.HipMid}${this.suffixes.x}`] =
-        (this.getUnsureAttributeValue({
-          attributes,
+    return pointsPerPerson;
+  };
+
+  setHipMidPoint = ({frameJoints}) => {
+    for (const personIdx of this.personIndices) {
+      // set hip_mid x coordinate by determining the distance between hip_left and hip_right vectors
+      frameJoints[
+        `${personIdx}_${this.jointNames.HipMid}_${this.vectorComponents.x}`
+      ] =
+        (this.getJointVectorComponent({
+          frameJoints,
           personIdx,
-          pointLabel: this.keyPoints.HipLeft,
-          suffix: this.suffixes.x
+          jointName: this.jointNames.HipLeft,
+          vectorComponent: this.vectorComponents.x
         }) +
-          this.getUnsureAttributeValue({
-            attributes,
+          this.getJointVectorComponent({
+            frameJoints,
             personIdx,
-            pointLabel: this.keyPoints.HipRight,
-            suffix: this.suffixes.x
+            jointName: this.jointNames.HipRight,
+            vectorComponent: this.vectorComponents.x
           })) /
         2;
-      attributes[`${personIdx}_${this.keyPoints.HipMid}${this.suffixes.y}`] =
-        (this.getUnsureAttributeValue({
-          attributes,
+      // set hip_mid y coordinate by determining the distance between hip_left and hip_right vectors
+      frameJoints[
+        `${personIdx}_${this.jointNames.HipMid}_${this.vectorComponents.y}`
+      ] =
+        (this.getJointVectorComponent({
+          frameJoints,
           personIdx,
-          pointLabel: this.keyPoints.HipLeft,
-          suffix: this.suffixes.y
+          jointName: this.jointNames.HipLeft,
+          vectorComponent: this.vectorComponents.y
         }) +
-          this.getUnsureAttributeValue({
-            attributes,
+          this.getJointVectorComponent({
+            frameJoints,
             personIdx,
-            pointLabel: this.keyPoints.HipRight,
-            suffix: this.suffixes.y
+            jointName: this.jointNames.HipRight,
+            vectorComponent: this.vectorComponents.y
           })) /
         2;
-      attributes[`${personIdx}_${this.keyPoints.HipMid}${this.suffixes.z}`] =
-        (this.getUnsureAttributeValue({
-          attributes,
+      // set hip_mid z coordinate by determining the distance between hip_left and hip_right vectors
+      frameJoints[
+        `${personIdx}_${this.jointNames.HipMid}_${this.vectorComponents.z}`
+      ] =
+        (this.getJointVectorComponent({
+          frameJoints,
           personIdx,
-          pointLabel: this.keyPoints.HipLeft,
-          suffix: this.suffixes.z
+          jointName: this.jointNames.HipLeft,
+          vectorComponent: this.vectorComponents.z
         }) +
-          this.getUnsureAttributeValue({
-            attributes,
+          this.getJointVectorComponent({
+            frameJoints,
             personIdx,
-            pointLabel: this.keyPoints.HipRight,
-            suffix: this.suffixes.z
+            jointName: this.jointNames.HipRight,
+            vectorComponent: this.vectorComponents.z
           })) /
         2;
     }
 
-    return attributes;
-  }
+    return frameJoints;
+  };
 
-  getUnsureAttributeValue({attributes, personIdx, pointLabel, suffix}) {
-    return [pointLabel, pointLabel.replaceAll('_', '')].reduce(
+  /**
+   * To support multiple input formats, this method tries CameCase and underscore-separated joint name styles.
+   * Furthermore "person index"-prefixed names and those index-less are considered as well.
+   * Therefore the supported formats are:
+   *    - {personIdx: Number}_BodyPart{vectorComponent: X | Y | Z} (e.g. 0_Hand_Right_X)
+   *    - {personIdx: Number}_Body_Part{vectorComponent: _X | _Y | _Z} (e.g. 0_HandRightX)
+   *    - BodyPart{vectorComponent: X | Y | Z} (e.g.Hand_Right_X)
+   *    - Body_Part{vectorComponent: _X | _Y | _Z} (e.g. HandRightX)
+   *
+   * @param {object} frameJoints all joint points of teh current frame
+   *        (e.g. {Ankle_Left_X: ..., Left_Arm_Y: ... etc.} or prefixed with person index {0_Ankle_Left_X: ..., _3_Left_Arm_Y: ... etc.})
+   * @param {number} personIdx index of a person the point is required from
+   *        (e.g. 0, 1, 2, 3 etc.)
+   * @param {string} jointName name of the joint the coordinate is required from
+   *        (one of this._keyPoints, e.g. "Ankle_Left", "Hand_Right" etc.)
+   * @param {string} vectorComponent represents the required vector component of the point
+   *        (one of this._suffix, e.g. {"x" | "y" | "z"})
+   * @returns {number} single vector component of the joint as a number if joint exists or NaN otherwise
+   */
+  getJointVectorComponent = ({
+    frameJoints,
+    jointName,
+    vectorComponent,
+    personIdx
+  }) => {
+    return [jointName, jointName.replaceAll('_', '')].reduce(
       (v, label) =>
-        this.getKnownAttributeValue({
-          attributes,
-          personIdx,
-          pointLabel: label,
-          suffix
-        }),
+        v ||
+        Number(
+          frameJoints[`${personIdx}_${label}_${vectorComponent}`] ||
+            frameJoints[`${personIdx}${label}${vectorComponent}`] ||
+            frameJoints[`${label}_${vectorComponent}`] ||
+            frameJoints[`${label}${vectorComponent}`]
+        ),
       NaN
     );
-  }
+  };
 
-  getKnownAttributeValue({attributes, personIdx, pointLabel, suffix}) {
-    return Number(
-      attributes[`${personIdx}_${pointLabel}${suffix}`] ||
-        attributes[`${personIdx}${pointLabel}${suffix}`] ||
-        attributes[`${pointLabel}${suffix}`]
-    );
-  }
-
-  getSingleFramePointsForPerson({attributes, pointLabels, personIdx}) {
+  getSingleFramePointsForPerson = ({frameJoints, jointNames, personIdx}) => {
     const points = {
       asObjects: [],
       asArrays: [],
@@ -253,32 +278,26 @@ export class LHLegacyProcessor extends IDataSetProcessor {
     };
 
     let zeroPointsCounter = 0;
-    for (const pointLabel of pointLabels) {
+    for (const jointName of jointNames) {
       const values = [
-        this.scale(
-          this.getKnownAttributeValue({
-            attributes,
-            personIdx,
-            pointLabel,
-            suffix: this.suffixes.x
-          })
-        ),
-        this.scale(
-          this.getKnownAttributeValue({
-            attributes,
-            personIdx,
-            pointLabel,
-            suffix: this.suffixes.y
-          })
-        ),
-        this.scale(
-          this.getKnownAttributeValue({
-            attributes,
-            personIdx,
-            pointLabel,
-            suffix: this.suffixes.z
-          })
-        )
+        this.getJointVectorComponent({
+          frameJoints,
+          personIdx,
+          jointName,
+          vectorComponent: this.vectorComponents.x
+        }),
+        this.getJointVectorComponent({
+          frameJoints,
+          personIdx,
+          jointName,
+          vectorComponent: this.vectorComponents.y
+        }),
+        this.getJointVectorComponent({
+          frameJoints,
+          personIdx,
+          jointName,
+          vectorComponent: this.vectorComponents.z
+        })
       ];
       if (values.reduce((flag, v) => isNaN(v), false)) continue;
       zeroPointsCounter += values.reduce(
@@ -287,20 +306,23 @@ export class LHLegacyProcessor extends IDataSetProcessor {
       );
       if (zeroPointsCounter > 3) break;
 
+      if (values[0] < this.extremes.xMin) this.extremes.xMin = values[0];
+      if (values[1] < this.extremes.yMin) this.extremes.yMin = values[1];
+      if (values[2] < this.extremes.zMin) this.extremes.zMin = values[2];
+
+      if (values[0] > this.extremes.xMax) this.extremes.xMax = values[0];
+      if (values[1] > this.extremes.yMax) this.extremes.yMax = values[1];
+      if (values[2] > this.extremes.zMax) this.extremes.zMax = values[2];
+
       const labeledValues = {
-        label: pointLabel,
-        x: values[0],
-        y: values[1],
-        z: values[2]
+        label: jointName,
+        [this.vectorComponents.x.toLowerCase()]: values[0],
+        [this.vectorComponents.y.toLowerCase()]: values[1],
+        [this.vectorComponents.z.toLowerCase()]: values[2]
       };
-      points.asObjects.push({
-        label: pointLabel,
-        x: values[0],
-        y: values[1],
-        z: values[2]
-      });
+      points.asObjects.push(labeledValues);
       this.bodyLinesScheme.forEach((bodyLineScheme, i) => {
-        if (bodyLineScheme.includes(pointLabel)) {
+        if (bodyLineScheme.includes(jointName)) {
           points.bodyLines[i].push(labeledValues);
         }
       });
@@ -320,5 +342,25 @@ export class LHLegacyProcessor extends IDataSetProcessor {
       });
     });
     return points;
+  };
+
+  get jointNames() {
+    return this._jointNames;
+  }
+
+  get bodyLinesScheme() {
+    return this._bodyLinesScheme;
+  }
+
+  get vectorComponents() {
+    return this._vectorComponents;
+  }
+
+  get personIndices() {
+    return this._personIndices;
+  }
+
+  set personIndices(value) {
+    this._personIndices = value;
   }
 }

@@ -8,7 +8,9 @@ function* handleDownloadResults() {
   const json = JSON.stringify({
     source: {
       id: 'tf',
-      model
+      details:{
+        model
+      }
     },
     frames: poses
   });
