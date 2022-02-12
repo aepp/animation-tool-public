@@ -7,10 +7,10 @@ import {
 } from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
 import MenuIcon from '@mui/icons-material/Menu';
-import {selectIsAnimationInitialized} from '../../../../views/Animation/modules/Animation/reducers';
+import {selectIsAnimationInitialized} from '../../../../views/Visualization/modules/Animation/reducers';
 import {SET_DRAWER_STATE} from '../../actions';
 import {Route, Routes} from 'react-router-dom';
-import AnimationControls from '../../../../views/Animation/modules/AnimationControls';
+import AnimationControls from '../../../../views/Visualization/modules/AnimationControls';
 import routes from '../../../../routes';
 
 export const AppBar = () => {

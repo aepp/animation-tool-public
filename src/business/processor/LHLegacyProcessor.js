@@ -9,7 +9,7 @@ export class LHLegacyProcessor extends IDataSetProcessor {
     z: 'Z'
   };
 
-  _jointNames = {
+  static _jointNames = {
     AnkleRight: 'Ankle_Right',
     AnkleLeft: 'Ankle_Left',
     ElbowRight: 'Elbow_Right',
@@ -20,55 +20,149 @@ export class LHLegacyProcessor extends IDataSetProcessor {
     HandLeftTip: 'Hand_Left_Tip',
     Head: 'Head',
     HipRight: 'Hip_Right',
-    HipMid: 'Hip_Mid',
     HipLeft: 'Hip_Left',
     ShoulderRight: 'Shoulder_Right',
     ShoulderLeft: 'Shoulder_Left',
     SpineMid: 'Spine_Mid',
-    SpineShoulder: 'Spine_Shoulder'
+    SpineShoulder: 'Spine_Shoulder',
+    HipMid: 'Hip_Mid'
   };
 
-  _bodyLinesScheme = [
-    [
-      this.jointNames.AnkleLeft,
-      this.jointNames.AnkleLeft.replaceAll('_', ''),
-      this.jointNames.HipLeft,
-      this.jointNames.HipLeft.replaceAll('_', ''),
-      this.jointNames.HipRight,
-      this.jointNames.HipRight.replaceAll('_', ''),
-      this.jointNames.AnkleRight,
-      this.jointNames.AnkleRight.replaceAll('_', '')
-    ],
-    [
-      this.jointNames.HandLeftTip,
-      this.jointNames.HandLeftTip.replaceAll('_', ''),
-      this.jointNames.HandLeft,
-      this.jointNames.HandLeft.replaceAll('_', ''),
-      this.jointNames.ElbowLeft,
-      this.jointNames.ElbowLeft.replaceAll('_', ''),
-      this.jointNames.ShoulderLeft,
-      this.jointNames.ShoulderLeft.replaceAll('_', ''),
-      this.jointNames.SpineShoulder,
-      this.jointNames.SpineShoulder.replaceAll('_', ''),
-      this.jointNames.ShoulderRight,
-      this.jointNames.ShoulderRight.replaceAll('_', ''),
-      this.jointNames.ElbowRight,
-      this.jointNames.ElbowRight.replaceAll('_', ''),
-      this.jointNames.HandRight,
-      this.jointNames.HandRight.replaceAll('_', ''),
-      this.jointNames.HandRightTip,
-      this.jointNames.HandRightTip.replaceAll('_', '')
-    ],
-    [
-      this.jointNames.Head,
-      this.jointNames.SpineShoulder,
-      this.jointNames.SpineShoulder.replaceAll('_', ''),
-      this.jointNames.SpineMid,
-      this.jointNames.SpineMid.replaceAll('_', ''),
-      this.jointNames.HipMid,
-      this.jointNames.HipMid.replaceAll('_', '')
-    ]
+  static _jointNamesArray = [
+    LHLegacyProcessor._jointNames.AnkleRight,
+    LHLegacyProcessor._jointNames.AnkleLeft,
+    LHLegacyProcessor._jointNames.ElbowRight,
+    LHLegacyProcessor._jointNames.ElbowLeft,
+    LHLegacyProcessor._jointNames.HandRight,
+    LHLegacyProcessor._jointNames.HandLeft,
+    LHLegacyProcessor._jointNames.HandRightTip,
+    LHLegacyProcessor._jointNames.HandLeftTip,
+    LHLegacyProcessor._jointNames.Head,
+    LHLegacyProcessor._jointNames.HipRight,
+    LHLegacyProcessor._jointNames.HipLeft,
+    LHLegacyProcessor._jointNames.ShoulderRight,
+    LHLegacyProcessor._jointNames.ShoulderLeft,
+    LHLegacyProcessor._jointNames.SpineMid,
+    LHLegacyProcessor._jointNames.SpineShoulder,
+    LHLegacyProcessor._jointNames.HipMid
   ];
+
+  static getAdjacentJoints() {
+    return [
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.AnkleLeft
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HipLeft
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HipLeft
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HipRight
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HipRight
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.AnkleRight
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HipMid
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.SpineMid
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.SpineMid
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.SpineShoulder
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.SpineShoulder
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.Head
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HandLeftTip
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HandLeft
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HandLeft
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ElbowLeft
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ElbowLeft
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ShoulderLeft
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ShoulderLeft
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.SpineShoulder
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.SpineShoulder
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ShoulderRight
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ShoulderRight
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ElbowRight
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.ElbowRight
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HandRight
+        )
+      ],
+      [
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HandRight
+        ),
+        LHLegacyProcessor._jointNamesArray.indexOf(
+          LHLegacyProcessor._jointNames.HandRightTip
+        )
+      ]
+    ];
+  }
 
   notEmptyFrame = allPersonsPoints => {
     // e.g. allPersonsPoints = [{...points of person 1}, {...points of person 2}, ...]
@@ -95,19 +189,7 @@ export class LHLegacyProcessor extends IDataSetProcessor {
       personsFrames.map(frame => {
         return {
           ...frame,
-          points: {
-            ...frame.points,
-            bodyLines: frame.points.bodyLines.map(bodyLine =>
-              bodyLine.map(point => {
-                return {
-                  ...point,
-                  x: (point.x - this.translateX) / this.normalScaleFactor - 0.5,
-                  y: (point.y - this.translateY) / this.normalScaleFactor - 0.5,
-                  z: (point.z - this.translateZ) / this.normalScaleFactor
-                };
-              })
-            )
-          }
+          keyPoints: frame.keyPoints.map(this.getNormalizedCenteredPoint)
         };
       })
     );
@@ -157,16 +239,20 @@ export class LHLegacyProcessor extends IDataSetProcessor {
 
     const pointsPerPerson = [];
     for (const personIdx of this.personIndices) {
-      const points = this.getSingleFramePointsForPerson({
+      const keyPoints = this.getSingleFramePointsForPerson({
         frameJoints,
         jointNames,
         personIdx
       });
 
-      if (!points) continue;
+      if (
+        !keyPoints ||
+        (Array.isArray(keyPoints) && keyPoints.length < this.jointNames.length)
+      )
+        continue;
       pointsPerPerson.push({
         personIdx,
-        points
+        keyPoints
       });
     }
 
@@ -270,13 +356,7 @@ export class LHLegacyProcessor extends IDataSetProcessor {
   };
 
   getSingleFramePointsForPerson = ({frameJoints, jointNames, personIdx}) => {
-    const points = {
-      asObjects: [],
-      asArrays: [],
-      flat: [],
-      bodyLines: this.bodyLinesScheme.map(_ => [])
-    };
-
+    const keyPoints = [];
     let zeroPointsCounter = 0;
     for (const jointName of jointNames) {
       const values = [
@@ -315,41 +395,21 @@ export class LHLegacyProcessor extends IDataSetProcessor {
       if (values[2] > this.extremes.zMax) this.extremes.zMax = values[2];
 
       const labeledValues = {
-        label: jointName,
+        name: jointName,
         [this.vectorComponents.x.toLowerCase()]: values[0],
         [this.vectorComponents.y.toLowerCase()]: values[1],
         [this.vectorComponents.z.toLowerCase()]: values[2]
       };
-      points.asObjects.push(labeledValues);
-      this.bodyLinesScheme.forEach((bodyLineScheme, i) => {
-        if (bodyLineScheme.includes(jointName)) {
-          points.bodyLines[i].push(labeledValues);
-        }
-      });
-
-      points.asArrays.push(values);
-      points.flat.push(...values);
+      keyPoints.push(labeledValues);
     }
 
     if (zeroPointsCounter > 3) return null;
 
-    points.bodyLines.forEach((bodyLine, i) => {
-      return bodyLine.sort((a, b) => {
-        return (
-          this.bodyLinesScheme[i].indexOf(a.label) -
-          this.bodyLinesScheme[i].indexOf(b.label)
-        );
-      });
-    });
-    return points;
+    return keyPoints;
   };
 
   get jointNames() {
-    return this._jointNames;
-  }
-
-  get bodyLinesScheme() {
-    return this._bodyLinesScheme;
+    return LHLegacyProcessor._jointNames;
   }
 
   get vectorComponents() {
@@ -362,5 +422,9 @@ export class LHLegacyProcessor extends IDataSetProcessor {
 
   set personIndices(value) {
     this._personIndices = value;
+  }
+
+  get jointNamesArray() {
+    return LHLegacyProcessor._jointNamesArray;
   }
 }

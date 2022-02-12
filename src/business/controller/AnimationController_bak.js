@@ -19,7 +19,7 @@ import {
   PLAYBACK_DIRECTION_DEFAULT
 } from '../../constants';
 import {BACKGROUND_COLOR} from '../../react/theme/constants';
-import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../react/views/Animation/modules/Animation/actions/uiChannel';
+import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
 import {RenderService3D} from '../service/RenderService3D';
 import {RenderService2D} from '../service/RenderService2D';
 import {UNKNOWN_DATA_SOURCE} from '../../messages';

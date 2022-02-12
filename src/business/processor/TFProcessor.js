@@ -32,14 +32,22 @@ export class TFProcessor extends IDataSetProcessor {
     this.frames.forEach(({keypoints}) =>
       keypoints.forEach(({x, y, score}) => {
         this.extremes.xMax =
-          this.extremes.xMax < x && score > scoreThreshold ? x : this.extremes.xMax;
+          this.extremes.xMax < x && score > scoreThreshold
+            ? x
+            : this.extremes.xMax;
         this.extremes.yMax =
-          this.extremes.yMax < y && score > scoreThreshold ? y : this.extremes.yMax;
+          this.extremes.yMax < y && score > scoreThreshold
+            ? y
+            : this.extremes.yMax;
 
         this.extremes.xMin =
-          this.extremes.xMin > x && score > scoreThreshold ? x : this.extremes.xMin;
+          this.extremes.xMin > x && score > scoreThreshold
+            ? x
+            : this.extremes.xMin;
         this.extremes.yMin =
-          this.extremes.yMin > y && score > scoreThreshold ? y : this.extremes.yMin;
+          this.extremes.yMin > y && score > scoreThreshold
+            ? y
+            : this.extremes.yMin;
       })
     );
 
@@ -47,18 +55,16 @@ export class TFProcessor extends IDataSetProcessor {
     this.calculateTranslations();
 
     const framesPerPerson = this.frames.map(({keypoints, score}) => ({
-      keyPoints: keypoints.map(point => {
-        return {
-          ...point,
-          xNormal: (point.x - this.translateX) / this.normalScaleFactor - 0.5,
-          yNormal: (point.y - this.translateY) / this.normalScaleFactor - 0.5
-        };
-      }),
+      keyPoints: keypoints.map(point => ({
+        ...this.getNormalizedCenteredPoint(point),
+        z: 0
+      })),
       score
     }));
     return new Promise(resolve => {
       return resolve({
-        framesPerPerson,
+        // @todo consider "real" multi-person datasets
+        framesPerPerson: framesPerPerson.map(frame => [frame]),
         personIndices: [0],
         extremes: this.extremes,
         normalization: {

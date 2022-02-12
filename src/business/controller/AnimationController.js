@@ -6,7 +6,9 @@ import {
   Scene,
   Color,
   PerspectiveCamera,
-  Vector2
+  Vector2,
+  Points,
+  Float32BufferAttribute, PointsMaterial
 } from 'three';
 import {
   DATA_SOURCE_KINECT,
@@ -14,7 +16,7 @@ import {
   PLAYBACK_DIRECTION_DEFAULT
 } from '../../constants';
 import {BACKGROUND_COLOR} from '../../react/theme/constants';
-import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../react/views/Animation/modules/Animation/actions/uiChannel';
+import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
 import {UNKNOWN_DATA_SOURCE} from '../../messages';
 import {RenderService3D} from '../service/RenderService3D';
 import {RenderService2D} from '../service/RenderService2D';
@@ -74,7 +76,11 @@ export class AnimationController extends PlaybackController {
 
     console.log('normalization', normalization);
     console.log('extremes', extremes);
-    const serviceParameters = {rootElement: this.rootElement, extremes, normalization};
+    const serviceParameters = {
+      rootElement: this.rootElement,
+      extremes,
+      normalization
+    };
     switch (dataSource) {
       case DATA_SOURCE_KINECT:
         this._renderService = new RenderService3D(serviceParameters);
@@ -89,13 +95,12 @@ export class AnimationController extends PlaybackController {
     this.camera = new PerspectiveCamera(
       this.fov,
       this.rootElement.clientWidth / this.rootElement.clientHeight,
-      0.1,
-      2
+      0.01,
+      10
     );
-    const camPos = this.renderService.getDefaultCameraPosition({fov: this.fov});
-console.log('camPos', camPos);
-    this.camera.position.set(...camPos);
-    this.camera.lookAt(...this.renderService.getDefaultCameraLookAt({fov: this.fov}));
+        this.camera.position.set(0, 0, this.renderService.calculateFovDistance({fov: this.fov}));
+        // this.camera.position.set(0, 0, 3);
+    //     this.camera.lookAt(...this.renderService.getDefaultCameraLookAt({fov: this.fov}));
 
     const geometryFrame = new BufferGeometry();
     const materialFrame = new LineDashedMaterial({
@@ -108,10 +113,10 @@ console.log('camPos', camPos);
 
     const pointsFrame = [];
 
-    const BOTTOM_LEFT = [-1, -1];
-    const BOTTOM_RIGHT = [1, -1];
-    const TOP_RIGHT = [1, 1];
-    const TOP_LEFT = [-1, 1];
+    const BOTTOM_LEFT = [(this.renderService.extremes.xMin - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMin - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
+    const BOTTOM_RIGHT = [(this.renderService.extremes.xMax - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMin - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
+    const TOP_RIGHT = [(this.renderService.extremes.xMax - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMax - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
+    const TOP_LEFT = [(this.renderService.extremes.xMin - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMax - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
 
     pointsFrame.push(new Vector2(...BOTTOM_LEFT));
     pointsFrame.push(new Vector2(...BOTTOM_RIGHT));
@@ -122,7 +127,20 @@ console.log('camPos', camPos);
     geometryFrame.setFromPoints(pointsFrame);
     const lineFrame = new Line(geometryFrame, materialFrame);
     lineFrame.computeLineDistances();
+
     this.scene.add(lineFrame);
+
+    // const pointGeometry = new BufferGeometry();
+    //
+    // this.scene.add(
+    //   new Points(
+    //     pointGeometry.setAttribute(
+    //       'position',
+    //       new Float32BufferAttribute([0, 0, -1], 3)
+    //     ),
+    //     new PointsMaterial({size: 1, color: 0xff3333})
+    //   )
+    // );
 
     return this;
   }

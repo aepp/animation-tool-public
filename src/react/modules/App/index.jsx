@@ -1,7 +1,7 @@
 import React from 'react';
 import {Route, Routes} from 'react-router-dom';
 import {Box} from '@mui/material';
-import Visualization from '../../views/Animation/modules/Animation';
+import Visualization from '../../views/Visualization';
 import routes from '../../routes';
 import RecordingContent from '../../views/Recording';
 import AppDrawer from './components/Drawer';

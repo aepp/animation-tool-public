@@ -3,13 +3,16 @@ import createSagaMiddleware from 'redux-saga';
 import appReducer, {reducerKey as appReducerKey} from './modules/App/reducers';
 import visualizationReducer, {
   reducerKey as visualizationReducerKey
-} from './views/Animation/modules/Animation/reducers';
+} from './views/Visualization/modules/Animation/reducers';
+import dataSetReducer, {
+  reducerKey as dataSetReducerKey
+} from './views/Visualization/modules/DataSet/reducers';
 import uploadReducer, {
   reducerKey as uploadReducerKey
-} from './views/Animation/modules/Upload/reducers';
+} from './views/Visualization/modules/Upload/reducers';
 import animationControlsReducer, {
   reducerKey as animationControlsReducerKey
-} from './views/Animation/modules/AnimationControls/reducers';
+} from './views/Visualization/modules/AnimationControls/reducers';
 import recordingReducer, {
   reducerKey as recordingReducerKey
 } from './views/Recording/reducers';
@@ -22,7 +25,8 @@ export const store = configureStore({
     [visualizationReducerKey]: visualizationReducer,
     [uploadReducerKey]: uploadReducer,
     [animationControlsReducerKey]: animationControlsReducer,
-    [recordingReducerKey]: recordingReducer
+    [recordingReducerKey]: recordingReducer,
+    [dataSetReducerKey]: dataSetReducer
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({serializableCheck: false}).concat(sagaMiddleware)

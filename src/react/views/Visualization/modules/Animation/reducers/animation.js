@@ -1,4 +1,4 @@
-import {FINISH_ANIMATION_INIT} from '../actions';
+import {FINISH_ANIMATION_INIT} from '../actions/animation';
 import {
   UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
   UPDATE_FRAMES_COUNT
@@ -8,7 +8,7 @@ export const reducerKey = 'animation';
 const defaultState = {
   isInitialized: false,
   currentFrameIdx: 0,
-  framesCount: 0
+  framesCount: 0,
 };
 const r = (state = defaultState, action) => {
   switch (action.type) {
@@ -34,7 +34,9 @@ const r = (state = defaultState, action) => {
 
 export default r;
 
-export const selectIsAnimationInitialized = state =>
-  state[reducerKey].isInitialized;
-export const selectCurrentFrameIdx = state => state[reducerKey].currentFrameIdx;
-export const selectFramesCount = state => state[reducerKey].framesCount;
+export const selectors = {
+  selectIsAnimationInitialized: state => state[reducerKey].isInitialized,
+  selectCurrentFrameIdx: state => state[reducerKey].currentFrameIdx,
+  selectFramesCount: state => state[reducerKey].framesCount,
+};
+

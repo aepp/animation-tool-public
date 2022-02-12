@@ -78,11 +78,20 @@ export class IDataSetProcessor {
   };
 
   calculateTranslations = () => {
-    this.translateX = this.extremes.xMin;
-    this.translateY = this.extremes.yMin;
-    this.translateZ = this.extremes.zMin;
+    this.translateX =
+      this.extremes.xMin + (this.extremes.xMax - this.extremes.xMin) / 2;
+    this.translateY =
+      this.extremes.yMin + (this.extremes.yMax - this.extremes.yMin) / 2;
+    this.translateZ =
+      this.extremes.zMin + (this.extremes.zMax - this.extremes.zMin) / 2;
   };
 
+  getNormalizedCenteredPoint = point => ({
+    ...point,
+    x: (point.x - this.translateX) / this.normalScaleFactor,
+    y: (point.y - this.translateY) / this.normalScaleFactor,
+    z: (point.z - this.translateZ) / this.normalScaleFactor
+  });
   /**
    * @public
    * @returns {Array}

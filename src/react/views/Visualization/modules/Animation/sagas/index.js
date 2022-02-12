@@ -10,9 +10,13 @@ import {UNKNOWN_DATA_SOURCE} from '../../../../../../messages';
 import {LHLegacyProcessor} from '../../../../../../business/processor/LHLegacyProcessor';
 import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
-import {FINISH_ANIMATION_INIT, START_ANIMATION_INIT} from '../actions';
+import {
+  FINISH_ANIMATION_INIT,
+  START_ANIMATION_INIT
+} from '../actions/animation';
 
 import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
+import {setDataSet} from '../../DataSet/actions';
 
 const START_UI_CHANNEL = 'START_UI_CHANNEL';
 
@@ -76,13 +80,16 @@ function* handleStartAnimationInit(action) {
     fn: ProcessorInstance.preProcess
   });
 
+  yield put(
+    setDataSet({framesPerPerson, personIndices, extremes, normalization, dataSource})
+  );
   console.log('pre-process finished! rendering...');
 
   yield put({
     type: UPDATE_FRAMES_COUNT,
     payload: {framesCount: framesPerPerson.length}
   });
-
+console.log('framesPerPerson', framesPerPerson);
   const AnimationControllerInstance =
     window[LOCAL_STORAGE_THREE_INSTANCE] ||
     new AnimationController({rootElement});
