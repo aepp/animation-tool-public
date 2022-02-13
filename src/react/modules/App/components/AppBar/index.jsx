@@ -8,7 +8,7 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import MenuIcon from '@mui/icons-material/Menu';
 import {selectIsAnimationInitialized} from '../../../../views/Visualization/modules/Animation/reducers';
-import {SET_DRAWER_STATE} from '../../actions';
+import {setDrawerState} from '../../actions';
 import {Route, Routes} from 'react-router-dom';
 import AnimationControls from '../../../../views/Visualization/modules/AnimationControls';
 import routes from '../../../../routes';
@@ -24,15 +24,9 @@ export const AppBar = () => {
             <IconButton
               color='inherit'
               aria-label='open animation controls'
-              onClick={() =>
-                dispatch({
-                  type: SET_DRAWER_STATE,
-                  payload: {isDrawerOpen: true}
-                })
-              }
+              onClick={() => dispatch(setDrawerState(true))}
               edge='start'
-              sx={{mr: 2, zIndex: 1}}
-            >
+              sx={{mr: 2, zIndex: 1}}>
               <MenuIcon />
             </IconButton>
           )}

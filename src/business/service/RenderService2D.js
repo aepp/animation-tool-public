@@ -19,4 +19,5 @@ export class RenderService2D extends RenderService {
 
   getVector = ({x, y, z= 0}) => super.getVector({x, y: -y, z: 0});
   getPoint = ({x, y, z}) => super.getPoint({x, y: -y, z: 0});
+  getPositions = ({x, y, z}) => super.getPositions({x, y: -y, z: 0});
 }

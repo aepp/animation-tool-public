@@ -6,13 +6,14 @@ import {
   Line,
   Points,
   Vector3,
-  Bone,
   Float32BufferAttribute,
-  Skeleton,
-  CylinderGeometry,
-  Uint16BufferAttribute,
-  SkinnedMesh
+  SphereGeometry,
+  MeshBasicMaterial,
+  Mesh
 } from 'three';
+import {LineGeometry} from 'three/examples/jsm/lines/LineGeometry';
+import {LineMaterial} from 'three/examples/jsm/lines/LineMaterial';
+import {Line2} from 'three/examples/jsm/lines/Line2';
 
 export class RenderService {
   /* BEGIN: "abstract" methods (may / should be overwritten in corresponding render service implementations) */
@@ -28,7 +29,7 @@ export class RenderService {
    * @returns {Vector3 | Vector2}
    */
   getVector({x, y, z = 0}) {
-    return new Vector3(x, y, z);
+    return new Vector3(x, y, z).getPositionFromMatrix();
   }
 
   /**
@@ -41,6 +42,16 @@ export class RenderService {
     return new Float32BufferAttribute([x, y, z], 3);
   }
 
+  /**
+   *
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @returns {number[]}
+   */
+  getPositions({x, y, z}) {
+    return [x, y, z];
+  }
   /* END "abstract" methods */
 
   /**
@@ -58,6 +69,23 @@ export class RenderService {
     color: 0x222222,
     linewidth: 2
   });
+
+  _fatLineMaterial = new LineMaterial({
+    color: 0xffffff,
+    linewidth: 10, // in world units with size attenuation, pixels otherwise
+    vertexColors: true,
+
+    //resolution:  // to be set by renderer, eventually
+    dashed: false,
+    alphaToCoverage: true
+  });
+
+  /**
+   *
+   * @type {MeshBasicMaterial}
+   * @private
+   */
+  _meshMaterial = new MeshBasicMaterial({color: 0xff0000});
 
   /**
    * @type {{zMin: number, yMin: number, zMax: number, yMax: number, xMax: number, xMin: number}}
@@ -92,6 +120,7 @@ export class RenderService {
   constructor({extremes, normalization}) {
     this._extremes = extremes;
     this._normalization = normalization;
+    this._fatLineMaterial.resolution.set(window.innerWidth, window.innerHeight);
   }
 
   /**
@@ -103,120 +132,58 @@ export class RenderService {
     const objects = [];
     this.getAdjacentJointPairs().forEach(([i, j]) => {
       for (const person of frame) {
+        // fat lines
+
+        let positions = [];
+        positions.push(...this.getPositions(person.keyPoints[i]));
+        positions.push(...this.getPositions(person.keyPoints[j]));
+        let geometry = new LineGeometry();
+        geometry.setPositions(positions);
+        // geometry.setColors( [255, 0, 0, 0, 255, 20] );
+
+        objects.push(new Line2(geometry, this.fatLineMaterial));
+
         // lines
-        let geometry = new BufferGeometry();
-        // const bone1 = new Bone();
-        // const bone2 = new Bone();
+        // let geometry = new BufferGeometry();
         //
+        // objects.push(
+        //   new Line(
+        //     geometry.setFromPoints([
+        //       this.getVector(person.keyPoints[i]),
+        //       this.getVector(person.keyPoints[j])
+        //     ]),
+        //     this.lineMaterial
+        //   )
+        // );
         //
-        // bone1.position.set(person.keyPoints[i].x, person.keyPoints[i].y, person.keyPoints[i].z);
-        // bone2.position.set(person.keyPoints[j].x, person.keyPoints[j].y, person.keyPoints[j].z);
-        //
-        // bone1.add(bone2);
-        //
-        // const bones = [bone1, bone2];
-        //
-        // const bodyPartSkeleton = new Skeleton( bones );
-        // objects.push(bodyPartSkeleton);
-
-//         const bones = [];
-//         const shoulder = new Bone();
-//         const elbow = new Bone();
-//         const hand = new Bone();
-//
-//         shoulder.add( elbow );
-//         elbow.add( hand );
-//
-//         bones.push( shoulder );
-//         bones.push( elbow );
-//         bones.push( hand );
-//
-//         shoulder.position.y = -5;
-//         elbow.position.y = 0;
-//         hand.position.y = 5;
-//
-//         const armSkeleton = new Skeleton( bones );
-//
-//         geometry = new CylinderGeometry( 1, 1, 1, 5, 15, 5, 30 );
-//
-// // create the skin indices and skin weights
-//
-//         const position = geometry.attributes.position;
-//
-//         const vertex = new Vector3();
-//
-//         const skinIndices = [];
-//         const skinWeights = [];
-//
-//         const sizing = {
-//           segmentHeight: 0.1
-//         };
-//         for ( let i = 0; i < position.count; i ++ ) {
-//
-//           vertex.fromBufferAttribute( position, i );
-//
-//           // compute skinIndex and skinWeight based on some configuration data
-//
-//           const y = ( vertex.y + sizing.halfHeight );
-//
-//           const skinIndex = Math.floor( y / sizing.segmentHeight );
-//           const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
-//
-//           skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
-//           skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
-//
-//         }
-//
-//         geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
-//         geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
-//
-// // create skinned mesh and skeleton
-//
-//         const mesh = new SkinnedMesh( geometry );
-//         const skeleton = new Skeleton( bones );
-//
-// // see example from Skeleton
-//
-//         const rootBone = skeleton.bones[ 0 ];
-//         mesh.add( rootBone );
-//
-// // bind the skeleton to the mesh
-//
-//         mesh.bind( skeleton );
-//
-// // move the bones and manipulate the model
-//
-//         skeleton.bones[ 0 ].rotation.x = -0.1;
-//         skeleton.bones[ 1 ].rotation.x = 0.2;
-// objects.push(mesh);
-        objects.push(
-          new Line(
-            geometry.setFromPoints([
-              this.getVector(person.keyPoints[i]),
-              this.getVector(person.keyPoints[j])
-            ]),
-            this.lineMaterial
-          )
-        );
-
         // points
-        geometry = new BufferGeometry();
-        objects.push(
-          new Points(
-            geometry.setAttribute(
-              'position',
-              this.getPoint(person.keyPoints[i])
-            ),
-            this.pointsMaterial
-          )
+        // geometry = new BufferGeometry();
+        // objects.push(
+        //   new Points(
+        //     geometry.setAttribute(
+        //       'position',
+        //       this.getPoint(person.keyPoints[i])
+        //     ),
+        //     this.pointsMaterial
+        //   )
+        // );
+
+        // spheres
+        const sphere = new Mesh(
+          new SphereGeometry(0.005, 32, 16),
+          this.meshMaterial
         );
+
+        sphere.position.set(...this.getPositions(person.keyPoints[i]));
+
+        objects.push(sphere);
       }
     });
     return objects;
   };
 
   calculateFovDistance = ({fov = 45}) =>
-    (this.extremes.yMax +0.01 - (this.extremes.yMin - 0.01)) /
+    (this.extremes.yMax + 0.01 - (this.extremes.yMin - 0.01)) /
     this.normalization.scaleFactor /
     2 /
     Math.tan(ThreeMath.degToRad(fov / 2));
@@ -243,5 +210,21 @@ export class RenderService {
 
   set normalization(value) {
     this._normalization = value;
+  }
+
+  get meshMaterial() {
+    return this._meshMaterial;
+  }
+
+  set meshMaterial(value) {
+    this._meshMaterial = value;
+  }
+
+  get fatLineMaterial() {
+    return this._fatLineMaterial;
+  }
+
+  set fatLineMaterial(value) {
+    this._fatLineMaterial = value;
   }
 }

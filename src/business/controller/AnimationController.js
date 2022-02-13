@@ -7,8 +7,6 @@ import {
   Color,
   PerspectiveCamera,
   Vector2,
-  Points,
-  Float32BufferAttribute, PointsMaterial
 } from 'three';
 import {
   DATA_SOURCE_KINECT,
@@ -64,7 +62,7 @@ export class AnimationController extends PlaybackController {
     this.rootElement = rootElement;
     this.datasetHelper = new DatasetHelper();
 
-    this.renderer = new WebGLRenderer();
+    this.renderer = new WebGLRenderer({ antialias: true });
     this.renderer.setSize(rootElement.clientWidth, rootElement.clientHeight);
     this.rootElement.appendChild(this.renderer.domElement);
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -195,6 +193,8 @@ export class AnimationController extends PlaybackController {
     this.generateAnimationObjectsFromCurrentFrame();
 
     this.currentFrameObjects.forEach(o => this.scene.add(o));
+
+    this.renderer.clearDepth(); // important!
 
     this.sendToUi({
       type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,

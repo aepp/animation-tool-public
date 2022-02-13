@@ -2,7 +2,7 @@ import React from 'react';
 import {Drawer} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
 import {selectIsDrawerOpen} from '../../reducers';
-import {SET_DRAWER_STATE} from '../../actions';
+import {setDrawerState} from '../../actions';
 
 export const AppDrawer = () => {
   const dispatch = useDispatch();
@@ -12,9 +12,8 @@ export const AppDrawer = () => {
     <Drawer
       anchor={'left'}
       open={isDrawerOpen}
-      onClose={() =>
-        dispatch({type: SET_DRAWER_STATE, payload: {isDrawerOpen: false}})
-      }/>
+      onClose={() => dispatch(setDrawerState(false))}
+    />
   );
 };
 

@@ -1,1 +1,4 @@
-export const SET_DRAWER_STATE = 'SET_DRAWER_STATE';
+import {createAction} from '@reduxjs/toolkit';
+
+export const setAppConfig = createAction('setAppConfig');
+export const setDrawerState = createAction('setDrawerState');

@@ -12,11 +12,13 @@ import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
 import {
   FINISH_ANIMATION_INIT,
-  START_ANIMATION_INIT
+  skeletonTest,
+  startAnimation
 } from '../actions/animation';
 
 import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
 import {setDataSet} from '../../DataSet/actions';
+import {SimpleTestAnimationController} from '../../../../../../business/controller/SimpleTestAnimationController';
 
 const START_UI_CHANNEL = 'START_UI_CHANNEL';
 
@@ -81,15 +83,24 @@ function* handleStartAnimationInit(action) {
   });
 
   yield put(
-    setDataSet({framesPerPerson, personIndices, extremes, normalization, dataSource})
+    setDataSet({
+      framesPerPerson,
+      personIndices,
+      extremes,
+      normalization,
+      dataSource
+    })
   );
+
   console.log('pre-process finished! rendering...');
 
   yield put({
     type: UPDATE_FRAMES_COUNT,
     payload: {framesCount: framesPerPerson.length}
   });
-console.log('framesPerPerson', framesPerPerson);
+
+  console.log('framesPerPerson', framesPerPerson);
+
   const AnimationControllerInstance =
     window[LOCAL_STORAGE_THREE_INSTANCE] ||
     new AnimationController({rootElement});
@@ -108,8 +119,21 @@ console.log('framesPerPerson', framesPerPerson);
   yield put({type: START_UI_CHANNEL});
   yield put({type: FINISH_ANIMATION_INIT});
 }
+
+function* handleSkeletonTest(action) {
+  const {
+    payload: {rootElement}
+  } = action;
+
+  const controller = new SimpleTestAnimationController({rootElement});
+  yield call({context: controller, fn: controller.init});
+}
+
 function* watchStartAnimationInit() {
-  yield takeLatest(START_ANIMATION_INIT, handleStartAnimationInit);
+  yield takeLatest(startAnimation.type, handleStartAnimationInit);
+}
+function* watchSkeletonTest() {
+  yield takeLatest(skeletonTest.type, handleSkeletonTest);
 }
 function* watchStartUiChannel() {
   yield takeLatest(START_UI_CHANNEL, handleStartUiChannel);
@@ -118,6 +142,8 @@ function* watchStartUiChannel() {
 function* rootSaga() {
   yield fork(watchStartAnimationInit);
   yield fork(watchStartUiChannel);
+
+  yield fork(watchSkeletonTest);
 }
 
 export default rootSaga;
