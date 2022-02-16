@@ -13,7 +13,6 @@ import {useDispatch, useSelector} from 'react-redux';
 // import * as tf from '@tensorflow/tfjs-core';
 // Register one of the TF.js backends.
 import '@tensorflow/tfjs-backend-webgl';
-import videoSrc from '../../../demoData/video/choreo1.mp4';
 import {useContentStyle} from '../../modules/App/hooks/useContentStyle';
 import {useWindowSize} from '../../modules/App/hooks/useWindowSize';
 import {DOWNLOAD_DETECTION_RESULTS, VIDEO_PLAYBACK_END} from './actions';
@@ -81,7 +80,13 @@ export const RecordingContent = () => {
                 });
               }}
             >
-              <source src={videoSrc} type='video/mp4' />
+              <source
+                src={
+                  process.env.PUBLIC_URL +
+                  '/resources/demoData/video/choreo1.mp4'
+                }
+                type='video/mp4'
+              />
             </video>
           </Box>
           <video
@@ -103,7 +108,12 @@ export const RecordingContent = () => {
             }
             muted
           >
-            <source src={videoSrc} type='video/mp4' />
+            <source
+              src={
+                process.env.PUBLIC_URL + '/resources/demoData/video/choreo1.mp4'
+              }
+              type='video/mp4'
+            />
           </video>
         </Grid>
         <Grid

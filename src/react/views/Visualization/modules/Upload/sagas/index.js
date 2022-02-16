@@ -5,6 +5,7 @@ function* handleSelectDataSetFile(action) {
   const {
     payload: {file}
   } = action;
+  if (!file) return;
 
   yield put({
     type: SET_DATASET_FILE_URL,

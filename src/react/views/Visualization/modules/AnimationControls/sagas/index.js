@@ -1,5 +1,5 @@
 import * as PropTypes from 'prop-types';
-import {put, takeLatest, fork, select} from 'redux-saga/effects';
+import {put, takeLatest, fork, select, throttle} from 'redux-saga/effects';
 import {
   CHANGE_PLAYBACK_SPEED,
   RESET_PLAYBACK_SPEED_AND_DIRECTION,
@@ -7,33 +7,33 @@ import {
   SET_PLAYBACK_SPEED,
   SET_PLAYBACK_SPEED_AND_DIRECTION,
   TOGGLE_PLAY,
-  UPDATE_CURRENT_FRAME_IDX_TO_THREE
+  updateCurrentFrameIdxToThree
 } from '../actions';
 import {
-  LOCAL_STORAGE_THREE_INSTANCE,
+  LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE,
   PLAYBACK_DIRECTION_DEFAULT,
   PLAYBACK_DIRECTION_REVERSE,
   PLAYBACK_SPEEDS
 } from '../../../../../../constants';
+import {selectFramesCount} from '../../Animation/reducers';
 import {
   selectIsPlaying,
   selectPlaybackDirection,
   selectPlaybackSpeedMultiplierIdx
 } from '../reducers';
-import {selectFramesCount} from '../../Animation/reducers';
-import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../Animation/actions/uiChannel';
 
 function* handleTogglePlay() {
   const isPlaying = yield select(selectIsPlaying);
-  const threeInstance = window[LOCAL_STORAGE_THREE_INSTANCE];
+  const animationControllerInstance =
+    window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
   yield put({type: SET_IS_PLAYING, payload: {isPlaying: !isPlaying}});
   if (isPlaying === true) {
     yield put({
       type: RESET_PLAYBACK_SPEED_AND_DIRECTION
     });
-    threeInstance.resetPlayback();
+    animationControllerInstance.resetPlayback();
   }
-  threeInstance.isPlaying = !isPlaying;
+  animationControllerInstance.isPlaying = !isPlaying;
 }
 
 function* handleChangePlaybackSpeed(action) {
@@ -45,11 +45,12 @@ function* handleChangePlaybackSpeed(action) {
   );
   const currentPlaybackDirection = yield select(selectPlaybackDirection);
 
-  const threeInstance = window[LOCAL_STORAGE_THREE_INSTANCE];
+  const animationControllerInstance =
+    window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
 
   if (currentPlaybackDirection !== playbackDirection) {
-    threeInstance.playbackSpeed = PLAYBACK_SPEEDS[0];
-    threeInstance.playbackDirection = playbackDirection;
+    animationControllerInstance.playbackSpeed = PLAYBACK_SPEEDS[0];
+    animationControllerInstance.playbackDirection = playbackDirection;
     yield put({
       type: SET_PLAYBACK_SPEED_AND_DIRECTION,
       payload: {playbackSpeedMultiplierIdx: 0, playbackDirection}
@@ -60,7 +61,8 @@ function* handleChangePlaybackSpeed(action) {
       currentPlaybackSpeedMultiplierIdx + 1 < PLAYBACK_SPEEDS.length
         ? currentPlaybackSpeedMultiplierIdx + 1
         : 0;
-    threeInstance.playbackSpeed = PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx];
+    animationControllerInstance.playbackSpeed =
+      PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx];
     yield put({
       type: SET_PLAYBACK_SPEED,
       payload: {
@@ -79,30 +81,19 @@ handleChangePlaybackSpeed.propTypes = {
 };
 
 function* handleUpdateCurrentFrameIdxToThree(action) {
-  const {
-    payload: {frameIdx}
-  } = action;
-  const threeInstance = window[LOCAL_STORAGE_THREE_INSTANCE];
+  const frameIdx = action.payload;
+  const animationControllerInstance =
+    window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
+
+  animationControllerInstance.updateFrameIdxFromUi(frameIdx);
+
   const framesCount = yield select(selectFramesCount);
-  threeInstance.currentFrameIdx = frameIdx;
-  yield put({
-    type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
-    payload: {currentFrameIdx: frameIdx}
-  });
-  if (threeInstance.isPlaying) {
+  if (animationControllerInstance.isPlaying) {
     if (framesCount - 1 === frameIdx || frameIdx === 0) {
-      threeInstance.isPlaying = false;
+      animationControllerInstance.isPlaying = false;
       yield put({type: SET_IS_PLAYING, payload: {isPlaying: false}});
     }
-  } else {
-    threeInstance.renderCurrentFrame();
   }
-  // if((framesCount - 1 === frameIdx || frameIdx === 0) && threeInstance.isPlaying){
-  //   threeInstance.isPlaying = false;
-  // } else {
-  //   threeInstance.isPlaying = true;
-  // }
-  // threeInstance.isPlaying = !(framesCount - 1 === frameIdx || frameIdx === 0);
 }
 
 function* watchTogglePlay() {
@@ -112,9 +103,9 @@ function* watchChangePlaybackSpeed() {
   yield takeLatest(CHANGE_PLAYBACK_SPEED, handleChangePlaybackSpeed);
 }
 function* watchUpdateCurrentFrameIdxToThree() {
-  // yield debounce(10, UPDATE_CURRENT_FRAME_IDX_TO_THREE, handleUpdateCurrentFrameIdxToThree)
-  yield takeLatest(
-    UPDATE_CURRENT_FRAME_IDX_TO_THREE,
+  yield throttle(
+    50,
+    updateCurrentFrameIdxToThree.type,
     handleUpdateCurrentFrameIdxToThree
   );
 }

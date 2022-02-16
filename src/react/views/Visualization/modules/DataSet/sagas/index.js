@@ -13,10 +13,14 @@ function* handlePlotDataSet(action) {
   const x = [];
   const y = [];
   const z = [];
-  dataSet.framesPerPerson.forEach(frame => frame.forEach(person => person.keyPoints.forEach(point => {
-    x.push(point.x);
-    y.push(point.y);
-  })))
+  dataSet.framesPerPerson.forEach(frame =>
+    frame.forEach(person =>
+      person.keyPoints.forEach(point => {
+        x.push(point.x);
+        y.push(point.y);
+      })
+    )
+  );
   const trace1 = {
     x,
     y,

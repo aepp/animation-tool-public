@@ -2,7 +2,8 @@ import {
   SET_PLAYBACK_SPEED_AND_DIRECTION,
   SET_PLAYBACK_SPEED,
   SET_IS_PLAYING,
-  RESET_PLAYBACK_SPEED_AND_DIRECTION
+  RESET_PLAYBACK_SPEED_AND_DIRECTION,
+  resetAnimationControls
 } from '../actions';
 import {PLAYBACK_DIRECTION_DEFAULT} from '../../../../../../constants';
 
@@ -36,6 +37,10 @@ const r = (state = defaultState, action) => {
         ...state,
         playbackSpeedMultiplierIdx: null,
         playbackDirection: PLAYBACK_DIRECTION_DEFAULT
+      };
+    case [resetAnimationControls.type]:
+      return {
+        ...defaultState
       };
     default:
       return state;

@@ -1,3 +1,6 @@
-export const UPDATE_CURRENT_FRAME_IDX_FROM_THREE =
-  'uiChannel/UPDATE_CURRENT_FRAME_IDX_FROM_THREE';
-export const UPDATE_FRAMES_COUNT = 'uiChannel/UPDATE_FRAMES_COUNT';
+import {createAction} from '@reduxjs/toolkit';
+
+export const updateCurrentFrameIndexFromThree = createAction(
+  'updateCurrentFrameIndexFromThree'
+);
+export const updateFramesCount = createAction('updateFramesCount');

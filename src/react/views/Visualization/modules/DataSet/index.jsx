@@ -13,9 +13,9 @@ import Plot from 'react-plotly.js';
 // // import {Scatter} from 'react-chartjs-2';
 
 import {selectDataSet} from './reducers';
-import {DATA_SOURCE_TF} from '../../../../../constants';
 import {selectIsAnimationInitialized} from '../Animation/reducers';
 import {PRIMARY_COLOR, SECONDARY_COLOR} from '../../../../theme/constants';
+import {DataSourceType} from '../../../../../constants';
 
 // ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -30,6 +30,10 @@ export const options = {
 export const DataSet = () => {
   const theme = useTheme();
   const isInitialized = useSelector(selectIsAnimationInitialized);
+
+  /**
+   * @type {PreProcessedDataSet}
+   */
   const dataSet = useSelector(selectDataSet);
 
   const [points, setPoints] = useState({x: [], y: []});
@@ -52,7 +56,7 @@ export const DataSet = () => {
           })
         )
       );
-      if (dataSet.dataSource === DATA_SOURCE_TF) {
+      if (dataSet.dataSource === DataSourceType.DATA_SOURCE_TF) {
         setPoints({x, y});
         // setVectors(vectors);
         setPlotType('scattergl');
@@ -87,7 +91,8 @@ export const DataSet = () => {
         '& .main-svg': {
           borderRadius: `${theme.shape.borderRadius}px`
         }
-      }}>
+      }}
+    >
       {/*<Scatter*/}
       {/*  options={options}*/}
       {/*  type={'scatter'}*/}

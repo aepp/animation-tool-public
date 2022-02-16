@@ -6,7 +6,7 @@ import {combineReducers} from 'redux';
 
 export const reducerKey = 'visualization';
 const r = combineReducers({
-  [animationReducerKey]: animationReducer,
+  [animationReducerKey]: animationReducer
 });
 export default r;
 

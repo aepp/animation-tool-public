@@ -1,4 +1,5 @@
 import {fork, takeLatest, select} from 'redux-saga/effects';
+import {DataSourceType} from '../../../../constants';
 import {DOWNLOAD_DETECTION_RESULTS} from '../actions';
 import {selectDetectedPoses, selectDetectionModel} from '../reducers';
 
@@ -7,8 +8,8 @@ function* handleDownloadResults() {
   const model = yield select(selectDetectionModel);
   const json = JSON.stringify({
     source: {
-      id: 'tf',
-      details:{
+      id: DataSourceType.DATA_SOURCE_TF,
+      details: {
         model
       }
     },

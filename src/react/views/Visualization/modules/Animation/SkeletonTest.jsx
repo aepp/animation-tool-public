@@ -23,7 +23,8 @@ export const SkeletonTest = () => {
         alignItems: 'center',
         justifyContent: 'center',
         boxSizing: 'border-box'
-      }}/>
+      }}
+    />
   );
 };
 

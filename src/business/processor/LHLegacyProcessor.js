@@ -1,4 +1,23 @@
 import {IDataSetProcessor} from './IDataSetProcessor';
+import {DataSourceType} from '../../constants';
+
+/**
+ * @typedef RawLHLegacyFrame
+ * @type {object}
+ * @property {string} frameStamp
+ * @property {object} frameAttributes
+ */
+
+/**
+ * @typedef RawLHLegacyDataSet
+ * @type {object}
+ * @property {string} [recordingID]
+ * @property {string} [RecordingID]
+ * @property {RawLHLegacyFrame[]} [frames]
+ * @property {RawLHLegacyFrame[]} [Frames]
+ * @property {DataSourceType} [applicationName]
+ * @property {DataSourceType} [ApplicationName]
+ */
 
 export class LHLegacyProcessor extends IDataSetProcessor {
   _personIndices = [];
@@ -203,7 +222,8 @@ export class LHLegacyProcessor extends IDataSetProcessor {
           translateX: this.translateX,
           translateY: this.translateY,
           translateZ: this.translateZ
-        }
+        },
+        dataSource: DataSourceType.DATA_SOURCE_KINECT
       })
     );
   };

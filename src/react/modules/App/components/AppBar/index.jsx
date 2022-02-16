@@ -26,7 +26,8 @@ export const AppBar = () => {
               aria-label='open animation controls'
               onClick={() => dispatch(setDrawerState(true))}
               edge='start'
-              sx={{mr: 2, zIndex: 1}}>
+              sx={{mr: 2, zIndex: 1}}
+            >
               <MenuIcon />
             </IconButton>
           )}

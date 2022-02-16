@@ -1,39 +1,39 @@
 import {eventChannel} from 'redux-saga';
 import {takeLatest, take, fork, select, call, put} from 'redux-saga/effects';
 import {
-  DATA_SOURCE_KINECT,
-  DATA_SOURCE_TF,
-  LOCAL_STORAGE_THREE_INSTANCE
+  DataSourceType,
+  LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE
 } from '../../../../../../constants';
 import {AnimationController} from '../../../../../../business/controller/AnimationController';
-import {UNKNOWN_DATA_SOURCE} from '../../../../../../messages';
+import {UNKNOWN_DATA_SOURCE} from '../../../../../../i18n/messages';
 import {LHLegacyProcessor} from '../../../../../../business/processor/LHLegacyProcessor';
 import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
 import {
-  FINISH_ANIMATION_INIT,
+  finishAnimationInit,
   skeletonTest,
   startAnimation
 } from '../actions/animation';
-
-import {UPDATE_FRAMES_COUNT} from '../actions/uiChannel';
+import {updateFramesCount} from '../actions/uiChannel';
 import {setDataSet} from '../../DataSet/actions';
 import {SimpleTestAnimationController} from '../../../../../../business/controller/SimpleTestAnimationController';
+import {resetAnimationControls} from '../../AnimationControls/actions';
 
 const START_UI_CHANNEL = 'START_UI_CHANNEL';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
 function* handleStartUiChannel() {
-  const threeInstance = window[LOCAL_STORAGE_THREE_INSTANCE];
+  const animationControllerInstance =
+    window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
 
   const uiChannel = eventChannel(emitter => {
-    threeInstance.sendToUi = ({type, payload}) => {
+    animationControllerInstance.sendToUi = ({type, payload}) => {
       emitter({type, payload});
     };
     // The subscriber must return an unsubscribe function
     return () => {
-      threeInstance.reset();
+      animationControllerInstance.reset();
     };
   });
 
@@ -68,10 +68,10 @@ function* handleStartAnimationInit(action) {
 
   let ProcessorInstance;
   switch (dataSource) {
-    case DATA_SOURCE_KINECT:
+    case DataSourceType.DATA_SOURCE_KINECT:
       ProcessorInstance = new LHLegacyProcessor({frames});
       break;
-    case DATA_SOURCE_TF:
+    case DataSourceType.DATA_SOURCE_TF:
       ProcessorInstance = new TFProcessor({frames});
       break;
     default:
@@ -94,30 +94,43 @@ function* handleStartAnimationInit(action) {
 
   console.log('pre-process finished! rendering...');
 
-  yield put({
-    type: UPDATE_FRAMES_COUNT,
-    payload: {framesCount: framesPerPerson.length}
-  });
+  yield put(updateFramesCount(framesPerPerson.length));
 
-  console.log('framesPerPerson', framesPerPerson);
+  let AnimationControllerInstance =
+    window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
+  if (AnimationControllerInstance) {
+    console.log('replacing dataset...');
+    AnimationControllerInstance.handleDataSetReplacement();
+    yield put(resetAnimationControls);
+  } else {
+    AnimationControllerInstance = new AnimationController({rootElement});
+  }
 
-  const AnimationControllerInstance =
-    window[LOCAL_STORAGE_THREE_INSTANCE] ||
-    new AnimationController({rootElement});
-
-  AnimationControllerInstance.reset()
-    .init({dataSource, extremes, normalization})
-    .initFrames({
+  yield call(
+    {
+      context: AnimationControllerInstance,
+      fn: AnimationControllerInstance.setup
+    },
+    {
+      dataSource,
+      extremes,
+      normalization,
       framesPerPerson,
       framesCount: framesPerPerson.length,
       personIndices
-    })
-    .animationLoop();
+    }
+  );
 
-  window[LOCAL_STORAGE_THREE_INSTANCE] = AnimationControllerInstance;
+  yield call({
+    context: AnimationControllerInstance,
+    fn: AnimationControllerInstance.animationLoop
+  });
+
+  window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE] =
+    AnimationControllerInstance;
 
   yield put({type: START_UI_CHANNEL});
-  yield put({type: FINISH_ANIMATION_INIT});
+  yield put(finishAnimationInit());
 }
 
 function* handleSkeletonTest(action) {

@@ -1,292 +1,242 @@
 import {
-  LineDashedMaterial,
-  BufferGeometry,
-  Line,
-  WebGLRenderer,
-  Scene,
-  Color,
-  PerspectiveCamera,
-  Vector2,
+  // eslint-disable-next-line no-unused-vars
+  Object3D
 } from 'three';
 import {
-  DATA_SOURCE_KINECT,
-  DATA_SOURCE_TF,
+  DataSourceType,
+  ORBIT_CONTROLS_Z_LIMIT_ADDITION,
   PLAYBACK_DIRECTION_DEFAULT
 } from '../../constants';
-import {BACKGROUND_COLOR} from '../../react/theme/constants';
-import {UPDATE_CURRENT_FRAME_IDX_FROM_THREE} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
-import {UNKNOWN_DATA_SOURCE} from '../../messages';
-import {RenderService3D} from '../service/RenderService3D';
-import {RenderService2D} from '../service/RenderService2D';
-import {DatasetHelper} from './DatasetHelper';
+import {updateCurrentFrameIndexFromThree} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
+import {UNKNOWN_DATA_SOURCE} from '../../i18n/messages';
+import {RenderHelper3D} from '../helper/RenderHelper3D';
+import {RenderHelper2D} from '../helper/RenderHelper2D';
+import ThreeRenderService from '../service/ThreeRenderService';
+import {DataSetModel} from '../model/DataSetModel';
 import {PlaybackController} from './PlaybackController';
 
 export class AnimationController extends PlaybackController {
-  _rootElement;
-
-  // three.js
   /**
    *
-   * @type {number}
-   * @private
-   */
-  _fov = 45;
-
-  _renderer;
-
-  _scene;
-
-  _camera;
-
-  /**
-   *
-   * @type {[]}
+   * @type {Object3D[]}
    * @private
    */
   _currentFrameObjects = [];
 
-  // helper classes
-  _datasetHelper;
+  /**
+   *
+   * @type {Object3D}
+   * @private
+   */
+  _room;
 
-  _renderService;
+  // services
+  /**
+   * @type {RenderHelper}
+   * @private
+   */
+  _renderHelper;
 
-  // feedback to the ui over redux-saga channel
-  _sendToUi = () => {};
+  /**
+   * @type {ThreeRenderService}
+   * @private
+   */
+  _threeRenderService;
 
+  /**
+   * Has to set on sagas setup to be able to send feedback to the ui over redux-saga channel
+   * @type {Function}
+   * @param {String} type
+   * @param {Object} payload
+   * @private
+   */
+  _sendToUi = ({type, payload}) => {
+    console.log(
+      `trying to send message ${type} with payload ${payload}, but sendToUi not ready yet...`
+    );
+  };
+
+  /**
+   * @param {HTMLElement} rootElement
+   */
   constructor(
     {rootElement = document.body} = {
       rootElement: document.body
     }
   ) {
     super();
-    this.rootElement = rootElement;
-    this.datasetHelper = new DatasetHelper();
-
-    this.renderer = new WebGLRenderer({ antialias: true });
-    this.renderer.setSize(rootElement.clientWidth, rootElement.clientHeight);
-    this.rootElement.appendChild(this.renderer.domElement);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this._threeRenderService = new ThreeRenderService({rootElement});
   }
 
-  init({dataSource, extremes, normalization}) {
-    this.scene = new Scene();
-    this.scene.background = new Color(BACKGROUND_COLOR);
-
-    console.log('normalization', normalization);
-    console.log('extremes', extremes);
-    const serviceParameters = {
-      rootElement: this.rootElement,
+  /**
+   *
+   * @public
+   * @param {DataSourceType} dataSource
+   * @param {Extremes} extremes
+   * @param {Normalization} normalization
+   * @param {Array.<>} framesPerPerson
+   * @param {number} framesCount
+   * @param {number[]} personIndices
+   * @returns {AnimationController}
+   */
+  setup({
+    dataSource,
+    extremes,
+    normalization,
+    framesPerPerson,
+    framesCount,
+    personIndices
+  }) {
+    const dataSetModel = new DataSetModel({
       extremes,
-      normalization
-    };
+      normalization,
+      framesPerPerson,
+      framesCount,
+      personIndices
+    });
+
     switch (dataSource) {
-      case DATA_SOURCE_KINECT:
-        this._renderService = new RenderService3D(serviceParameters);
+      case DataSourceType.DATA_SOURCE_KINECT:
+        this._renderHelper = new RenderHelper3D({dataSetModel});
         break;
-      case DATA_SOURCE_TF:
-        this._renderService = new RenderService2D(serviceParameters);
+      case DataSourceType.DATA_SOURCE_TF:
+        this._renderHelper = new RenderHelper2D({dataSetModel});
         break;
       default:
         throw new Error(UNKNOWN_DATA_SOURCE);
     }
 
-    this.camera = new PerspectiveCamera(
-      this.fov,
-      this.rootElement.clientWidth / this.rootElement.clientHeight,
-      0.01,
-      10
-    );
-        this.camera.position.set(0, 0, this.renderService.calculateFovDistance({fov: this.fov}));
-        // this.camera.position.set(0, 0, 3);
-    //     this.camera.lookAt(...this.renderService.getDefaultCameraLookAt({fov: this.fov}));
-
-    const geometryFrame = new BufferGeometry();
-    const materialFrame = new LineDashedMaterial({
-      color: 0xff0000,
-      linewidth: 0.2,
-      scale: 1,
-      dashSize: 0.01,
-      gapSize: 0.01
+    this._threeRenderService.updateCameraPosition({
+      x: 0,
+      y: 0,
+      z: this._renderHelper.calculateFovDistance({
+        fov: this._threeRenderService.fov
+      })
     });
 
-    const pointsFrame = [];
-
-    const BOTTOM_LEFT = [(this.renderService.extremes.xMin - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMin - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
-    const BOTTOM_RIGHT = [(this.renderService.extremes.xMax - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMin - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
-    const TOP_RIGHT = [(this.renderService.extremes.xMax - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMax - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
-    const TOP_LEFT = [(this.renderService.extremes.xMin - this.renderService.normalization.translateX) / this.renderService.normalization.scaleFactor, (this.renderService.extremes.yMax - this.renderService.normalization.translateY) / this.renderService.normalization.scaleFactor];
-
-    pointsFrame.push(new Vector2(...BOTTOM_LEFT));
-    pointsFrame.push(new Vector2(...BOTTOM_RIGHT));
-    pointsFrame.push(new Vector2(...TOP_RIGHT));
-    pointsFrame.push(new Vector2(...TOP_LEFT));
-    pointsFrame.push(new Vector2(...BOTTOM_LEFT));
-
-    geometryFrame.setFromPoints(pointsFrame);
-    const lineFrame = new Line(geometryFrame, materialFrame);
-    lineFrame.computeLineDistances();
-
-    this.scene.add(lineFrame);
-
-    // const pointGeometry = new BufferGeometry();
-    //
-    // this.scene.add(
-    //   new Points(
-    //     pointGeometry.setAttribute(
-    //       'position',
-    //       new Float32BufferAttribute([0, 0, -1], 3)
-    //     ),
-    //     new PointsMaterial({size: 1, color: 0xff3333})
-    //   )
-    // );
-
-    return this;
-  }
-
-  initFrames({framesPerPerson, framesCount, personIndices}) {
-    this.datasetHelper.initFrames({
-      framesPerPerson,
-      framesCount,
-      personIndices
+    this._threeRenderService.updateCameraControls({
+      minDistance: extremes.zMin - ORBIT_CONTROLS_Z_LIMIT_ADDITION,
+      maxDistance: extremes.zMax + ORBIT_CONTROLS_Z_LIMIT_ADDITION
     });
+
+    this._room = this._renderHelper.generateRoom();
+    this._threeRenderService.addObject(this._room);
+
+    this._currentFrameIdx = 0;
     return this;
   }
 
-  generateAnimationObjectsFromCurrentFrame() {
-    this.currentFrameObjects =
-      this.renderService.generateAnimationObjectsFromFrame({
-        frame: this.datasetHelper.framesPerPerson[this.currentFrameIdx]
-      });
-    return this;
-  }
-
+  /**
+   * @async
+   * @public
+   * @returns {Promise<AnimationController>}
+   */
   async animationLoop() {
     await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
     requestAnimationFrame(this.animationLoop.bind(this));
-    this.playAnimation.call(this);
+    this._playAnimation.call(this);
     return this;
   }
 
-  playAnimation() {
+  /**
+   * @private
+   * @returns {AnimationController}
+   */
+  _playAnimation() {
     if (this.isPlaying) {
+      this._renderCurrentFrame();
+
       if (this.playbackDirection === PLAYBACK_DIRECTION_DEFAULT) {
-        if (this.currentFrameIdx === this.datasetHelper.maxFramesCount - 1) {
-          this.currentFrameIdx = -1;
+        if (
+          this.currentFrameIdx ===
+          this._renderHelper.dataSetModel.maxFramesCount - 1
+        ) {
+          this.currentFrameIdx = 0;
         }
         this.currentFrameIdx += 1;
       } else {
         if (this.currentFrameIdx === 0) {
-          this.currentFrameIdx = this.datasetHelper.maxFramesCount;
+          this.currentFrameIdx = this._renderHelper.dataSetModel.maxFramesCount;
         }
         this.currentFrameIdx -= 1;
       }
-
-      this.renderCurrentFrame();
+      this._sendFrameIdxToUi();
+    } else {
+      this._threeRenderService.updateScene();
     }
     return this;
   }
 
-  renderCurrentFrame() {
-    this.currentFrameObjects.forEach(o => this.scene.remove(o));
-    this.currentFrameObjects = [];
+  /**
+   * @private
+   * @returns {AnimationController}
+   */
+  _renderCurrentFrame() {
+    const newSceneObjects =
+      this._renderHelper.generateAnimationObjectsFromFrame({
+        frameIdx: this._currentFrameIdx
+      });
 
-    this.generateAnimationObjectsFromCurrentFrame();
-
-    this.currentFrameObjects.forEach(o => this.scene.add(o));
-
-    this.renderer.clearDepth(); // important!
-
-    this.sendToUi({
-      type: UPDATE_CURRENT_FRAME_IDX_FROM_THREE,
-      payload: {currentFrameIdx: this.currentFrameIdx}
+    this._threeRenderService.updateScene({
+      objectsToAdd: newSceneObjects
     });
-    this.renderer.render(this.scene, this.camera);
+
     return this;
   }
 
-  reset() {
-    this.renderer.resetState();
+  /**
+   * @public
+   * @returns {AnimationController}
+   */
+  handleDataSetReplacement() {
+    this._threeRenderService.softReset();
+    this._room = undefined;
+    this._currentFrameObjects = [];
+    this.currentFrameIdx = 0;
+    this._sendFrameIdxToUi();
     this.resetPlayback();
+    this._threeRenderService.updateScene();
+
     return this;
   }
 
+  /**
+   * @public
+   * @param {number} frameIdx
+   */
   set currentFrameIdx(frameIdx) {
-    this.datasetHelper.currentFrameIdx = frameIdx;
+    this._currentFrameIdx = frameIdx;
   }
 
   get currentFrameIdx() {
-    return this.datasetHelper.currentFrameIdx;
+    return this._currentFrameIdx;
   }
 
-  get renderService() {
-    return this._renderService;
-  }
-
-  set renderService(value) {
-    this._renderService = value;
-  }
-
-  get scene() {
-    return this._scene;
-  }
-
-  set scene(value) {
-    this._scene = value;
-  }
-
-  get camera() {
-    return this._camera;
-  }
-
-  set camera(value) {
-    this._camera = value;
-  }
-
-  get rootElement() {
-    return this._rootElement;
-  }
-
-  set rootElement(value) {
-    this._rootElement = value;
-  }
-
-  get renderer() {
-    return this._renderer;
-  }
-
-  set renderer(value) {
-    this._renderer = value;
-  }
-
-  get datasetHelper() {
-    return this._datasetHelper;
-  }
-
-  set datasetHelper(value) {
-    this._datasetHelper = value;
-  }
-
-  get sendToUi() {
-    return this._sendToUi;
-  }
-
+  /**
+   * @public
+   * @param {Function} value
+   */
   set sendToUi(value) {
     this._sendToUi = value;
   }
 
-  get currentFrameObjects() {
-    return this._currentFrameObjects;
+  /**
+   * @private
+   * @param {number} [frameIdx]
+   */
+  _sendFrameIdxToUi(frameIdx = undefined) {
+    this._sendToUi({
+      type: updateCurrentFrameIndexFromThree.type,
+      payload: frameIdx === undefined ? this.currentFrameIdx : frameIdx
+    });
   }
 
-  set currentFrameObjects(value) {
-    this._currentFrameObjects = value;
-  }
-
-  get fov() {
-    return this._fov;
-  }
-
-  set fov(value) {
-    this._fov = value;
+  /**
+   * @public
+   * @param {number} frameIdx
+   */
+  updateFrameIdxFromUi(frameIdx = undefined) {
+    this._currentFrameIdx = frameIdx;
+    this._renderCurrentFrame();
   }
 }

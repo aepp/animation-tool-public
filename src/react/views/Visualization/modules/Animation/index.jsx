@@ -27,7 +27,8 @@ export const Animation = () => {
         alignItems: 'center',
         justifyContent: 'center',
         boxSizing: 'border-box'
-      }}>
+      }}
+    >
       {!isInitialized && (
         <Typography sx={{position: 'absolute'}}>Upload dataset...</Typography>
       )}

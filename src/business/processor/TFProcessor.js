@@ -1,4 +1,5 @@
 import {IDataSetProcessor} from './IDataSetProcessor';
+import {DataSourceType} from '../../constants';
 
 export class TFProcessor extends IDataSetProcessor {
   _model;
@@ -27,6 +28,10 @@ export class TFProcessor extends IDataSetProcessor {
     super({frames});
     this._model = model;
   }
+
+  /**
+   * @returns {Promise<PreProcessedDataSet>}
+   */
   preProcess = () => {
     const scoreThreshold = 0.95;
     this.frames.forEach(({keypoints}) =>
@@ -62,7 +67,10 @@ export class TFProcessor extends IDataSetProcessor {
       score
     }));
     return new Promise(resolve => {
-      return resolve({
+      /**
+       * @type {PreProcessedDataSet}
+       */
+      const processedDataSet = {
         // @todo consider "real" multi-person datasets
         framesPerPerson: framesPerPerson.map(frame => [frame]),
         personIndices: [0],
@@ -71,8 +79,10 @@ export class TFProcessor extends IDataSetProcessor {
           translateX: this.translateX,
           translateY: this.translateY,
           scaleFactor: this.normalScaleFactor
-        }
-      });
+        },
+        dataSource: DataSourceType.DATA_SOURCE_TF
+      };
+      return resolve(processedDataSet);
     });
   };
 

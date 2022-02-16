@@ -2,8 +2,12 @@ import {createSelector, createReducer} from '@reduxjs/toolkit';
 import {setDataSet} from '../actions';
 
 export const reducerKey = 'dataSet';
+
+/**
+ * @type {PreProcessedDataSet}
+ */
 const defaultState = {
-  dataSource: null,
+  dataSource: undefined,
   framesPerPerson: [],
   personIndices: [],
   extremes: {},

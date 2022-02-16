@@ -1,3 +1,37 @@
+/**
+ * @typedef Normalization
+ * @description parameters used to scale the dataset points to the values between 0 and 1
+ *              and shift the dataset to the center of the scene (i.e. html element containing
+ *              the animation).
+ * @type {object}
+ * @property {number} translateX  required shift on the x axis.
+ * @property {number} translateY  required shift on the y axis.
+ * @property {number} translateZ  required shift on the z axis.
+ * @property {number} scaleFactor length of the vector, which represents the distance between
+ *                                a point with smallest x, y, and z available in the dataset
+ *                                and a point with the largest x, y, and z available in the dataset.
+ */
+
+/**
+ * @typedef Extremes
+ * @type {object}
+ * @property {number} zMin - smallest z value of the entire dataset.
+ * @property {number} yMin - smallest y value of the entire dataset.
+ * @property {number} xMin - smallest x value of the entire dataset.
+ * @property {number} zMax - highest z value of the entire dataset.
+ * @property {number} yMax - highest y value of the entire dataset.
+ * @property {number} xMax - highest x value of the entire dataset.
+ */
+
+/**
+ * @typedef PreProcessedDataSet
+ * @type {object}
+ * @property {object[]} framesPerPerson
+ * @property {number[]} personIndices
+ * @property {Extremes} extremes
+ * @property {Normalization} normalization
+ * @property {DataSourceType} dataSource
+ */
 export class IDataSetProcessor {
   /**
    * @type {RegExp}
@@ -18,7 +52,7 @@ export class IDataSetProcessor {
   _frames;
 
   /**
-   * @type {object}
+   * @type {Extremes}
    * @private
    */
   _extremes = {
