@@ -4,8 +4,8 @@ KEEP_RELEASES=3
 APP_ROOT=/usr/docker/containers/at.epps-apps.com
 RELEASE_NAME=$(date '+%Y_%m_%d_%H_%M_%S')
 DEPLOY_SERVER_URL=epps-apps.com
-TEMP_DIR=temp_fe
-RELEASES_DIR=releases_fe
+TEMP_DIR=temp
+RELEASES_DIR=releases
 DIST_DIR=build
 
 ssh-keyscan -H ${DEPLOY_SERVER_URL} >> ~/.ssh/known_hosts
