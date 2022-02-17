@@ -1,32 +1,33 @@
 import React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {Box, Button, CircularProgress} from '@mui/material';
 import {
   LocalFireDepartment as FireIcon,
   PlayArrow,
   Pause
 } from '@mui/icons-material';
-import {useDispatch, useSelector} from 'react-redux';
-import '@tensorflow/tfjs-backend-webgl';
+import {beginWarmUpModel} from '../../actions/estimation';
 import {
-  VIDEO_PLAYBACK_PAUSE,
-  VIDEO_PLAYBACK_START,
-  BEGIN_WARM_UP_MODEL
-} from '../../actions';
-import {
-  selectDetectionStatus,
+  selectHasDetectionStarted,
+  selectHasDetectionFinished,
+  selectIsDetecting,
   selectIsModelWarmedUp,
   selectIsModelWarmingUp
 } from '../../reducers';
+import {
+  startEstimationVideo,
+  stopEstimationVideo
+} from '../../actions/estimationPlayback';
 
-export const VideoButton = ({videoElementPreview, videoElementOriginal}) => {
+export const VideoButton = ({videoElementOriginal}) => {
   const dispatch = useDispatch();
   const isModelWarmingUp = useSelector(selectIsModelWarmingUp);
   const isModelWarmedUp = useSelector(selectIsModelWarmedUp);
-  const {hasDetectionStarted, hasDetectionFinished, isDetecting} = useSelector(
-    selectDetectionStatus
-  );
+  const isDetecting = useSelector(selectIsDetecting);
+  const hasDetectionStarted = useSelector(selectHasDetectionStarted);
+  const hasDetectionFinished = useSelector(selectHasDetectionFinished);
 
-  let action = BEGIN_WARM_UP_MODEL,
+  let action = beginWarmUpModel,
     label = 'Warm up model',
     icon = <FireIcon color={'error'} />,
     disabled = false;
@@ -39,11 +40,11 @@ export const VideoButton = ({videoElementPreview, videoElementOriginal}) => {
     if (hasDetectionStarted) {
       label = 'Resume detection';
     }
-    action = VIDEO_PLAYBACK_START;
+    action = startEstimationVideo;
     icon = <PlayArrow color={'inherit'} />;
   } else if (isDetecting) {
     label = 'Pause detection';
-    action = VIDEO_PLAYBACK_PAUSE;
+    action = stopEstimationVideo;
     icon = <Pause color={'inherit'} />;
   }
 
@@ -57,22 +58,15 @@ export const VideoButton = ({videoElementPreview, videoElementOriginal}) => {
       display={'flex'}
       alignItems={'center'}
       justifyContent={'center'}
-      zIndex={2}
-    >
+      zIndex={2}>
       {!hasDetectionFinished && (
         <Button
           id={'video-button'}
           variant={'contained'}
           color={'primary'}
-          onClick={() =>
-            dispatch({
-              type: action,
-              payload: {videoElementPreview, videoElementOriginal}
-            })
-          }
+          onClick={() => dispatch(action(videoElementOriginal))}
           startIcon={icon}
-          disabled={disabled}
-        >
+          disabled={disabled}>
           {label}
         </Button>
       )}

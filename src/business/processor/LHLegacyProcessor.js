@@ -1,5 +1,5 @@
 import {IDataSetProcessor} from './IDataSetProcessor';
-import {DataSourceType} from '../../constants';
+import {DataSourceType} from '../../config/constants';
 
 /**
  * @typedef RawLHLegacyFrame

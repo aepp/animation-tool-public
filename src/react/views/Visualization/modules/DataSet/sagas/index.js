@@ -12,7 +12,6 @@ function* handlePlotDataSet(action) {
   console.log('dataSet', dataSet);
   const x = [];
   const y = [];
-  const z = [];
   dataSet.framesPerPerson.forEach(frame =>
     frame.forEach(person =>
       person.keyPoints.forEach(point => {

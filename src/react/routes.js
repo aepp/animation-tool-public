@@ -1,6 +1,11 @@
 export const routes = {
   root: '/',
-  recording: '/recording'
+  estimate: '/estimateFromVideo'
 };
 
 export default routes;
+
+export const routeLabels = {
+  [routes.root]: '',
+  [routes.estimate]: 'Estimate pose from video'
+};

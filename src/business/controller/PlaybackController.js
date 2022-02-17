@@ -1,8 +1,8 @@
 import {PlaybackService} from '../service/PlaybackService';
 import {
   PLAYBACK_SPEED_DEFAULT,
-  PLAYBACK_DIRECTION_DEFAULT
-} from '../../constants';
+  PlayBackDirectionType
+} from '../../config/constants';
 
 export class PlaybackController {
   _isPlaying;
@@ -19,12 +19,12 @@ export class PlaybackController {
     {
       isPlaying = true,
       playbackSpeed = PLAYBACK_SPEED_DEFAULT,
-      playbackDirection = PLAYBACK_DIRECTION_DEFAULT,
+      playbackDirection = PlayBackDirectionType.DEFAULT,
       framesAmountToSkip = 0
     } = {
       isPlaying: true,
       playbackSpeed: PLAYBACK_SPEED_DEFAULT,
-      playbackDirection: PLAYBACK_DIRECTION_DEFAULT,
+      playbackDirection: PlayBackDirectionType.DEFAULT,
       framesAmountToSkip: 0
     }
   ) {
@@ -70,7 +70,7 @@ export class PlaybackController {
   }
 
   resetPlayback() {
-    this.playbackDirection = PLAYBACK_DIRECTION_DEFAULT;
+    this.playbackDirection = PlayBackDirectionType.DEFAULT;
     this.playbackSpeed = PLAYBACK_SPEED_DEFAULT;
   }
 }

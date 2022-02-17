@@ -1,10 +1,7 @@
-import {finishAnimationInit} from '../actions/animation';
-import {
-  updateCurrentFrameIndexFromThree,
-  updateFramesCount
-} from '../actions/uiChannel';
-import {updateCurrentFrameIdx} from '../../AnimationControls/actions';
 import {createReducer} from '@reduxjs/toolkit';
+import {updateCurrentFrameIdx} from '../../AnimationControls/actions';
+import {finishAnimationInit, updateFramesCount} from '../actions/animation';
+import {updateCurrentFrameIndexFromThree} from '../actions/uiChannel';
 
 export const reducerKey = 'animation';
 const defaultState = {

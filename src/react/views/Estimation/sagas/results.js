@@ -1,6 +1,6 @@
 import {fork, takeLatest, select} from 'redux-saga/effects';
-import {DataSourceType} from '../../../../constants';
-import {DOWNLOAD_DETECTION_RESULTS} from '../actions';
+import {DataSourceType} from '../../../../config/constants';
+import {downloadEstimationResult} from '../actions/estimationResult';
 import {selectDetectedPoses, selectDetectionModel} from '../reducers';
 
 function* handleDownloadResults() {
@@ -27,7 +27,7 @@ function* handleDownloadResults() {
 }
 
 function* watchDownloadResults() {
-  yield takeLatest(DOWNLOAD_DETECTION_RESULTS, handleDownloadResults);
+  yield takeLatest(downloadEstimationResult.type, handleDownloadResults);
 }
 
 function* rootSaga() {

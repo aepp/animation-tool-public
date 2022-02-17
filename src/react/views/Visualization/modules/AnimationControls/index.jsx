@@ -13,8 +13,7 @@ export const AnimationControls = () => {
           alignItems: 'center',
           justifyContent: 'center',
           width: '100%'
-        }}
-      >
+        }}>
         <PlaybackControls />
       </Box>
       <Box sx={{ml: 'auto'}}>

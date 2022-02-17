@@ -1,14 +1,11 @@
 import React from 'react';
-import {Button, styled} from '@mui/material';
+import {Button} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
+import InputFile from '../../../../components/InputFile';
 import {SET_DATASET_FILE} from './actions';
 import {selectDataSetFileUrl} from './reducers';
 
 const ID = 'upload-file__button';
-
-const Input = styled('input')({
-  display: 'none'
-});
 
 export const UploadButton = () => {
   const dataSetFileUrl = useSelector(selectDataSetFileUrl);
@@ -17,10 +14,9 @@ export const UploadButton = () => {
 
   return (
     <label htmlFor={ID}>
-      <Input
+      <InputFile
         accept='application/json'
         id={ID}
-        type='file'
         onChange={e =>
           dispatch({type: SET_DATASET_FILE, payload: {file: e.target.files[0]}})
         }

@@ -1,56 +1,69 @@
+import {createReducer, createSelector} from '@reduxjs/toolkit';
+import {PlayBackDirectionType} from '../../../../../../config/constants';
 import {
-  SET_PLAYBACK_SPEED_AND_DIRECTION,
-  SET_PLAYBACK_SPEED,
-  SET_IS_PLAYING,
-  RESET_PLAYBACK_SPEED_AND_DIRECTION,
-  resetAnimationControls
+  resetAnimationControls,
+  setIsPlaying,
+  setPlaybackSpeedAndDirection,
+  setPlaybackSpeed,
+  resetPlaybackSpeedAndDirection
 } from '../actions';
-import {PLAYBACK_DIRECTION_DEFAULT} from '../../../../../../constants';
 
 export const reducerKey = 'animationControls';
 
+/**
+ * @typedef AnimationControlsState
+ * @type {object}
+ * @property {number} [playbackSpeedMultiplierIdx]
+ * @property {boolean} isPlaying.
+ * @property {PlayBackDirectionType} playbackDirection
+ */
+
+/**
+ * @type AnimationControlsState
+ */
 const defaultState = {
   isPlaying: true,
   playbackSpeedMultiplierIdx: null,
-  playbackDirection: PLAYBACK_DIRECTION_DEFAULT
+  playbackDirection: PlayBackDirectionType.DEFAULT
 };
-const r = (state = defaultState, action) => {
-  switch (action.type) {
-    case SET_IS_PLAYING:
-      return {
-        ...state,
-        isPlaying: action.payload.isPlaying
-      };
-    case SET_PLAYBACK_SPEED_AND_DIRECTION:
-      return {
-        ...state,
-        playbackSpeedMultiplierIdx: action.payload.playbackSpeedMultiplierIdx,
-        playbackDirection: action.payload.playbackDirection
-      };
-    case SET_PLAYBACK_SPEED:
-      return {
-        ...state,
-        playbackSpeedMultiplierIdx: action.payload.playbackSpeedMultiplierIdx
-      };
-    case RESET_PLAYBACK_SPEED_AND_DIRECTION:
-      return {
-        ...state,
-        playbackSpeedMultiplierIdx: null,
-        playbackDirection: PLAYBACK_DIRECTION_DEFAULT
-      };
-    case [resetAnimationControls.type]:
-      return {
-        ...defaultState
-      };
-    default:
-      return state;
-  }
-};
+const r = createReducer(defaultState, {
+  [setIsPlaying]: (state, action) => {
+    state.isPlaying = action.payload;
+  },
+  [setPlaybackSpeedAndDirection]: (state, action) => {
+    state.playbackSpeedMultiplierIdx =
+      action.payload.playbackSpeedMultiplierIdx;
+    state.playbackDirection = action.payload.playbackDirection;
+  },
+  [setPlaybackSpeed]: (state, action) => {
+    state.playbackSpeedMultiplierIdx = action.payload;
+  },
+  [resetPlaybackSpeedAndDirection]: state => {
+    state.playbackSpeedMultiplierIdx = null;
+    state.playbackSpeedMultiplierIdx = null;
+  },
+  [resetAnimationControls]: () => ({
+    ...defaultState
+  })
+});
 
 export default r;
 
-export const selectIsPlaying = state => state[reducerKey].isPlaying;
-export const selectPlaybackSpeedMultiplierIdx = state =>
-  state[reducerKey].playbackSpeedMultiplierIdx;
-export const selectPlaybackDirection = state =>
-  state[reducerKey].playbackDirection;
+/**
+ * @param state
+ * @return AnimationControlsState
+ */
+const selectSelf = state => state[reducerKey];
+export const selectIsPlaying = createSelector(
+  selectSelf,
+  /** @param {AnimationControlsState} state */ state => state.isPlaying
+);
+export const selectPlaybackSpeedMultiplierIdx = createSelector(
+  selectSelf,
+  /** @param {AnimationControlsState} state */ state =>
+    state.playbackSpeedMultiplierIdx
+);
+export const selectPlaybackDirection = createSelector(
+  selectSelf,
+  /** @param {AnimationControlsState} state */ state => state.playbackDirection
+);

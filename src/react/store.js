@@ -15,7 +15,7 @@ import animationControlsReducer, {
 } from './views/Visualization/modules/AnimationControls/reducers';
 import recordingReducer, {
   reducerKey as recordingReducerKey
-} from './views/Recording/reducers';
+} from './views/Estimation/reducers';
 
 export const sagaMiddleware = createSagaMiddleware();
 
@@ -29,5 +29,8 @@ export const store = configureStore({
     [dataSetReducerKey]: dataSetReducer
   },
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({serializableCheck: false}).concat(sagaMiddleware)
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false
+    }).concat(sagaMiddleware)
 });

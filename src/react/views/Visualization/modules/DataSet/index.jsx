@@ -15,7 +15,7 @@ import Plot from 'react-plotly.js';
 import {selectDataSet} from './reducers';
 import {selectIsAnimationInitialized} from '../Animation/reducers';
 import {PRIMARY_COLOR, SECONDARY_COLOR} from '../../../../theme/constants';
-import {DataSourceType} from '../../../../../constants';
+import {DataSourceType} from '../../../../../config/constants';
 
 // ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -91,8 +91,7 @@ export const DataSet = () => {
         '& .main-svg': {
           borderRadius: `${theme.shape.borderRadius}px`
         }
-      }}
-    >
+      }}>
       {/*<Scatter*/}
       {/*  options={options}*/}
       {/*  type={'scatter'}*/}

@@ -23,8 +23,7 @@ export const Progress = () => {
       display={'flex'}
       alignItems={'center'}
       justifyContent={'center'}
-      sx={{mx: 2}}
-    >
+      sx={{mx: 2}}>
       <Divider orientation={'vertical'} sx={{mr: 2}} flexItem />
       <Box sx={{width: 300}} display={'flex'} flexDirection={'column'}>
         <FormHelperText sx={{ml: 'auto'}}>

@@ -5,13 +5,10 @@ import {
   Pause as PauseIcon,
   PlayArrow as PlayArrowIcon
 } from '@mui/icons-material';
+import {PlayBackDirectionType} from '../../../../../../../config/constants';
 import {selectIsAnimationInitialized} from '../../../Animation/reducers';
-import {TOGGLE_PLAY} from '../../actions';
+import {togglePlay} from '../../actions';
 import {selectIsPlaying} from '../../reducers';
-import {
-  PLAYBACK_DIRECTION_DEFAULT,
-  PLAYBACK_DIRECTION_REVERSE
-} from '../../../../../../../constants';
 import DirectionButton from '../DirectionButton';
 import Progress from '../Progress';
 
@@ -25,17 +22,15 @@ export const PlaybackControls = () => {
       display={'flex'}
       alignItems={'center'}
       justifyContent={'center'}
-      mx={'auto'}
-    >
-      <DirectionButton playbackDirection={PLAYBACK_DIRECTION_REVERSE} />
+      mx={'auto'}>
+      <DirectionButton playbackDirection={PlayBackDirectionType.REVERSE} />
       <IconButton
-        onClick={() => dispatch({type: TOGGLE_PLAY})}
+        onClick={() => dispatch(togglePlay())}
         disabled={!isInitialized}
-        sx={{mx: 1}}
-      >
+        sx={{mx: 1}}>
         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
       </IconButton>
-      <DirectionButton playbackDirection={PLAYBACK_DIRECTION_DEFAULT} />
+      <DirectionButton playbackDirection={PlayBackDirectionType.DEFAULT} />
       {isInitialized && <Progress />}
     </Box>
   );

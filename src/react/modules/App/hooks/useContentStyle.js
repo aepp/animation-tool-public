@@ -1,5 +1,5 @@
 import {useSelector} from 'react-redux';
-import {APP_BAR_HEIGHT} from '../../../../constants';
+import {APP_BAR_HEIGHT} from '../../../../config/constants';
 import {selectWithAppBar} from '../reducers';
 
 export const useContentStyle = () => {

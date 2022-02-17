@@ -7,12 +7,11 @@ import {
   FastRewind as FastRewindIcon
 } from '@mui/icons-material';
 import {
-  PLAYBACK_DIRECTION_DEFAULT,
-  PLAYBACK_DIRECTION_REVERSE,
+  PlayBackDirectionType,
   PLAYBACK_SPEEDS
-} from '../../../../../../../constants';
+} from '../../../../../../../config/constants';
 import {selectIsAnimationInitialized} from '../../../Animation/reducers';
-import {CHANGE_PLAYBACK_SPEED} from '../../actions';
+import {changePlaybackSpeed} from '../../actions';
 import {
   selectIsPlaying,
   selectPlaybackDirection,
@@ -30,15 +29,9 @@ export const DirectionButton = ({playbackDirection}) => {
 
   const button = (
     <IconButton
-      onClick={() =>
-        dispatch({
-          type: CHANGE_PLAYBACK_SPEED,
-          payload: {playbackDirection}
-        })
-      }
-      disabled={!isPlaying || !isInitialized}
-    >
-      {playbackDirection === PLAYBACK_DIRECTION_DEFAULT ? (
+      onClick={() => dispatch(changePlaybackSpeed(playbackDirection))}
+      disabled={!isPlaying || !isInitialized}>
+      {playbackDirection === PlayBackDirectionType.DEFAULT ? (
         <FastForwardIcon />
       ) : (
         <FastRewindIcon />
@@ -58,10 +51,11 @@ export const DirectionButton = ({playbackDirection}) => {
         anchorOrigin={{
           vertical: 'bottom',
           horizontal:
-            playbackDirection === PLAYBACK_DIRECTION_DEFAULT ? 'right' : 'left'
+            playbackDirection === PlayBackDirectionType.DEFAULT
+              ? 'right'
+              : 'left'
         }}
-        badgeContent={`x${PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx]}`}
-      >
+        badgeContent={`x${PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx]}`}>
         {button}
       </Badge>
     );
@@ -69,9 +63,6 @@ export const DirectionButton = ({playbackDirection}) => {
   return button;
 };
 DirectionButton.propTypes = {
-  playbackDirection: PropTypes.oneOf([
-    PLAYBACK_DIRECTION_DEFAULT,
-    PLAYBACK_DIRECTION_REVERSE
-  ])
+  playbackDirection: PropTypes.oneOf(Object.keys(PlayBackDirectionType))
 };
 export default DirectionButton;

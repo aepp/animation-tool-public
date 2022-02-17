@@ -5,8 +5,8 @@ import {
 import {
   DataSourceType,
   ORBIT_CONTROLS_Z_LIMIT_ADDITION,
-  PLAYBACK_DIRECTION_DEFAULT
-} from '../../constants';
+  PlayBackDirectionType
+} from '../../config/constants';
 import {updateCurrentFrameIndexFromThree} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
 import {UNKNOWN_DATA_SOURCE} from '../../i18n/messages';
 import {RenderHelper3D} from '../helper/RenderHelper3D';
@@ -126,15 +126,19 @@ export class AnimationController extends PlaybackController {
     return this;
   }
 
+  _requestId = 1;
   /**
    * @async
    * @public
    * @returns {Promise<AnimationController>}
    */
   async animationLoop() {
-    await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
-    requestAnimationFrame(this.animationLoop.bind(this));
-    this._playAnimation.call(this);
+    cancelAnimationFrame(this._requestId);
+    // @todo dynamic fps adjustment
+    // await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
+    await new Promise(resolve => setTimeout(resolve, 16)); // i.e. 1000 / 16 = 60 fps
+    this._requestId = requestAnimationFrame(this.animationLoop.bind(this));
+    this._playAnimation();
     return this;
   }
 
@@ -146,7 +150,7 @@ export class AnimationController extends PlaybackController {
     if (this.isPlaying) {
       this._renderCurrentFrame();
 
-      if (this.playbackDirection === PLAYBACK_DIRECTION_DEFAULT) {
+      if (this.playbackDirection === PlayBackDirectionType.DEFAULT) {
         if (
           this.currentFrameIdx ===
           this._renderHelper.dataSetModel.maxFramesCount - 1
