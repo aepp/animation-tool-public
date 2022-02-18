@@ -10,8 +10,9 @@ export const setPlaybackSpeedAndDirection = createAction(
 export const resetPlaybackSpeedAndDirection = createAction(
   'resetPlaybackSpeedAndDirection'
 );
-export const resetAnimationControls = createAction('resetAnimationControls');
 export const updateCurrentFrameIdx = createAction('updateCurrentFrameIdx');
 export const updateCurrentFrameIdxToThree = createAction(
   'updateCurrentFrameIdxToThree'
 );
+
+export const resetAnimationControls = createAction('resetAnimationControls');

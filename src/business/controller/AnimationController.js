@@ -192,7 +192,7 @@ export class AnimationController extends PlaybackController {
    * @public
    * @returns {AnimationController}
    */
-  handleDataSetReplacement() {
+  softReset() {
     this._threeRenderService.softReset();
     this._room = undefined;
     this._currentFrameObjects = [];

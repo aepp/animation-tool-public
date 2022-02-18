@@ -32,6 +32,7 @@ import {
   endEstimationVideo,
   stopEstimationVideo
 } from '../actions/estimationPlayback';
+import {cleanupEstimationView} from '../actions/view';
 
 function* handleWarmUpModel() {
   const dimensions = yield select(selectEstimationVideoOriginalDimensions);
@@ -125,6 +126,9 @@ function* handleStartDetection(action) {
       yield cancel(detectionLoop);
     }
   );
+  yield takeLatest(cleanupEstimationView.type, function* () {
+    yield cancel(detectionLoop);
+  });
 }
 
 function* handlePauseDetection() {

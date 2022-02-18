@@ -1,5 +1,6 @@
 import {createReducer, createSelector} from '@reduxjs/toolkit';
 import {
+  resetEstimationPlayback,
   setEstimationVideoOriginalDimensions,
   setEstimationVideoPreviewDimensions,
   setEstimationVideoUrl,
@@ -53,7 +54,8 @@ const r = createReducer(defaultState, {
   },
   [setEstimationVideoOriginalDimensions]: (state, action) => {
     state.originalVideoDimensions = action.payload;
-  }
+  },
+  [resetEstimationPlayback]: () => ({...defaultState})
 });
 
 export default r;
@@ -68,7 +70,7 @@ export const selectors = {
     selectSelf,
     /** @param {EstimationPlaybackState} state */ state => state.isInitialized
   ),
-  selectIsEstimationVideoUrl: createSelector(
+  selectEstimationVideoUrl: createSelector(
     selectSelf,
     /** @param {EstimationPlaybackState} state */ state =>
       state.estimationVideoUrl

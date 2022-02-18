@@ -24,6 +24,7 @@ function* handleDownloadResults() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(href);
 }
 
 function* watchDownloadResults() {

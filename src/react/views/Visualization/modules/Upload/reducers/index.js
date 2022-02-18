@@ -1,22 +1,32 @@
-import {SET_DATASET_FILE_URL} from '../actions';
+import {resetUpload, setDataSetFileUrl} from '../actions';
+import {createReducer, createSelector} from '@reduxjs/toolkit';
 
 export const reducerKey = 'upload';
 
+/**
+ * @typedef DataSetUploadState
+ * @type {object}
+ * @property {string} [url]
+ */
 const defaultState = {
   url: null
 };
-const r = (state = defaultState, action) => {
-  switch (action.type) {
-    case SET_DATASET_FILE_URL:
-      return {
-        ...state,
-        url: action.payload.url
-      };
-    default:
-      return state;
-  }
-};
+const r = createReducer(defaultState, {
+  [setDataSetFileUrl]: (state, action) => {
+    state.url = action.payload;
+  },
+  [resetUpload]: () => ({...defaultState})
+});
 
 export default r;
 
-export const selectDataSetFileUrl = state => state[reducerKey].url;
+/**
+ * @param state
+ * @return PreProcessedDataSet
+ */
+const selectSelf = state => state[reducerKey];
+export const selectDataSetFileUrl = createSelector(
+  selectSelf,
+  /** @param {DataSetUploadState} state */
+  state => state.url
+);

@@ -36,8 +36,8 @@ export const selectIsEstimationVideoInitialized = state =>
   estimationPlaybackSelectors.selectIsEstimationVideoInitialized(
     state[reducerKey]
   );
-export const selectIsEstimationVideoUrl = state =>
-  estimationPlaybackSelectors.selectIsEstimationVideoUrl(state[reducerKey]);
+export const selectEstimationVideoUrl = state =>
+  estimationPlaybackSelectors.selectEstimationVideoUrl(state[reducerKey]);
 export const selectIsEstimationVideoPlaying = state =>
   estimationPlaybackSelectors.selectIsEstimationVideoPlaying(state[reducerKey]);
 export const selectEstimationVideoTotalTime = state =>

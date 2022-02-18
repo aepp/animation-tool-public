@@ -15,8 +15,6 @@ export const DetectionProgress = () => {
   const currentTime = useSelector(selectEstimationVideoCurrentTime);
   const totalTime = useSelector(selectEstimationVideoTotalTime);
 
-  console.log('render DetectionProgress');
-
   return (
     <>
       <Box sx={{display: 'flex', flexDirection: 'column', width: '100%'}}>

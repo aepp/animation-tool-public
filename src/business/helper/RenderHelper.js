@@ -270,6 +270,11 @@ export class RenderHelper {
     2 /
     Math.tan(ThreeMath.degToRad(fov / 2));
 
+  softReset() {
+    this._dataSetModel = undefined;
+    return this;
+  }
+
   get dataSetModel() {
     return this._dataSetModel;
   }

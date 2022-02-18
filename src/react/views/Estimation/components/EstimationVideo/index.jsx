@@ -5,7 +5,7 @@ import {
   selectEstimationVideoOriginalDimensions,
   selectEstimationVideoPreviewDimensions,
   selectIsEstimationVideoPlaying,
-  selectIsEstimationVideoUrl,
+  selectEstimationVideoUrl,
   selectIsModelWarmingUp
 } from '../../reducers';
 import VideoButton from '../../components/VideoButton';
@@ -33,7 +33,7 @@ export const EstimationVideo = () => {
   const originalVideoDimensions = useSelector(
     selectEstimationVideoOriginalDimensions
   );
-  const estimationVideoUrl = useSelector(selectIsEstimationVideoUrl);
+  const estimationVideoUrl = useSelector(selectEstimationVideoUrl);
   const isPlaying = useSelector(selectIsEstimationVideoPlaying);
   const isModelWarmingUp = useSelector(selectIsModelWarmingUp);
 

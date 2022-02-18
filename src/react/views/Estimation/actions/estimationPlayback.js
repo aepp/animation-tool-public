@@ -25,3 +25,5 @@ export const setEstimationVideoPreviewDimensions = createAction(
 export const setEstimationVideoOriginalDimensions = createAction(
   'setEstimationVideoOriginalDimensions'
 );
+
+export const resetEstimationPlayback = createAction('resetEstimationPlayback');

@@ -1,5 +1,5 @@
 import {createSelector, createReducer} from '@reduxjs/toolkit';
-import {setDataSet} from '../actions';
+import {resetDataSet, setDataSet} from '../actions';
 
 export const reducerKey = 'dataSet';
 
@@ -14,12 +14,15 @@ const defaultState = {
   normalization: {}
 };
 const r = createReducer(defaultState, {
-  [setDataSet]: (state, action) => action.payload
+  [setDataSet]: (state, action) => action.payload,
+  [resetDataSet]: () => ({...defaultState})
 });
 
 export default r;
 
-export const selectDataSet = createSelector(
-  state => state[reducerKey],
-  dataSet => dataSet
-);
+/**
+ * @param state
+ * @return PreProcessedDataSet
+ */
+const selectSelf = state => state[reducerKey];
+export const selectDataSet = createSelector(selectSelf, state => state);

@@ -5,7 +5,7 @@ import InputFile from '../../../../components/InputFile';
 import {
   selectIsDetecting,
   selectIsEstimationVideoInitialized,
-  selectIsEstimationVideoUrl,
+  selectEstimationVideoUrl,
   selectIsModelWarmingUp
 } from '../../reducers';
 import {updateEstimationVideoFile} from '../../actions/estimationPlayback';
@@ -15,7 +15,7 @@ const ID = 'upload-estimation-video__button';
 export const EstimationControls = () => {
   const dispatch = useDispatch();
   const isInitialized = useSelector(selectIsEstimationVideoInitialized);
-  const estimationVideoUrl = useSelector(selectIsEstimationVideoUrl);
+  const estimationVideoUrl = useSelector(selectEstimationVideoUrl);
   const isModelWarmingUp = useSelector(selectIsModelWarmingUp);
   const isDetecting = useSelector(selectIsDetecting);
 

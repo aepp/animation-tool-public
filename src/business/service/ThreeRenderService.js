@@ -147,7 +147,9 @@ export class ThreeRenderService {
     this._renderer.resetState();
     this._scene.clear();
     this._controls.reset();
+    return this;
   }
+
   get fov() {
     return this._fov;
   }

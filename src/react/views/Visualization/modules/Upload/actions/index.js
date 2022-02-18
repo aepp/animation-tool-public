@@ -1,2 +1,6 @@
-export const SET_DATASET_FILE = 'SET_DATASET_FILE';
-export const SET_DATASET_FILE_URL = 'SET_DATASET_FILE_URL';
+import {createAction} from '@reduxjs/toolkit';
+
+export const setDataSetFile = createAction('setDataSetFile');
+export const setDataSetFileUrl = createAction('setDataSetFileUrl');
+
+export const resetUpload = createAction('resetUpload');

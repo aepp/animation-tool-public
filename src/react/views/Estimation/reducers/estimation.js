@@ -6,7 +6,8 @@ import {
   setHasDetectionStarted,
   addDetectedPose,
   beginWarmUpModel,
-  finishWarmUpModel
+  finishWarmUpModel,
+  resetEstimation
 } from '../actions/estimation';
 
 export const reducerKey = 'recording';
@@ -55,7 +56,10 @@ const r = createReducer(defaultState, {
   [finishWarmUpModel]: state => {
     state.isModelWarmedUp = true;
     state.isModelWarmingUp = false;
-  }
+  },
+  [resetEstimation]: () => ({
+    ...defaultState
+  })
 });
 
 export default r;

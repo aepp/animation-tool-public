@@ -1,16 +1,23 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Grid, useTheme} from '@mui/material';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import DefaultTemplate from '../../template/Default';
 import DetectionProgress from './components/DetectionProgress';
 import EstimationVideo from './components/EstimationVideo';
 import {selectHasDetectionStarted} from './reducers';
 import EstimationControls from './components/Controls';
+import {cleanupEstimationView} from './actions/view';
 
 export const EstimationContent = () => {
+  const dispatch = useDispatch();
   const theme = useTheme();
 
   const hasDetectionStarted = useSelector(selectHasDetectionStarted);
+
+  useEffect(() => {
+    return () => dispatch(cleanupEstimationView());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <DefaultTemplate>

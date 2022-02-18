@@ -1,20 +1,19 @@
-import {put, takeLatest, fork} from 'redux-saga/effects';
-import {SET_DATASET_FILE, SET_DATASET_FILE_URL} from '../actions';
+import {put, takeLatest, fork, select} from 'redux-saga/effects';
+import {setDataSetFile, setDataSetFileUrl} from '../actions';
+import {selectDataSetFileUrl} from '../reducers';
 
 function* handleSelectDataSetFile(action) {
-  const {
-    payload: {file}
-  } = action;
+  const file = action.payload;
   if (!file) return;
 
-  yield put({
-    type: SET_DATASET_FILE_URL,
-    payload: {url: window.URL.createObjectURL(file)}
-  });
+  const currentUrl = yield select(selectDataSetFileUrl);
+  if (currentUrl) URL.revokeObjectURL(currentUrl);
+
+  yield put(setDataSetFileUrl(window.URL.createObjectURL(file)));
 }
 
 function* watchSelectDataSetSaga() {
-  yield takeLatest(SET_DATASET_FILE, handleSelectDataSetFile);
+  yield takeLatest(setDataSetFile.type, handleSelectDataSetFile);
 }
 
 function* rootSaga() {

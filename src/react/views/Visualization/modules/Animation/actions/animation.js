@@ -4,4 +4,4 @@ export const finishAnimationInit = createAction('finishAnimationInit');
 export const startAnimation = createAction('startAnimation');
 export const updateFramesCount = createAction('updateFramesCount');
 
-export const skeletonTest = createAction('skeletonTest');
+export const resetAnimation = createAction('resetAnimation');

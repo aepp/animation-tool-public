@@ -13,6 +13,7 @@ import {resetAnimationControls} from '../../AnimationControls/actions';
 import {finishAnimationInit, startAnimation} from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
+import {validateSelectedDataSet} from '../../../util/dataSetUtil';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
@@ -24,15 +25,20 @@ function* handleStartAnimationInit(action) {
 
   console.log('begin loading dataset...');
   const dataSet = yield call(fetchDataSet, dataSetFileUrl);
-  const dataSource =
-    dataSet.ApplicationName ||
-    dataSet.applicationName ||
-    (dataSet.source ? dataSet.source.id : null);
 
-  if (!dataSource || dataSource === '') throw new Error(UNKNOWN_DATA_SOURCE);
+  const {dataSource, frames, model, isValid, message} = yield call(
+    validateSelectedDataSet,
+    dataSet
+  );
 
-  const frames = dataSet.Frames || dataSet.frames;
-  console.log('dataset loaded, beginning pre-process...');
+  if (!isValid) {
+    alert(message || UNKNOWN_DATA_SOURCE);
+    return;
+  }
+
+  console.log(
+    'dataset loaded and format is supported, beginning pre-process...'
+  );
 
   let ProcessorInstance;
   switch (dataSource) {
@@ -42,7 +48,7 @@ function* handleStartAnimationInit(action) {
     case DataSourceType.DATA_SOURCE_TF:
       ProcessorInstance = new TFProcessor({
         frames,
-        model: dataSet.source.details.model
+        model
       });
       break;
     default:
@@ -67,21 +73,24 @@ function* handleStartAnimationInit(action) {
 
   yield put(updateFramesCount(framesPerPerson.length));
 
-  let AnimationControllerInstance =
+  let animationControllerInstance =
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
-  if (AnimationControllerInstance) {
+  if (animationControllerInstance) {
     console.log('replacing dataset...');
-    AnimationControllerInstance.handleDataSetReplacement();
+    yield call({
+      context: animationControllerInstance,
+      fn: animationControllerInstance.softReset
+    });
     yield put(resetAnimationControls());
     yield put(closeUiChannel());
   } else {
-    AnimationControllerInstance = new AnimationController({rootElement});
+    animationControllerInstance = new AnimationController({rootElement});
   }
 
   yield call(
     {
-      context: AnimationControllerInstance,
-      fn: AnimationControllerInstance.setup
+      context: animationControllerInstance,
+      fn: animationControllerInstance.setup
     },
     {
       dataSource,
@@ -94,12 +103,12 @@ function* handleStartAnimationInit(action) {
   );
 
   yield call({
-    context: AnimationControllerInstance,
-    fn: AnimationControllerInstance.animationLoop
+    context: animationControllerInstance,
+    fn: animationControllerInstance.animationLoop
   });
 
   window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE] =
-    AnimationControllerInstance;
+    animationControllerInstance;
 
   yield put(openUiChannel());
   yield put(finishAnimationInit());
