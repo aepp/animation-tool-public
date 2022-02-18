@@ -24,6 +24,19 @@ export const PLAYBACK_SPEEDS = [2, 5, 10, 30, 60];
 /**
  * @readonly
  * @enum {string}
+ * @property {string} JSON
+ * @property {string} ZIP
+ */
+export const DataSetFileFormat = {
+  JSON: '.json',
+  ZIP: '.zip'
+};
+
+export const IgnoredFileNamesPatterns = ['DS_Store', '__MACOSX'];
+
+/**
+ * @readonly
+ * @enum {string}
  * @property {string} DATA_SOURCE_KINECT
  * @property {string} DATA_SOURCE_KINECT_AZURE
  * @property {string} DATA_SOURCE_TF
@@ -34,7 +47,7 @@ export const DataSourceType = {
   /** @member {string} */
   DATA_SOURCE_KINECT_AZURE: 'Kinect Azure',
   /** @member {string} */
-  DATA_SOURCE_TF: 'tf'
+  DATA_SOURCE_TF: 'TensorFlow'
 };
 
 // three.js

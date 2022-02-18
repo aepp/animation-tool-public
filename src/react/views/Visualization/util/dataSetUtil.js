@@ -15,8 +15,10 @@ export const validateSelectedDataSet = dataSet => {
     return generateBadFormatCheckResult("can't identify data source");
 
   let model = null;
+  let checkFramesIsArrayOfArrays = false;
   // if dealing with datasource from tensor flow estimation, determine the tensor flow model used for estimation
   if (source && dataSource === DataSourceType.DATA_SOURCE_TF) {
+    checkFramesIsArrayOfArrays = true;
     const details = source.details;
     const modelFromDataSet =
       details && details.model ? details.model : undefined;
@@ -39,7 +41,7 @@ export const validateSelectedDataSet = dataSet => {
     return generateBadFormatCheckResult('frames should be in an array');
   if (!frames.length)
     return generateBadFormatCheckResult('frames array is empty');
-  if (!Array.isArray(frames[0]))
+  if (checkFramesIsArrayOfArrays && !Array.isArray(frames[0]))
     return generateBadFormatCheckResult(
       'frames array should be an array of arrays with frames per person'
     );

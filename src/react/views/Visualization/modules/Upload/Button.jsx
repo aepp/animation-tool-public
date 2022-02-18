@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import InputFile from '../../../../components/InputFile';
 import {setDataSetFile} from './actions';
 import {selectDataSetFileUrl} from './reducers';
+import {DataSetFileFormat} from '../../../../../config/constants';
 
 const ID = 'upload-file__button';
 
@@ -15,7 +16,7 @@ export const UploadButton = () => {
   return (
     <label htmlFor={ID}>
       <InputFile
-        accept='application/json'
+        accept={Object.values(DataSetFileFormat).join(',')}
         id={ID}
         onChange={e => dispatch(setDataSetFile(e.target.files[0]))}
       />

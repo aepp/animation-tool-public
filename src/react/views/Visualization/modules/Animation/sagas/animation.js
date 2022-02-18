@@ -14,6 +14,7 @@ import {finishAnimationInit, startAnimation} from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
 import {validateSelectedDataSet} from '../../../util/dataSetUtil';
+import {showErrorMessage} from '../../../../../modules/App/actions';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
@@ -32,7 +33,7 @@ function* handleStartAnimationInit(action) {
   );
 
   if (!isValid) {
-    alert(message || UNKNOWN_DATA_SOURCE);
+    yield put(showErrorMessage(message || UNKNOWN_DATA_SOURCE));
     return;
   }
 
