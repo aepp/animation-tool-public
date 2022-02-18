@@ -20,13 +20,13 @@ import {
   selectIsDetecting
 } from '../reducers';
 import {
-  addDetectedPose,
+  addEstimatedPose,
   beginWarmUpModel,
-  endDetection,
+  endEstimation,
   finishWarmUpModel,
-  pauseDetection,
-  setDetectionStatus,
-  startDetection
+  pauseEstimation,
+  setEstimationStatus,
+  startEstimation
 } from '../actions/estimation';
 import {
   endEstimationVideo,
@@ -90,7 +90,7 @@ function* handleStartDetection(action) {
   const estimationConfig = yield select(selectEstimationConfig);
 
   yield put(
-    setDetectionStatus({
+    setEstimationStatus({
       hasDetectionStarted: true,
       isDetecting: true
     })
@@ -99,6 +99,7 @@ function* handleStartDetection(action) {
   const detector = window[LOCAL_STORAGE_POSE_DETECTOR_INSTANCE];
   const detectionLoop = yield fork(function* () {
     // yield call(detect, videoElementOriginal, estimationConfig);
+    console.log('estimation started');
     while (true) {
       const poses = yield call(
         {
@@ -108,21 +109,20 @@ function* handleStartDetection(action) {
         action.payload,
         estimationConfig
       );
-      yield put(addDetectedPose(poses));
+      yield put(addEstimatedPose(poses));
       yield delay(16);
     }
   });
 
-  console.log('waiting for finish or cancel...');
   yield takeLatest(
     [
       endEstimationVideo.type,
       stopEstimationVideo.type,
-      endDetection.type,
-      pauseDetection.type
+      endEstimation.type,
+      pauseEstimation.type
     ],
     function* () {
-      console.log('detection stopped');
+      console.log('estimation stopped');
       yield cancel(detectionLoop);
     }
   );
@@ -133,7 +133,7 @@ function* handleStartDetection(action) {
 
 function* handlePauseDetection() {
   yield put(
-    setDetectionStatus({
+    setEstimationStatus({
       isDetecting: false
     })
   );
@@ -141,7 +141,7 @@ function* handlePauseDetection() {
 
 function* handleEndDetection() {
   yield put(
-    setDetectionStatus({
+    setEstimationStatus({
       hasDetectionFinished: true,
       isDetecting: false
     })
@@ -165,13 +165,13 @@ function* watchWarmUpModel() {
   yield takeLatest(beginWarmUpModel.type, handleWarmUpModel);
 }
 function* watchStartDetection() {
-  yield takeLatest(startDetection.type, handleStartDetection);
+  yield takeLatest(startEstimation.type, handleStartDetection);
 }
 function* watchPauseDetection() {
-  yield takeLatest(pauseDetection.type, handlePauseDetection);
+  yield takeLatest(pauseEstimation.type, handlePauseDetection);
 }
 function* watchEndDetection() {
-  yield takeLatest(endDetection.type, handleEndDetection);
+  yield takeLatest(endEstimation.type, handleEndDetection);
 }
 
 function* rootSaga() {

@@ -1,17 +1,17 @@
 import {fork} from 'redux-saga/effects';
 
-import playbackSagas from './playback';
-import detectionSagas from './detection';
-import resultsSagas from './results';
-import uploadSagas from './upload';
-import viewSagas from './view';
+import playbackSaga from './playback';
+import estimationSaga from './estimation';
+import resultsSaga from './results';
+import uploadSaga from './upload';
+import viewSaga from './view';
 
 function* rootSaga() {
-  yield fork(playbackSagas);
-  yield fork(detectionSagas);
-  yield fork(resultsSagas);
-  yield fork(uploadSagas);
-  yield fork(viewSagas);
+  yield fork(playbackSaga);
+  yield fork(estimationSaga);
+  yield fork(resultsSaga);
+  yield fork(uploadSaga);
+  yield fork(viewSaga);
 }
 
 export default rootSaga;

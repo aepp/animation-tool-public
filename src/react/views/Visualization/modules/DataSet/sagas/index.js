@@ -43,7 +43,6 @@ function* handlePlotDataSet(action) {
       t: 0
     }
   };
-  console.log('render plot');
   Plotly.newPlot(containerElem, [trace1], layout);
 }
 

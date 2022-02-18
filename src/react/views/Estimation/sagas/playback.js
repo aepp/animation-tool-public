@@ -6,24 +6,24 @@ import {
   stopEstimationVideo
 } from '../actions/estimationPlayback';
 import {
-  endDetection,
-  pauseDetection,
-  startDetection
+  endEstimation,
+  pauseEstimation,
+  startEstimation
 } from '../actions/estimation';
 
 function* handleVideoPlaybackStart(action) {
   yield put(setIsEstimationVideoPlaying(true));
-  yield put(startDetection(action.payload));
+  yield put(startEstimation(action.payload));
 }
 
 function* handleVideoPlaybackPause() {
   yield put(setIsEstimationVideoPlaying(false));
-  yield put(pauseDetection());
+  yield put(pauseEstimation());
 }
 
 function* handleVideoPlaybackEnd() {
   yield put(setIsEstimationVideoPlaying(false));
-  yield put(endDetection());
+  yield put(endEstimation());
 }
 
 function* watchVideoPlaybackStart() {

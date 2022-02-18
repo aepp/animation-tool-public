@@ -2,9 +2,9 @@ import {createReducer} from '@reduxjs/toolkit';
 import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {ScoreThreshHold} from '../../../../config/tensorFlow';
 import {
-  setDetectionStatus,
-  setHasDetectionStarted,
-  addDetectedPose,
+  setEstimationStatus,
+  setHasEstimationStarted,
+  addEstimatedPose,
   beginWarmUpModel,
   finishWarmUpModel,
   resetEstimation
@@ -29,7 +29,7 @@ const defaultState = {
 };
 
 const r = createReducer(defaultState, {
-  [setDetectionStatus]: (state, action) => {
+  [setEstimationStatus]: (state, action) => {
     state.hasDetectionStarted =
       typeof action.payload.hasDetectionStarted === 'boolean'
         ? action.payload.hasDetectionStarted
@@ -43,10 +43,10 @@ const r = createReducer(defaultState, {
         ? action.payload.isDetecting
         : state.isDetecting;
   },
-  [setHasDetectionStarted]: (state, action) => {
+  [setHasEstimationStarted]: (state, action) => {
     state.hasDetectionStarted = action.payload;
   },
-  [addDetectedPose]: (state, action) => {
+  [addEstimatedPose]: (state, action) => {
     state.detectedPoses.push(action.payload);
   },
   [beginWarmUpModel]: state => {
