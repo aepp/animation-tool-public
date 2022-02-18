@@ -17,20 +17,21 @@ import recordingReducer, {
   reducerKey as recordingReducerKey
 } from './views/Estimation/reducers';
 
-export const sagaMiddleware = createSagaMiddleware();
+export const initSagas = () => createSagaMiddleware();
 
-export const store = configureStore({
-  reducer: {
-    [appReducerKey]: appReducer,
-    [visualizationReducerKey]: visualizationReducer,
-    [uploadReducerKey]: uploadReducer,
-    [animationControlsReducerKey]: animationControlsReducer,
-    [recordingReducerKey]: recordingReducer,
-    [dataSetReducerKey]: dataSetReducer
-  },
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-      immutableCheck: false
-    }).concat(sagaMiddleware)
-});
+export const initStore = sagaMiddleware =>
+  configureStore({
+    reducer: {
+      [appReducerKey]: appReducer,
+      [visualizationReducerKey]: visualizationReducer,
+      [uploadReducerKey]: uploadReducer,
+      [animationControlsReducerKey]: animationControlsReducer,
+      [recordingReducerKey]: recordingReducer,
+      [dataSetReducerKey]: dataSetReducer
+    },
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+        immutableCheck: false
+      }).concat(sagaMiddleware)
+  });

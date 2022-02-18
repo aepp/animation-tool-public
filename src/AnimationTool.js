@@ -1,17 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
+// eslint-disable-next-line no-unused-vars
+import {Task} from 'redux-saga';
 import {HashRouter} from 'react-router-dom';
 import {GlobalStyles} from '@mui/material';
 import {ThemeProvider} from '@mui/material/styles';
 import App from './react/modules/App';
-import {store, sagaMiddleware} from './react/store';
+import {initStore, initSagas} from './react/store';
 import rootSaga from './react/rootSaga';
 import {theme} from './react/theme/muiTheme';
 import {BACKGROUND_COLOR} from './react/theme/constants';
 import {setAppConfig} from './react/modules/App/actions';
+import {setDataSetFile} from './react/views/Visualization/modules/Upload/actions';
 
 export class AnimationTool {
+  _store;
+  _sagaMiddleware;
+
   /**
    *
    * @type {boolean}
@@ -20,10 +26,16 @@ export class AnimationTool {
   _isCreated = false;
 
   /**
-   * @type {HTMLElement | null}
+   * @type {HTMLElement | undefined}
    * @private
    */
   _container = document.getElementById('root');
+
+  /**
+   * @type {HTMLElement | undefined}
+   * @private
+   */
+  _dataSetFileInput = undefined;
 
   /**
    *
@@ -43,9 +55,14 @@ export class AnimationTool {
   _rootSagaTask;
 
   constructor(
-    {container = undefined, appConfig = undefined} = {
+    {
+      container = undefined,
+      appConfig = undefined,
+      dataSetFileInput = undefined
+    } = {
       container: undefined,
-      appConfig: undefined
+      appConfig: undefined,
+      dataSetFileInput: undefined
     }
   ) {
     if (container !== undefined) {
@@ -57,9 +74,14 @@ export class AnimationTool {
       this._container = container || this._container;
     }
 
+    this._dataSetFileInput = dataSetFileInput;
+    this._sagaMiddleware = initSagas();
+    this._store = initStore(this._sagaMiddleware);
     this.config = appConfig || this._config;
 
     this.create();
+    // create global variable to access this instance from external context
+    window._AnimationToolInstance = this;
   }
 
   /**
@@ -67,15 +89,17 @@ export class AnimationTool {
    * @returns {AnimationTool}
    */
   create() {
-    if (!this.container || !this.container instanceof HTMLElement) {
+    if (!this._container || !this._container instanceof HTMLElement) {
       console.error('You need to set container for the animation tool first.');
       return this;
     }
 
+    this.configureDataSetFileInput();
+
     ReactDOM.render(
       <React.StrictMode>
         <HashRouter>
-          <Provider store={store}>
+          <Provider store={this._store}>
             <ThemeProvider theme={theme}>
               <GlobalStyles
                 styles={{body: {backgroundColor: BACKGROUND_COLOR}}}
@@ -88,7 +112,7 @@ export class AnimationTool {
       this.container
     );
 
-    this._rootSagaTask = sagaMiddleware.run(rootSaga);
+    this._rootSagaTask = this._sagaMiddleware.run(rootSaga);
     this._isCreated = true;
     return this;
   }
@@ -134,7 +158,32 @@ export class AnimationTool {
    */
   set config(value) {
     this._config = {...this._config, ...value};
-    store.dispatch(setAppConfig(this._config));
+    this._store.dispatch(setAppConfig(this._config));
+  }
+
+  /**
+   * If provided through {AnimationTool} constructor or as method parameter,
+   * this method configures external file input to act as dataset input element
+   *
+   * @param {HTMLElement | string} [value]
+   * @returns {AnimationTool}
+   */
+  configureDataSetFileInput(value) {
+    if (value) this._dataSetFileInput = value;
+
+    let fileInputEl;
+    if (typeof this._dataSetFileInput === 'string') {
+      fileInputEl = document.querySelector(this._dataSetFileInput);
+    } else if (this._dataSetFileInput instanceof HTMLElement) {
+      fileInputEl = this._dataSetFileInput;
+    }
+
+    if (fileInputEl) {
+      fileInputEl.addEventListener('change', e => {
+        this._store.dispatch(setDataSetFile(e.target.files[0]));
+      });
+    }
+    return this;
   }
 }
 
