@@ -1,6 +1,4 @@
 import AnimationTool from './AnimationTool';
 
-// run standalone mode immediately in development environment
-// if (process.env.NODE_ENV === 'development') {
-new AnimationTool();
-// }
+// run standalone mode immediately in the default entry point
+new AnimationTool().create();

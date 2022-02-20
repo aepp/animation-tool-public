@@ -4,17 +4,16 @@ import {Provider} from 'react-redux';
 // eslint-disable-next-line no-unused-vars
 import {Task} from 'redux-saga';
 import {HashRouter} from 'react-router-dom';
-import {GlobalStyles} from '@mui/material';
+import {ScopedCssBaseline} from '@mui/material';
 import {ThemeProvider} from '@mui/material/styles';
 import App from './react/modules/App';
 import {initStore, initSagas} from './react/store';
 import rootSaga from './react/rootSaga';
 import {theme} from './react/theme/muiTheme';
-import {BACKGROUND_COLOR} from './react/theme/constants';
 import {setAppConfig} from './react/modules/App/actions';
 import {setDataSetFile} from './react/views/Visualization/modules/Upload/actions';
 
-export class AnimationTool {
+export default class AnimationTool {
   _store;
   _sagaMiddleware;
 
@@ -39,12 +38,11 @@ export class AnimationTool {
 
   /**
    *
-   * @type {{withAppBar: boolean, standalone: boolean}}
+   * @type {{standalone: boolean}}
    * @private
    */
   _config = {
-    standalone: true,
-    withAppBar: true
+    standalone: true
   };
 
   /**
@@ -79,9 +77,9 @@ export class AnimationTool {
     this._store = initStore(this._sagaMiddleware);
     this.config = appConfig || this._config;
 
-    this.create();
     // create global variable to access this instance from external context
     window._AnimationToolInstance = this;
+    return this;
   }
 
   /**
@@ -100,12 +98,11 @@ export class AnimationTool {
       <React.StrictMode>
         <HashRouter>
           <Provider store={this._store}>
-            <ThemeProvider theme={theme}>
-              <GlobalStyles
-                styles={{body: {backgroundColor: BACKGROUND_COLOR}}}
-              />
-              <App />
-            </ThemeProvider>
+            <ScopedCssBaseline style={{height: '100%'}}>
+              <ThemeProvider theme={theme}>
+                <App />
+              </ThemeProvider>
+            </ScopedCssBaseline>
           </Provider>
         </HashRouter>
       </React.StrictMode>,
@@ -146,7 +143,7 @@ export class AnimationTool {
 
   /**
    * @public
-   * @returns {{withAppBar: boolean, standalone: boolean}}
+   * @returns {{standalone: boolean}}
    */
   get config() {
     return this._config;
@@ -154,7 +151,7 @@ export class AnimationTool {
 
   /**
    * @public
-   * @param {{withAppBar: boolean, standalone: boolean}} value
+   * @param {{standalone: boolean}} value
    */
   set config(value) {
     this._config = {...this._config, ...value};
@@ -186,8 +183,3 @@ export class AnimationTool {
     return this;
   }
 }
-
-export default AnimationTool;
-
-// create global variable for manual instantiation of the app
-window.AnimationTool = AnimationTool;

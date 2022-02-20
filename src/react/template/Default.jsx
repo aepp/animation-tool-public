@@ -1,11 +1,14 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Box, Paper, useTheme} from '@mui/material';
 import {BACKGROUND_COLOR} from '../theme/constants';
 import {useContentStyle} from '../modules/App/hooks/useContentStyle';
+import {selectIsStandalone} from '../modules/App/reducers';
 
 export const DefaultTemplate = ({children}) => {
   const theme = useTheme();
   const contentStyle = useContentStyle();
+  const isStandalone = useSelector(selectIsStandalone);
 
   return (
     <Box
@@ -14,7 +17,7 @@ export const DefaultTemplate = ({children}) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 2,
+        padding: isStandalone ? 2 : 0,
         boxSizing: 'border-box',
         backgroundColor: theme.palette.background.paper
       }}>

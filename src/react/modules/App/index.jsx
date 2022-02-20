@@ -7,14 +7,14 @@ import routes from '../../routes';
 import EstimationContent from '../../views/Estimation';
 import AppDrawer from './components/Drawer';
 import {AppBar} from './components/AppBar';
-import {selectWithAppBar} from './reducers';
+import {selectIsStandalone} from './reducers';
 
 export const App = () => {
-  const withAppBar = useSelector(selectWithAppBar);
+  const isStandalone = useSelector(selectIsStandalone);
 
   return (
     <Box sx={{height: '100%', width: '100%'}}>
-      {withAppBar && <AppBar />}
+      {isStandalone && <AppBar />}
       <AppDrawer />
       <Routes>
         <Route path={routes.root} element={<Visualization />} exact />

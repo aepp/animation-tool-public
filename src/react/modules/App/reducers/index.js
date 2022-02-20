@@ -6,7 +6,7 @@ export const reducerKey = 'app';
 const defaultState = {
   isDrawerOpen: false,
   appConfig: {
-    withAppBar: true
+    standalone: true
   }
 };
 const r = createReducer(defaultState, {
@@ -21,4 +21,5 @@ const r = createReducer(defaultState, {
 export default r;
 
 export const selectIsDrawerOpen = state => state[reducerKey].isDrawerOpen;
-export const selectWithAppBar = state => state[reducerKey].appConfig.withAppBar;
+export const selectIsStandalone = state =>
+  state[reducerKey].appConfig.standalone;

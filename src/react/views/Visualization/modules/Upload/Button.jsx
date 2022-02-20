@@ -1,10 +1,10 @@
 import React from 'react';
 import {Button} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
+import {DataSetFileFormat} from '../../../../../config/constants';
 import InputFile from '../../../../components/InputFile';
 import {setDataSetFile} from './actions';
 import {selectDataSetFileUrl} from './reducers';
-import {DataSetFileFormat} from '../../../../../config/constants';
 
 const ID = 'upload-file__button';
 

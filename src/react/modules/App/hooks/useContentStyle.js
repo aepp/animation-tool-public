@@ -1,12 +1,12 @@
 import {useSelector} from 'react-redux';
 import {APP_BAR_HEIGHT} from '../../../../config/constants';
-import {selectWithAppBar} from '../reducers';
+import {selectIsStandalone} from '../reducers';
 
 export const useContentStyle = () => {
-  const withAppBar = useSelector(selectWithAppBar);
-  if (withAppBar)
+  const isStandalone = useSelector(selectIsStandalone);
+  if (isStandalone)
     return {
-      height: `calc(100vh - ${APP_BAR_HEIGHT}px)`
+      height: `calc(100% - ${APP_BAR_HEIGHT}px)`
     };
-  return {height: '100vh'};
+  return {height: '100%'};
 };
