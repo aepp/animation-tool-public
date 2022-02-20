@@ -3,6 +3,7 @@
   "version": "0.5.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.4.3",
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
     "@mediapipe/pose": "^0.5.1635988162",
@@ -41,9 +42,12 @@
     "@mediapipe/pose": "^0.5.1635988162"
   },
   "scripts": {
-    "dev": "NODE_ENV=development react-scripts start",
-    "build": "NODE_ENV=production react-scripts build",
-    "test": "react-scripts test",
+    "dev": "craco start",
+    "build": "yarn build:craco",
+    "build:craco": "craco build",
+    "build:cra": "react-scripts build && yarn _cp-plugin",
+    "_cp-plugin": ". .env && mkdir -p build/dist && cp build/static/js/*main*.js \"$_\"/\"${PLUGIN_FILE_NAME}\"",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "p": "npx prettier 'src/**/*' --write",
     "l": "npx eslint --ext .js --ext .jsx src/ --fix"
