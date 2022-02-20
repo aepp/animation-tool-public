@@ -7,15 +7,15 @@ import {
   FastRewind as FastRewindIcon
 } from '@mui/icons-material';
 import {
-  PlayBackDirectionType,
-  PLAYBACK_SPEEDS
+  DEFAULT_FPS_MULTIPLIER,
+  PlayBackDirectionType
 } from '../../../../../../../config/constants';
 import {selectIsAnimationInitialized} from '../../../Animation/reducers';
-import {changePlaybackSpeed} from '../../actions';
+import {increaseFps} from '../../actions';
 import {
   selectIsPlaying,
   selectPlaybackDirection,
-  selectPlaybackSpeedMultiplierIdx
+  selectFpsMultiplier
 } from '../../reducers';
 
 export const DirectionButton = ({playbackDirection}) => {
@@ -23,13 +23,11 @@ export const DirectionButton = ({playbackDirection}) => {
   const isPlaying = useSelector(selectIsPlaying);
   const isInitialized = useSelector(selectIsAnimationInitialized);
   const currentPlaybackDirection = useSelector(selectPlaybackDirection);
-  const playbackSpeedMultiplierIdx = useSelector(
-    selectPlaybackSpeedMultiplierIdx
-  );
+  const fpsMultiplier = useSelector(selectFpsMultiplier);
 
   const button = (
     <IconButton
-      onClick={() => dispatch(changePlaybackSpeed(playbackDirection))}
+      onClick={() => dispatch(increaseFps(playbackDirection))}
       disabled={!isPlaying || !isInitialized}>
       {playbackDirection === PlayBackDirectionType.DEFAULT ? (
         <FastForwardIcon />
@@ -40,9 +38,7 @@ export const DirectionButton = ({playbackDirection}) => {
   );
 
   if (
-    playbackSpeedMultiplierIdx !== null &&
-    playbackSpeedMultiplierIdx >= 0 &&
-    playbackSpeedMultiplierIdx < PLAYBACK_SPEEDS.length &&
+    fpsMultiplier > DEFAULT_FPS_MULTIPLIER &&
     currentPlaybackDirection === playbackDirection
   ) {
     return (
@@ -55,7 +51,7 @@ export const DirectionButton = ({playbackDirection}) => {
               ? 'right'
               : 'left'
         }}
-        badgeContent={`x${PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx]}`}>
+        badgeContent={`x${fpsMultiplier}`}>
         {button}
       </Badge>
     );

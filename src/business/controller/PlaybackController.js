@@ -1,38 +1,70 @@
-import {PlaybackService} from '../service/PlaybackService';
 import {
-  PLAYBACK_SPEED_DEFAULT,
+  BASE_FPS,
+  DEFAULT_FPS_MULTIPLIER,
+  FPS_SPEED_UPS,
   PlayBackDirectionType
 } from '../../config/constants';
 
 export class PlaybackController {
-  _isPlaying;
+  /**
+   *
+   * @type {boolean}
+   * @private
+   */
+  _isPlaying = false;
 
-  _playbackSpeed;
+  /**
+   *
+   * @type {PlayBackDirectionType}
+   * @private
+   */
+  _playbackDirection = PlayBackDirectionType.DEFAULT;
 
-  _playbackDirection;
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  _fpsMultiplier = DEFAULT_FPS_MULTIPLIER;
 
-  _framesAmountToSkip;
-
-  _playbackService;
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  _frameIdxIncrement = DEFAULT_FPS_MULTIPLIER;
 
   constructor(
     {
-      isPlaying = true,
-      playbackSpeed = PLAYBACK_SPEED_DEFAULT,
-      playbackDirection = PlayBackDirectionType.DEFAULT,
-      framesAmountToSkip = 0
+      isPlaying = undefined,
+      playbackDirection = undefined,
+      fpsMultiplier = undefined
     } = {
-      isPlaying: true,
-      playbackSpeed: PLAYBACK_SPEED_DEFAULT,
-      playbackDirection: PlayBackDirectionType.DEFAULT,
-      framesAmountToSkip: 0
+      isPlaying: undefined,
+      playbackDirection: undefined,
+      fpsMultiplier: undefined
     }
   ) {
-    this._playbackService = new PlaybackService();
-    this._isPlaying = isPlaying;
-    this._playbackSpeed = playbackSpeed;
-    this._playbackDirection = playbackDirection;
-    this._framesAmountToSkip = framesAmountToSkip;
+    this._isPlaying = isPlaying || this._isPlaying;
+    this._playbackDirection = playbackDirection || this._playbackDirection;
+    this.fpsMultiplier = fpsMultiplier || this._fpsMultiplier;
+  }
+
+  incrementFrameRate() {
+    const currentFpsMultiplierIdx = FPS_SPEED_UPS.indexOf(this._fpsMultiplier);
+    let nextFpsIdx =
+      currentFpsMultiplierIdx + 1 < FPS_SPEED_UPS.length
+        ? currentFpsMultiplierIdx + 1
+        : 0;
+    this.fpsMultiplier = FPS_SPEED_UPS[nextFpsIdx];
+    return this._fpsMultiplier;
+  }
+  /**
+   * e.g. 1000ms / 60 fps = 16ms - i.e. render next frame every 16 to achieve a frame rate of 60
+   * @returns {number}
+   */
+  getTimeoutByCurrentFps() {
+    return 1000 / (this._fpsMultiplier * BASE_FPS);
   }
 
   get isPlaying() {
@@ -43,16 +75,6 @@ export class PlaybackController {
     this._isPlaying = value;
   }
 
-  get playbackSpeed() {
-    return this._playbackService.calculatePlaybackSpeed({
-      factor: this._playbackSpeed
-    });
-  }
-
-  set playbackSpeed(value) {
-    this._playbackSpeed = value;
-  }
-
   get playbackDirection() {
     return this._playbackDirection;
   }
@@ -61,16 +83,21 @@ export class PlaybackController {
     this._playbackDirection = value;
   }
 
-  get framesAmountToSkip() {
-    return this._framesAmountToSkip;
+  get fpsMultiplier() {
+    return this._fpsMultiplier;
   }
 
-  set framesAmountToSkip(value) {
-    this._framesAmountToSkip = value;
+  set fpsMultiplier(value) {
+    this._fpsMultiplier = value;
+    this._frameIdxIncrement = Math.ceil(value);
+  }
+
+  get frameIdxIncrement() {
+    return this._frameIdxIncrement;
   }
 
   resetPlayback() {
-    this.playbackDirection = PlayBackDirectionType.DEFAULT;
-    this.playbackSpeed = PLAYBACK_SPEED_DEFAULT;
+    this._playbackDirection = PlayBackDirectionType.DEFAULT;
+    this.fpsMultiplier = DEFAULT_FPS_MULTIPLIER;
   }
 }

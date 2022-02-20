@@ -9,6 +9,8 @@ import {
   updateCurrentFrameIdx,
   updateCurrentFrameIdxToThree
 } from '../../actions';
+import {selectFpsMultiplier} from '../../reducers';
+import {useProgressTransition} from '../../hooks/useProgressTransition';
 
 const valuetext = frameIdx => `Frame ${frameIdx}`;
 
@@ -17,6 +19,8 @@ export const Progress = () => {
   const dispatch = useDispatch();
   const currentFrameIdx = useSelector(selectCurrentFrameIdx);
   const framesCount = useSelector(selectFramesCount);
+  const fpsMultiplier = useSelector(selectFpsMultiplier);
+  const transition = useProgressTransition();
 
   return (
     <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
@@ -27,7 +31,7 @@ export const Progress = () => {
           getAriaValueText={valuetext}
           valueLabelDisplay='auto'
           valueLabelFormat={valuetext}
-          step={Math.floor(framesCount / 200)}
+          step={Math.ceil(fpsMultiplier)}
           min={0}
           max={framesCount - 1}
           value={currentFrameIdx}
@@ -38,10 +42,14 @@ export const Progress = () => {
           sx={{
             color: 'secondary',
             height: 4,
+            '& .MuiSlider-track': {
+              transition
+            },
             '& .MuiSlider-thumb': {
-              // width: 8,
-              // height: 8,
-              transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+              backgroundColor: theme.palette.primary.light,
+              width: 16,
+              height: 16,
+              transition,
               '&:before': {
                 boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
               },

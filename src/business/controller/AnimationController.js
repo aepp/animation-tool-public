@@ -17,6 +17,13 @@ import {PlaybackController} from './PlaybackController';
 
 export class AnimationController extends PlaybackController {
   /**
+   * internal id to be able to cancel the `requestAnimationFrame` loop when resetting the controller instance
+   * @type {number}
+   * @private
+   */
+  _requestAnimationFrameId = 1;
+
+  /**
    *
    * @type {Object3D[]}
    * @private
@@ -126,18 +133,18 @@ export class AnimationController extends PlaybackController {
     return this;
   }
 
-  _requestId = 1;
   /**
    * @async
    * @public
    * @returns {Promise<AnimationController>}
    */
   async animationLoop() {
-    cancelAnimationFrame(this._requestId);
-    // @todo dynamic fps adjustment
-    // await new Promise(resolve => setTimeout(resolve, this.playbackSpeed));
-    await new Promise(resolve => setTimeout(resolve, 16)); // i.e. 1000 / 16 = 60 fps
-    this._requestId = requestAnimationFrame(this.animationLoop.bind(this));
+    await new Promise(resolve =>
+      setTimeout(resolve, this.getTimeoutByCurrentFps())
+    );
+    this._requestAnimationFrameId = requestAnimationFrame(
+      this.animationLoop.bind(this)
+    );
     this._playAnimation();
     return this;
   }
@@ -152,17 +159,18 @@ export class AnimationController extends PlaybackController {
 
       if (this.playbackDirection === PlayBackDirectionType.DEFAULT) {
         if (
-          this.currentFrameIdx ===
-          this._renderHelper.dataSetModel.maxFramesCount - 1
+          this.currentFrameIdx >=
+          this._renderHelper.dataSetModel.maxFramesCount -
+            this.frameIdxIncrement
         ) {
           this.currentFrameIdx = 0;
         }
-        this.currentFrameIdx += 1;
+        this.currentFrameIdx += this.frameIdxIncrement;
       } else {
-        if (this.currentFrameIdx === 0) {
+        if (this.currentFrameIdx - this.frameIdxIncrement <= 0) {
           this.currentFrameIdx = this._renderHelper.dataSetModel.maxFramesCount;
         }
-        this.currentFrameIdx -= 1;
+        this.currentFrameIdx -= this.frameIdxIncrement;
       }
       this._sendFrameIdxToUi();
     } else {
@@ -184,22 +192,6 @@ export class AnimationController extends PlaybackController {
     this._threeRenderService.updateScene({
       objectsToAdd: newSceneObjects
     });
-
-    return this;
-  }
-
-  /**
-   * @public
-   * @returns {AnimationController}
-   */
-  softReset() {
-    this._threeRenderService.softReset();
-    this._room = undefined;
-    this._currentFrameObjects = [];
-    this.currentFrameIdx = 0;
-    this._sendFrameIdxToUi();
-    this.resetPlayback();
-    this._threeRenderService.updateScene();
 
     return this;
   }
@@ -242,5 +234,22 @@ export class AnimationController extends PlaybackController {
   updateFrameIdxFromUi(frameIdx = undefined) {
     this._currentFrameIdx = frameIdx;
     this._renderCurrentFrame();
+  }
+
+  /**
+   * @public
+   * @returns {AnimationController}
+   */
+  softReset() {
+    cancelAnimationFrame(this._requestAnimationFrameId);
+    this._threeRenderService.softReset();
+    this._room = undefined;
+    this._currentFrameObjects = [];
+    this.currentFrameIdx = 0;
+    this._sendFrameIdxToUi();
+    this.resetPlayback();
+    this._threeRenderService.updateScene();
+
+    return this;
   }
 }

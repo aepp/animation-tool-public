@@ -3,9 +3,9 @@ import {PlayBackDirectionType} from '../../../../../../config/constants';
 import {
   resetAnimationControls,
   setIsPlaying,
-  setPlaybackSpeedAndDirection,
-  setPlaybackSpeed,
-  resetPlaybackSpeedAndDirection,
+  setFpsMultiplierAndDirection,
+  setFpsMultiplier,
+  resetFpsMultiplierAndDirection,
   toggleInlineAnimationControlsVisibility
 } from '../actions';
 
@@ -14,7 +14,7 @@ export const reducerKey = 'animationControls';
 /**
  * @typedef AnimationControlsState
  * @type {object}
- * @property {number} [playbackSpeedMultiplierIdx]
+ * @property {number} [fpsMultiplier]
  * @property {boolean} isPlaying.
  * @property {PlayBackDirectionType} playbackDirection
  * @property {boolean} areInlineControlsVisible
@@ -24,8 +24,8 @@ export const reducerKey = 'animationControls';
  * @type AnimationControlsState
  */
 const defaultState = {
-  isPlaying: true,
-  playbackSpeedMultiplierIdx: null,
+  isPlaying: false,
+  fpsMultiplier: 1,
   playbackDirection: PlayBackDirectionType.DEFAULT,
   areInlineControlsVisible: true
 };
@@ -33,17 +33,16 @@ const r = createReducer(defaultState, {
   [setIsPlaying]: (state, action) => {
     state.isPlaying = action.payload;
   },
-  [setPlaybackSpeedAndDirection]: (state, action) => {
-    state.playbackSpeedMultiplierIdx =
-      action.payload.playbackSpeedMultiplierIdx;
+  [setFpsMultiplierAndDirection]: (state, action) => {
+    state.fpsMultiplier = action.payload.fpsMultiplier;
     state.playbackDirection = action.payload.playbackDirection;
   },
-  [setPlaybackSpeed]: (state, action) => {
-    state.playbackSpeedMultiplierIdx = action.payload;
+  [setFpsMultiplier]: (state, action) => {
+    state.fpsMultiplier = action.payload;
   },
-  [resetPlaybackSpeedAndDirection]: state => {
-    state.playbackSpeedMultiplierIdx = null;
-    state.playbackSpeedMultiplierIdx = null;
+  [resetFpsMultiplierAndDirection]: state => {
+    state.fpsMultiplier = 1;
+    state.playbackDirection = PlayBackDirectionType.DEFAULT;
   },
   [toggleInlineAnimationControlsVisibility]: state => {
     state.areInlineControlsVisible = !state.areInlineControlsVisible;
@@ -64,10 +63,9 @@ export const selectIsPlaying = createSelector(
   selectSelf,
   /** @param {AnimationControlsState} state */ state => state.isPlaying
 );
-export const selectPlaybackSpeedMultiplierIdx = createSelector(
+export const selectFpsMultiplier = createSelector(
   selectSelf,
-  /** @param {AnimationControlsState} state */ state =>
-    state.playbackSpeedMultiplierIdx
+  /** @param {AnimationControlsState} state */ state => state.fpsMultiplier
 );
 export const selectPlaybackDirection = createSelector(
   selectSelf,

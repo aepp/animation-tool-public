@@ -5,9 +5,11 @@ import {resetAnimation} from '../modules/Animation/actions/animation';
 import {resetAnimationControls} from '../modules/AnimationControls/actions';
 import {resetDataSet} from '../modules/DataSet/actions';
 import {resetUpload} from '../modules/Upload/actions';
+import {closeUiChannel} from '../modules/Animation/actions/uiChannel';
 
 function* handleCleanup() {
   console.log('cleanup animation view');
+  yield put(closeUiChannel());
   yield put(resetAnimation());
   yield put(resetAnimationControls());
   yield put(resetDataSet());

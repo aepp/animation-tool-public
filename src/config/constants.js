@@ -18,8 +18,9 @@ export const PlayBackDirectionType = {
   REVERSE: 'REVERSE'
 };
 
-export const PLAYBACK_SPEED_DEFAULT = 1;
-export const PLAYBACK_SPEEDS = [2, 5, 10, 30, 60];
+export const BASE_FPS = 60;
+export const DEFAULT_FPS_MULTIPLIER = 1;
+export const FPS_SPEED_UPS = [1.5, 2, 2.5, 3];
 
 /**
  * @readonly

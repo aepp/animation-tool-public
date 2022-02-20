@@ -1,25 +1,22 @@
 import * as PropTypes from 'prop-types';
 import {put, takeLatest, fork, select, throttle} from 'redux-saga/effects';
 import {
-  changePlaybackSpeed,
-  resetPlaybackSpeedAndDirection,
+  increaseFps,
+  resetFpsMultiplierAndDirection,
   setIsPlaying,
-  setPlaybackSpeed,
-  setPlaybackSpeedAndDirection,
+  setFpsMultiplier,
+  setFpsMultiplierAndDirection,
   togglePlay,
   updateCurrentFrameIdxToThree
 } from '../actions';
 import {
   LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE,
   PlayBackDirectionType,
-  PLAYBACK_SPEEDS
+  FPS_SPEED_UPS,
+  DEFAULT_FPS_MULTIPLIER
 } from '../../../../../../config/constants';
 import {selectFramesCount} from '../../Animation/reducers';
-import {
-  selectIsPlaying,
-  selectPlaybackDirection,
-  selectPlaybackSpeedMultiplierIdx
-} from '../reducers';
+import {selectIsPlaying, selectPlaybackDirection} from '../reducers';
 
 function* handleTogglePlay() {
   const isPlaying = yield select(selectIsPlaying);
@@ -27,43 +24,34 @@ function* handleTogglePlay() {
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
   yield put(setIsPlaying(!isPlaying));
   if (isPlaying === true) {
-    yield put(resetPlaybackSpeedAndDirection());
+    yield put(resetFpsMultiplierAndDirection());
     animationControllerInstance.resetPlayback();
   }
   animationControllerInstance.isPlaying = !isPlaying;
 }
 
-function* handleChangePlaybackSpeed(action) {
+function* handleIncreaseFps(action) {
   const playbackDirection = action.payload;
-  const currentPlaybackSpeedMultiplierIdx = yield select(
-    selectPlaybackSpeedMultiplierIdx
-  );
   const currentPlaybackDirection = yield select(selectPlaybackDirection);
 
   const animationControllerInstance =
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
 
   if (currentPlaybackDirection !== playbackDirection) {
-    animationControllerInstance.playbackSpeed = PLAYBACK_SPEEDS[0];
+    animationControllerInstance.fpsMultiplier = FPS_SPEED_UPS[0];
     animationControllerInstance.playbackDirection = playbackDirection;
     yield put(
-      setPlaybackSpeedAndDirection({
-        playbackSpeedMultiplierIdx: 0,
+      setFpsMultiplierAndDirection({
+        fpsMultiplier: FPS_SPEED_UPS[0],
         playbackDirection
       })
     );
   } else {
-    const playbackSpeedMultiplierIdx =
-      currentPlaybackSpeedMultiplierIdx !== null &&
-      currentPlaybackSpeedMultiplierIdx + 1 < PLAYBACK_SPEEDS.length
-        ? currentPlaybackSpeedMultiplierIdx + 1
-        : 0;
-    animationControllerInstance.playbackSpeed =
-      PLAYBACK_SPEEDS[playbackSpeedMultiplierIdx];
-    yield put(setPlaybackSpeed(playbackSpeedMultiplierIdx));
+    const fpsMultiplier = animationControllerInstance.incrementFrameRate();
+    yield put(setFpsMultiplier(fpsMultiplier));
   }
 }
-handleChangePlaybackSpeed.propTypes = {
+handleIncreaseFps.propTypes = {
   payload: PropTypes.shape({
     playbackDirection: PropTypes.oneOf(Object.keys(PlayBackDirectionType))
       .isRequired
@@ -89,8 +77,8 @@ function* handleUpdateCurrentFrameIdxToThree(action) {
 function* watchTogglePlay() {
   yield takeLatest(togglePlay.type, handleTogglePlay);
 }
-function* watchChangePlaybackSpeed() {
-  yield takeLatest(changePlaybackSpeed.type, handleChangePlaybackSpeed);
+function* watchIncreaseFps() {
+  yield takeLatest(increaseFps.type, handleIncreaseFps);
 }
 function* watchUpdateCurrentFrameIdxToThree() {
   yield throttle(
@@ -102,7 +90,7 @@ function* watchUpdateCurrentFrameIdxToThree() {
 
 function* rootSaga() {
   yield fork(watchTogglePlay);
-  yield fork(watchChangePlaybackSpeed);
+  yield fork(watchIncreaseFps);
   yield fork(watchUpdateCurrentFrameIdxToThree);
 }
 

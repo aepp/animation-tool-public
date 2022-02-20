@@ -55,8 +55,8 @@ export const Animation = () => {
           </Typography>
         )}
       </Box>
-      {/*{isInitialized && <AnimationControls />}*/}
-      <AnimationControls />
+      {isInitialized && <AnimationControls />}
+      {/*<AnimationControls />*/}
     </Box>
   );
 };

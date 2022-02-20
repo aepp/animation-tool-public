@@ -17,9 +17,12 @@ export const PlayButton = () => {
   return (
     <IconButton
       onClick={() => dispatch(togglePlay())}
-      disabled={!isInitialized}
-      sx={{mx: 1}}>
-      {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+      disabled={!isInitialized}>
+      {isPlaying ? (
+        <PauseIcon fontSize={'large'} />
+      ) : (
+        <PlayArrowIcon fontSize={'large'} />
+      )}
     </IconButton>
   );
 };
