@@ -12,6 +12,8 @@ export default r;
 
 export const selectIsAnimationInitialized = state =>
   animationSelectors.selectIsAnimationInitialized(state[reducerKey]);
+export const selectIsAnimationLoading = state =>
+  animationSelectors.selectIsAnimationLoading(state[reducerKey]);
 export const selectCurrentFrameIdx = state =>
   animationSelectors.selectCurrentFrameIdx(state[reducerKey]);
 export const selectFramesCount = state =>

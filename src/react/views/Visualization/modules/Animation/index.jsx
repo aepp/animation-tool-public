@@ -1,15 +1,22 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Box, Typography} from '@mui/material';
 import {selectDataSetFileUrl} from '../Upload/reducers';
-import {selectIsAnimationInitialized} from './reducers';
+import AnimationControls from '../AnimationControls';
+import {
+  selectIsAnimationInitialized,
+  selectIsAnimationLoading
+} from './reducers';
 import {startAnimation} from './actions/animation';
+import {toggleInlineAnimationControlsVisibility} from '../AnimationControls/actions';
 
 export const Animation = () => {
   const dataSetFileUrl = useSelector(selectDataSetFileUrl);
   const dispatch = useDispatch();
   const ref = useRef();
   const isInitialized = useSelector(selectIsAnimationInitialized);
+  const isLoading = useSelector(selectIsAnimationLoading);
+  const [isDrag, setIsDrag] = useState(false);
 
   useEffect(() => {
     if (ref.current && dataSetFileUrl) {
@@ -19,18 +26,37 @@ export const Animation = () => {
 
   return (
     <Box
-      ref={ref}
       sx={{
-        width: '100%',
         height: '100%',
+        position: 'relative',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
-        boxSizing: 'border-box'
+        alignItems: 'flex-end'
       }}>
-      {!isInitialized && (
-        <Typography sx={{position: 'absolute'}}>Upload dataset...</Typography>
-      )}
+      <Box
+        ref={ref}
+        sx={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxSizing: 'border-box'
+        }}
+        onMouseDown={() => setIsDrag(false)}
+        onMouseMove={() => setIsDrag(true)}
+        onMouseUp={() => {
+          if (!isDrag) dispatch(toggleInlineAnimationControlsVisibility());
+        }}>
+        {!isInitialized && (
+          <Typography sx={{position: 'absolute'}}>
+            {!isLoading ? 'Upload dataset' : 'Processing dataset'}...
+          </Typography>
+        )}
+      </Box>
+      {/*{isInitialized && <AnimationControls />}*/}
+      <AnimationControls />
     </Box>
   );
 };

@@ -5,7 +5,8 @@ import {
   setIsPlaying,
   setPlaybackSpeedAndDirection,
   setPlaybackSpeed,
-  resetPlaybackSpeedAndDirection
+  resetPlaybackSpeedAndDirection,
+  toggleInlineAnimationControlsVisibility
 } from '../actions';
 
 export const reducerKey = 'animationControls';
@@ -16,6 +17,7 @@ export const reducerKey = 'animationControls';
  * @property {number} [playbackSpeedMultiplierIdx]
  * @property {boolean} isPlaying.
  * @property {PlayBackDirectionType} playbackDirection
+ * @property {boolean} areInlineControlsVisible
  */
 
 /**
@@ -24,7 +26,8 @@ export const reducerKey = 'animationControls';
 const defaultState = {
   isPlaying: true,
   playbackSpeedMultiplierIdx: null,
-  playbackDirection: PlayBackDirectionType.DEFAULT
+  playbackDirection: PlayBackDirectionType.DEFAULT,
+  areInlineControlsVisible: true
 };
 const r = createReducer(defaultState, {
   [setIsPlaying]: (state, action) => {
@@ -41,6 +44,9 @@ const r = createReducer(defaultState, {
   [resetPlaybackSpeedAndDirection]: state => {
     state.playbackSpeedMultiplierIdx = null;
     state.playbackSpeedMultiplierIdx = null;
+  },
+  [toggleInlineAnimationControlsVisibility]: state => {
+    state.areInlineControlsVisible = !state.areInlineControlsVisible;
   },
   [resetAnimationControls]: () => ({
     ...defaultState
@@ -66,4 +72,9 @@ export const selectPlaybackSpeedMultiplierIdx = createSelector(
 export const selectPlaybackDirection = createSelector(
   selectSelf,
   /** @param {AnimationControlsState} state */ state => state.playbackDirection
+);
+export const selectAreInlineAnimationControlsVisible = createSelector(
+  selectSelf,
+  /** @param {AnimationControlsState} state */ state =>
+    state.areInlineControlsVisible
 );

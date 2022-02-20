@@ -15,6 +15,10 @@ import {
   MULTIPLE_DATASET_FILES,
   NO_SUPPORTED_DATASET_FILES_FOUND
 } from '../../../../../../i18n/messages';
+import {
+  beginAnimationInit,
+  cancelAnimationInit
+} from '../../Animation/actions/animation';
 import {setDataSetFile, setDataSetFileUrl} from '../actions';
 import {selectDataSetFileUrl} from '../reducers';
 
@@ -27,6 +31,8 @@ function* handleSelectDataSetFile(action) {
   const file = action.payload;
   if (!file) return;
 
+  yield put(beginAnimationInit());
+
   const currentUrl = yield select(selectDataSetFileUrl);
   if (currentUrl) URL.revokeObjectURL(currentUrl);
 
@@ -37,6 +43,7 @@ function* handleSelectDataSetFile(action) {
     // don't proceed if the zip is empty
     if (!zip.files) {
       yield put(showErrorMessage(ARCHIVE_IS_EMPTY));
+      yield put(cancelAnimationInit());
       return;
     }
 
@@ -50,6 +57,7 @@ function* handleSelectDataSetFile(action) {
     // don't proceed if zip contains only ignored files
     if (!fileNames.length) {
       yield put(showErrorMessage(FILE_FORMAT_NOT_SUPPORTED));
+      yield put(cancelAnimationInit());
       return;
     }
 
@@ -75,6 +83,7 @@ function* handleSelectDataSetFile(action) {
       if (!fileNames.length) {
         // don't proceed if no supported dataset files found in the archive
         yield put(showErrorMessage(NO_SUPPORTED_DATASET_FILES_FOUND));
+        yield put(cancelAnimationInit());
         return;
       }
       // if more than one file seem to be a supported dataset file, show a warning and simply use the first one
@@ -96,6 +105,7 @@ function* handleSelectDataSetFile(action) {
   } else {
     // provided file format is not supported
     yield put(showErrorMessage(FILE_FORMAT_NOT_SUPPORTED));
+    yield put(cancelAnimationInit());
     return;
   }
   // create objectUrl to the dataset file

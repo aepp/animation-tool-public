@@ -1,6 +1,6 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Box, Divider, FormHelperText, Slider, useTheme} from '@mui/material';
+import {Box, Slider, useTheme} from '@mui/material';
 import {
   selectCurrentFrameIdx,
   selectFramesCount
@@ -19,16 +19,8 @@ export const Progress = () => {
   const framesCount = useSelector(selectFramesCount);
 
   return (
-    <Box
-      display={'flex'}
-      alignItems={'center'}
-      justifyContent={'center'}
-      sx={{mx: 2}}>
-      <Divider orientation={'vertical'} sx={{mr: 2}} flexItem />
-      <Box sx={{width: 300}} display={'flex'} flexDirection={'column'}>
-        <FormHelperText sx={{ml: 'auto'}}>
-          Frame&nbsp;{currentFrameIdx}&nbsp;of&nbsp;{framesCount - 1}
-        </FormHelperText>
+    <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
+      <Box sx={{width: 300}}>
         <Slider
           color={'secondary'}
           aria-label='Animation progress'
@@ -47,8 +39,8 @@ export const Progress = () => {
             color: 'secondary',
             height: 4,
             '& .MuiSlider-thumb': {
-              width: 8,
-              height: 8,
+              // width: 8,
+              // height: 8,
               transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
               '&:before': {
                 boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'

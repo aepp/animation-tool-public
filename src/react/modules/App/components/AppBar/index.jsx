@@ -1,4 +1,5 @@
 import React from 'react';
+import {useDispatch} from 'react-redux';
 import {NavLink, Route, Routes, useLocation, useMatch} from 'react-router-dom';
 import {
   AppBar as MuiAppBar,
@@ -7,9 +8,8 @@ import {
   Toolbar,
   Typography
 } from '@mui/material';
-import {useDispatch} from 'react-redux';
 import MenuIcon from '@mui/icons-material/Menu';
-import AnimationControls from '../../../../views/Visualization/modules/AnimationControls';
+import VisualizationAppbar from '../../../../views/Visualization/components/AppBar';
 import routes, {routeLabels} from '../../../../routes';
 import EstimationAppBar from '../../../../views/Estimation/components/AppBar';
 import {setDrawerState} from '../../actions';
@@ -44,7 +44,7 @@ export const AppBar = () => {
             {label ? ` / ${label}` : ''}
           </Typography>
           <Routes>
-            <Route path={routes.root} element={<AnimationControls />} exact />
+            <Route path={routes.root} element={<VisualizationAppbar />} exact />
             <Route
               path={routes.estimate}
               element={<EstimationAppBar />}

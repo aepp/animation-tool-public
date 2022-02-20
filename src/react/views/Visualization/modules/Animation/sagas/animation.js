@@ -10,7 +10,11 @@ import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
 import {setDataSet} from '../../DataSet/actions';
 import {resetAnimationControls} from '../../AnimationControls/actions';
-import {finishAnimationInit, startAnimation} from '../actions/animation';
+import {
+  cancelAnimationInit,
+  finishAnimationInit,
+  startAnimation
+} from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
 import {validateSelectedDataSet} from '../../../util/dataSetUtil';
@@ -34,6 +38,7 @@ function* handleStartAnimationInit(action) {
 
   if (!isValid) {
     yield put(showErrorMessage(message || UNKNOWN_DATA_SOURCE));
+    yield put(cancelAnimationInit());
     return;
   }
 
@@ -53,6 +58,7 @@ function* handleStartAnimationInit(action) {
       });
       break;
     default:
+      yield put(cancelAnimationInit());
       throw new Error(UNKNOWN_DATA_SOURCE);
   }
   const {framesPerPerson, personIndices, extremes, normalization} = yield call({
