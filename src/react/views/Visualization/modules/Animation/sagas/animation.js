@@ -4,7 +4,10 @@ import {
   LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE
 } from '../../../../../../config/constants';
 import {AnimationController} from '../../../../../../business/controller/AnimationController';
-import {UNKNOWN_DATA_SOURCE} from '../../../../../../i18n/messages';
+import {
+  UNABLE_TO_LOAD_JSON_FILE,
+  UNKNOWN_DATA_SOURCE
+} from '../../../../../../i18n/messages';
 import {LHLegacyProcessor} from '../../../../../../business/processor/LHLegacyProcessor';
 import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
 import {selectDataSetFileUrl} from '../../Upload/reducers';
@@ -29,7 +32,14 @@ function* handleStartAnimationInit(action) {
   } = action;
 
   console.log('begin loading dataset...');
-  const dataSet = yield call(fetchDataSet, dataSetFileUrl);
+  let dataSet;
+  try {
+    dataSet = yield call(fetchDataSet, dataSetFileUrl);
+  } catch (error) {
+    yield put(showErrorMessage(UNABLE_TO_LOAD_JSON_FILE));
+    yield put(cancelAnimationInit());
+    return;
+  }
 
   const {dataSource, frames, model, isValid, message} = yield call(
     validateSelectedDataSet,
@@ -41,10 +51,6 @@ function* handleStartAnimationInit(action) {
     yield put(cancelAnimationInit());
     return;
   }
-
-  console.log(
-    'dataset loaded and format is supported, beginning pre-process...'
-  );
 
   let ProcessorInstance;
   switch (dataSource) {
@@ -59,8 +65,10 @@ function* handleStartAnimationInit(action) {
       break;
     default:
       yield put(cancelAnimationInit());
-      throw new Error(UNKNOWN_DATA_SOURCE);
+      yield put(showErrorMessage(UNKNOWN_DATA_SOURCE));
+      return;
   }
+
   const {framesPerPerson, personIndices, extremes, normalization} = yield call({
     context: ProcessorInstance,
     fn: ProcessorInstance.preProcess

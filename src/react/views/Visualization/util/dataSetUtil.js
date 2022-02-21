@@ -1,7 +1,7 @@
 import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {DataSourceType} from '../../../../config/constants';
 
-export const validateSelectedDataSet = dataSet => {
+export const validateSelectedDataSet = (dataSet = {}) => {
   const source = dataSet.source;
 
   // read datasource id from dataset

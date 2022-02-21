@@ -1,3 +1,5 @@
+export const UNABLE_TO_LOAD_JSON_FILE =
+  "Unable to load dataset. Make sure it's a properly formatted json file.";
 export const UNKNOWN_DATA_SOURCE =
   'Unknown data source. See readme for supported dataset formats.';
 export const ARCHIVE_IS_EMPTY =

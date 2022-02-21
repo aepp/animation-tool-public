@@ -1,5 +1,6 @@
 import {IDataSetProcessor} from './IDataSetProcessor';
 import {DataSourceType} from '../../config/constants';
+import {ScoreThreshHold} from '../../config/tensorFlow';
 // import {ScoreThreshHold} from '../../config/tensorFlow';
 
 export class TFProcessor extends IDataSetProcessor {
@@ -14,7 +15,7 @@ export class TFProcessor extends IDataSetProcessor {
    * @returns {Promise<PreProcessedDataSet>}
    */
   preProcess = () => {
-    const scoreThreshold = 0; //ScoreThreshHold[this._model];
+    const scoreThreshold = ScoreThreshHold[this._model] || 0.5;
 
     this.frames.forEach(persons =>
       persons.forEach(({keypoints}) =>
