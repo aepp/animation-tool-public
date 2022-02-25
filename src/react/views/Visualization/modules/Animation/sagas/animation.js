@@ -8,30 +8,34 @@ import {
   UNABLE_TO_LOAD_JSON_FILE,
   UNKNOWN_DATA_SOURCE
 } from '../../../../../../i18n/messages';
+import {showErrorMessage} from '../../../../../modules/App/actions';
 import {LHLegacyProcessor} from '../../../../../../business/processor/LHLegacyProcessor';
 import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
-import {selectDataSetFileUrl} from '../../Upload/reducers';
+import {validateSelectedDataSet} from '../../../util/dataSetUtil';
+import {finishVisualizationViewInit} from '../../../actions/view';
+import {selectDataFileUrl} from '../../Upload/reducers';
 import {setDataSet} from '../../DataSet/actions';
 import {resetAnimationControls} from '../../AnimationControls/actions';
 import {
+  beginAnimationInit,
   cancelAnimationInit,
   finishAnimationInit,
   startAnimation
 } from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
-import {validateSelectedDataSet} from '../../../util/dataSetUtil';
-import {showErrorMessage} from '../../../../../modules/App/actions';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
 function* handleStartAnimationInit(action) {
-  const dataSetFileUrl = yield select(selectDataSetFileUrl);
+  console.log('begin loading dataset...');
+  yield put(beginAnimationInit());
+
+  const dataSetFileUrl = yield select(selectDataFileUrl);
   const {
     payload: {rootElement}
   } = action;
 
-  console.log('begin loading dataset...');
   let dataSet;
   try {
     dataSet = yield call(fetchDataSet, dataSetFileUrl);
@@ -127,6 +131,7 @@ function* handleStartAnimationInit(action) {
 
   yield put(openUiChannel());
   yield put(finishAnimationInit());
+  yield put(finishVisualizationViewInit());
 }
 
 function* watchStartAnimationInit() {

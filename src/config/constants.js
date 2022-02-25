@@ -28,10 +28,35 @@ export const FPS_SPEED_UPS = [1.5, 2, 2.5, 3];
  * @property {string} JSON
  * @property {string} ZIP
  */
-export const DataSetFileFormat = {
+export const SupportedInputFileFormat = {
   JSON: '.json',
-  ZIP: '.zip'
+  ZIP: '.zip',
+  MP4: '.mp4'
 };
+/**
+ * @readonly
+ * @enum {string}
+ * @property {string} JSON
+ * @property {string} ZIP
+ */
+export const MimeType = {
+  JSON: 'application/json',
+  ZIP: 'application/zip',
+  MP4: 'video/mp4'
+};
+/**
+ * @readonly
+ * @enum {string}
+ * @property {MimeType.JSON}
+ * @property {MimeType.ZIP}
+ * @property {MimeType.MP4}
+ */
+export const MimeTypeLabel = {
+  [MimeType.JSON]: 'json dataset',
+  [MimeType.ZIP]: 'zip archive',
+  [MimeType.MP4]: 'mp4 video'
+};
+export const SupportedDataSetFileFormats = [SupportedInputFileFormat.JSON];
 
 export const IgnoredFileNamesPatterns = ['DS_Store', '__MACOSX'];
 

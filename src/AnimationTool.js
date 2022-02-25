@@ -11,7 +11,7 @@ import {initStore, initSagas} from './react/store';
 import rootSaga from './react/rootSaga';
 import {theme} from './react/theme/muiTheme';
 import {setAppConfig} from './react/modules/App/actions';
-import {setDataSetFile} from './react/views/Visualization/modules/Upload/actions';
+import {setDataFile} from './react/views/Visualization/modules/Upload/actions';
 
 export default class AnimationTool {
   _store;
@@ -177,7 +177,7 @@ export default class AnimationTool {
 
     if (fileInputEl) {
       fileInputEl.addEventListener('change', e => {
-        this._store.dispatch(setDataSetFile(e.target.files[0]));
+        this._store.dispatch(setDataFile(e.target.files[0]));
       });
     }
     return this;

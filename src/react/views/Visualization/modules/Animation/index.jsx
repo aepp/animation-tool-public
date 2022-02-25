@@ -1,33 +1,30 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Box, Typography} from '@mui/material';
-import {selectDataSetFileUrl} from '../Upload/reducers';
+import {selectDataFileUrl} from '../Upload/reducers';
 import AnimationControls from '../AnimationControls';
-import {
-  selectIsAnimationInitialized,
-  selectIsAnimationLoading
-} from './reducers';
-import {startAnimation} from './actions/animation';
 import {toggleInlineAnimationControlsVisibility} from '../AnimationControls/actions';
+import {selectIsAnimationInitialized} from './reducers';
+import {startAnimation} from './actions/animation';
 
 export const Animation = () => {
-  const dataSetFileUrl = useSelector(selectDataSetFileUrl);
+  const dataFileUrl = useSelector(selectDataFileUrl);
   const dispatch = useDispatch();
   const ref = useRef();
   const isInitialized = useSelector(selectIsAnimationInitialized);
-  const isLoading = useSelector(selectIsAnimationLoading);
   const [isDrag, setIsDrag] = useState(false);
 
   useEffect(() => {
-    if (ref.current && dataSetFileUrl) {
+    if (ref.current && dataFileUrl) {
       dispatch(startAnimation({rootElement: ref.current}));
     }
-  }, [dispatch, dataSetFileUrl]);
+  }, [dispatch, dataFileUrl]);
 
   return (
     <Box
       sx={{
         height: '100%',
+        width: '100%',
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
@@ -51,12 +48,11 @@ export const Animation = () => {
         }}>
         {!isInitialized && (
           <Typography sx={{position: 'absolute'}}>
-            {!isLoading ? 'Upload dataset' : 'Processing dataset'}...
+            Processing dataset...
           </Typography>
         )}
       </Box>
       {isInitialized && <AnimationControls />}
-      {/*<AnimationControls />*/}
     </Box>
   );
 };

@@ -1,18 +1,16 @@
 import React from 'react';
 import {Button} from '@mui/material';
 import {useDispatch, useSelector} from 'react-redux';
-import {DataSetFileFormat} from '../../../../../config/constants';
+import {SupportedInputFileFormat} from '../../../../../config/constants';
 import InputFile from '../../../../components/InputFile';
-import {
-  selectIsAnimationInitialized,
-  selectIsAnimationLoading
-} from '../Animation/reducers';
-import {setDataSetFile} from './actions';
+import {selectIsAnimationInitialized} from '../Animation/reducers';
+import {setDataFile} from './actions';
+import {selectIsFileUploading} from './reducers';
 
 const ID = 'upload-file__button';
 
 export const UploadButton = () => {
-  const isLoading = useSelector(selectIsAnimationLoading);
+  const isLoading = useSelector(selectIsFileUploading);
   const isInitialized = useSelector(selectIsAnimationInitialized);
 
   const dispatch = useDispatch();
@@ -20,9 +18,9 @@ export const UploadButton = () => {
   return (
     <label htmlFor={ID}>
       <InputFile
-        accept={Object.values(DataSetFileFormat).join(',')}
+        accept={Object.values(SupportedInputFileFormat).join(',')}
         id={ID}
-        onChange={e => dispatch(setDataSetFile(e.target.files[0]))}
+        onChange={e => dispatch(setDataFile(e.target.files[0]))}
       />
       <Button
         variant={'outlined'}
