@@ -26,11 +26,16 @@ jobs:
         run: yarn install
         shell: bash
 
+      - name: Pack (.tar) node_modules
+        run: tar -zcvf node_modules.tar.gz node_modules
+        shell: bash
+
       - name: Upload build artifact for the next job
         uses: actions/upload-artifact@v2
         with:
-          name: animation-tool-node-modules
-          path: node_modules
+          name: animation-tool-node-modules-tar
+          path: node_modules.tar.gz
+
   build:
     needs: 'install'
     env:
@@ -48,17 +53,25 @@ jobs:
 
       - uses: actions/download-artifact@master
         with:
-          name: animation-tool-node-modules
+          name: animation-tool-node-modules-tar
+
+      - name: Unpack node_modules
+        run: tar -xvzf node_modules.tar.gz
+        shell: bash
 
       - name: Build application
         run: yarn build
         shell: bash
 
+      - name: Pack (.tar) build
+        run: tar -zcvf build.tar.gz build
+        shell: bash
+
       - name: Upload build artifact for the next job
         uses: actions/upload-artifact@v2
         with:
-          name: animation-tool-release
-          path: build
+          name: animation-tool-release-tar
+          path: build.tar.gz
 
   generate-doc:
     needs: 'install'
@@ -71,17 +84,25 @@ jobs:
 
       - uses: actions/download-artifact@master
         with:
-          name: animation-tool-node-modules
+          name: animation-tool-node-modules-tar
+
+      - name: Unpack node_modules
+        run: tar -xvzf node_modules.tar.gz
+        shell: bash
 
       - name: Generate jsdoc
         run: yarn generate-docs
         shell: bash
 
+      - name: Pack (.tar) generated jsdoc
+        run: tar -zcvf out.tar.gz out
+        shell: bash
+
       - name: Upload build artifact for the next job
         uses: actions/upload-artifact@v2
         with:
-          name: animation-tool-jsdoc
-          path: out
+          name: animation-tool-jsdoc-tar
+          path: out.tar.gz
 
   deploy:
     needs:
@@ -107,16 +128,24 @@ jobs:
       - name: Download release artifact
         uses: actions/download-artifact@master
         with:
-          name: animation-tool-release
+          name: animation-tool-release-tar
 
       - name: Download jsdoc artifact
         uses: actions/download-artifact@master
         with:
-          name: animation-tool-jsdoc
+          name: animation-tool-jsdoc-tar
 
       - name: Display structure of workspace
         run: ls -alh
         working-directory: .
+
+      - name: Unpack build archive
+        run: tar -xvzf build.tar.gz
+        shell: bash
+
+      - name: Unpack jsdoc archive
+        run: tar -xvzf out.tar.gz
+        shell: bash
 
       - name: Run deploy helper script
         run: |
