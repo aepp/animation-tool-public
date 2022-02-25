@@ -13,6 +13,13 @@ import {
 export const reducerKey = 'estimationPlayback';
 
 /**
+ * @typedef DimensionsObjectType
+ * @type {object}
+ * @property {number} [width]
+ * @property {number} [height]
+ */
+
+/**
  * @typedef EstimationPlaybackState
  * @type {object}
  * @property {boolean} isInitialized
@@ -20,8 +27,8 @@ export const reducerKey = 'estimationPlayback';
  * @property {boolean} isPlaying
  * @property {number} totalTime
  * @property {number} currentTime
- * @property {{[width]: number, [height]: number}} previewVideoDimensions
- * @property {{[width]: number, [height]: number}} originalVideoDimensions
+ * @property {DimensionsObjectType} previewVideoDimensions
+ * @property {DimensionsObjectType} originalVideoDimensions
  */
 const defaultState = {
   isInitialized: false,

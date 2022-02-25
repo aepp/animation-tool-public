@@ -1,5 +1,5 @@
-import {IDataSetProcessor} from './IDataSetProcessor';
 import {DataSourceType} from '../../config/constants';
+import {CommonDataSetProcessor} from './CommonDataSetProcessor';
 
 /**
  * @typedef RawLHLegacyFrame
@@ -19,7 +19,11 @@ import {DataSourceType} from '../../config/constants';
  * @property {DataSourceType} [ApplicationName]
  */
 
-export class LHLegacyProcessor extends IDataSetProcessor {
+/**
+ * @class
+ * @extends {CommonDataSetProcessor}
+ */
+export class LHLegacyProcessor extends CommonDataSetProcessor {
   _personIndices = [];
 
   _vectorComponents = {

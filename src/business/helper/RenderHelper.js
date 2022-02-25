@@ -16,13 +16,21 @@ import {LineMaterial} from 'three/examples/jsm/lines/LineMaterial';
 import {Line2} from 'three/examples/jsm/lines/Line2';
 
 /**
- * @interface
+ * @typedef CoordinateObjectType
+ * @type {object}
+ * @property {number} x
+ * @property {number} y
+ * @property {number} [z]
+ */
+
+/**
+ * @abstract
  */
 export class RenderHelper {
   /* BEGIN: "abstract" methods (may / should be overwritten in corresponding render service implementations) */
   /**
    * @abstract
-   * @returns {[number[]]} array of tuples with indices of two adjacent parts
+   * @returns {number[][]} array of tuples with indices of two adjacent parts
    */
   getAdjacentJointPairs = () => [[0, 0]];
   /**
@@ -182,7 +190,7 @@ export class RenderHelper {
    *
    * @param {number} personIdx
    * @param {number} sphereIdx
-   * @param {Array.<{x: number, y: number, [z]: number}>} keyPoints
+   * @param {Array.<CoordinateObjectType>} keyPoints
    * @private
    */
   _updateSphere({personIdx, sphereIdx, keyPoints}) {

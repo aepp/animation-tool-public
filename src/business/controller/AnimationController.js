@@ -15,6 +15,12 @@ import ThreeRenderService from '../service/ThreeRenderService';
 import {DataSetModel} from '../model/DataSetModel';
 import {PlaybackController} from './PlaybackController';
 
+/**
+ * Main controller to create and interact with the animation.
+ *
+ * @class
+ * @extends {PlaybackController}
+ */
 export class AnimationController extends PlaybackController {
   /**
    * internal id to be able to cancel the `requestAnimationFrame` loop when resetting the controller instance
@@ -76,12 +82,11 @@ export class AnimationController extends PlaybackController {
   }
 
   /**
-   *
    * @public
    * @param {DataSourceType} dataSource
    * @param {Extremes} extremes
    * @param {Normalization} normalization
-   * @param {Array.<>} framesPerPerson
+   * @param {Array.<object>} framesPerPerson
    * @param {number} framesCount
    * @param {number[]} personIndices
    * @returns {AnimationController}

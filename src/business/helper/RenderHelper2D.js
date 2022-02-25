@@ -1,6 +1,12 @@
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import {RenderHelper} from './RenderHelper';
 
+/**
+ * RenderHelper for the 2D animation
+ *
+ * @class
+ * @extends {RenderHelper}
+ */
 export class RenderHelper2D extends RenderHelper {
   getAdjacentJointPairs = () =>
     poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.PoseNet);

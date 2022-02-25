@@ -1,0 +1,14 @@
+{
+  "recurseDepth": 10,
+  "source": {
+    "exclude": ["./build", "./node_modules", "./public", "./server", "./tasks"],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+    "template": "node_modules/minami",
+    "encoding": "utf8",
+    "destination": "./out/",
+    "recurse": true
+  }
+}

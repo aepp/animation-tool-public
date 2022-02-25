@@ -9,6 +9,9 @@ import {
 } from 'three';
 import {BACKGROUND_COLOR} from '../../react/theme/constants';
 
+/**
+ * @class
+ */
 export class ThreeRenderService {
   /**
    * @type {HTMLElement}

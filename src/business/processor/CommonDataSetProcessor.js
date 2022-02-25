@@ -32,7 +32,11 @@
  * @property {Normalization} normalization
  * @property {DataSourceType} dataSource
  */
-export class IDataSetProcessor {
+/**
+ * @class
+ * @abstract
+ */
+export class CommonDataSetProcessor {
   /**
    * @type {RegExp}
    * @private

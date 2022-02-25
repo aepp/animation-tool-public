@@ -9,10 +9,17 @@ app.use(
   '/integrations-demo/build/dist',
   express.static(fs.realpathSync('./build/dist'))
 );
+
 app.use(
   '/integrations-demo',
   express.static(fs.realpathSync('./integrations-demo/visual-inspection-tool'))
 );
+
+app.use(
+  '/jsdoc',
+  express.static(fs.realpathSync('./out'))
+);
+
 app.use('/', express.static(fs.realpathSync('./build')));
 
 app.listen(PORT, () => {

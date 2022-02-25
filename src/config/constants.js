@@ -33,6 +33,7 @@ export const SupportedInputFileFormat = {
   ZIP: '.zip',
   MP4: '.mp4'
 };
+
 /**
  * @readonly
  * @enum {string}
@@ -44,6 +45,7 @@ export const MimeType = {
   ZIP: 'application/zip',
   MP4: 'video/mp4'
 };
+
 /**
  * @readonly
  * @enum {string}
@@ -56,6 +58,7 @@ export const MimeTypeLabel = {
   [MimeType.ZIP]: 'zip archive',
   [MimeType.MP4]: 'mp4 video'
 };
+
 export const SupportedDataSetFileFormats = [SupportedInputFileFormat.JSON];
 
 export const IgnoredFileNamesPatterns = ['DS_Store', '__MACOSX'];

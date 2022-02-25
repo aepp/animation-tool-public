@@ -1,9 +1,18 @@
-import {IDataSetProcessor} from './IDataSetProcessor';
+// eslint-disable-next-line no-unused-vars
+import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {DataSourceType} from '../../config/constants';
 import {ScoreThreshHold} from '../../config/tensorFlow';
-// import {ScoreThreshHold} from '../../config/tensorFlow';
+import {CommonDataSetProcessor} from './CommonDataSetProcessor';
 
-export class TFProcessor extends IDataSetProcessor {
+/**
+ * @class
+ * @extends {CommonDataSetProcessor}
+ */
+export class TFProcessor extends CommonDataSetProcessor {
+  /**
+   * @type {SupportedModels}
+   * @private
+   */
   _model;
 
   constructor({frames, model}) {

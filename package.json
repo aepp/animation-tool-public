@@ -38,6 +38,8 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "jsdoc": "^3.6.10",
+    "minami": "^1.2.3",
     "prettier": "^2.5.1"
   },
   "peerDependencies": {
@@ -50,10 +52,11 @@
     "build:cra": "react-scripts build && yarn _cp-plugin",
     "_cp-plugin": ". .env && mkdir -p build/dist && cp build/static/js/*main*.js \"$_\"/\"${PLUGIN_FILE_NAME}\"",
     "start-server": "node server/main.js",
-    "test": "craco test",
-    "eject": "react-scripts eject",
+    "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
     "p": "npx prettier 'src/**/*' --write",
-    "l": "npx eslint --ext .js --ext .jsx src/ --fix"
+    "l": "npx eslint --ext .js --ext .jsx src/ --fix",
+    "test": "craco test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

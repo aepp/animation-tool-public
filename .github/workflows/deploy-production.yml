@@ -4,7 +4,7 @@ name: Deploy to production
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -12,11 +12,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
-    env:
-      DISABLE_ESLINT_PLUGIN: true
-      ESLINT_NO_DEV_ERRORS: true
-
+  install:
     environment: production
     runs-on: ubuntu-latest
 
@@ -30,6 +26,30 @@ jobs:
         run: yarn install
         shell: bash
 
+      - name: Upload build artifact for the next job
+        uses: actions/upload-artifact@v2
+        with:
+          name: animation-tool-node-modules
+          path: node_modules
+  build:
+    needs: 'install'
+    env:
+      DISABLE_ESLINT_PLUGIN: true
+      ESLINT_NO_DEV_ERRORS: true
+
+    environment: production
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout master branch
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@master
+        with:
+          name: animation-tool-node-modules
+
       - name: Build application
         run: yarn build
         shell: bash
@@ -40,8 +60,33 @@ jobs:
           name: animation-tool-release
           path: build
 
+  generate-doc:
+    needs: 'install'
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout master branch
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@master
+        with:
+          name: animation-tool-node-modules
+
+      - name: Generate jsdoc
+        run: yarn generate-docs
+        shell: bash
+
+      - name: Upload build artifact for the next job
+        uses: actions/upload-artifact@v2
+        with:
+          name: animation-tool-jsdoc
+          path: out
+
   deploy:
-    needs: 'build'
+    needs:
+      - 'build'
+      - 'generate-doc'
     environment: production
     runs-on: ubuntu-latest
 
@@ -59,10 +104,19 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.DEPLOY_SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - uses: actions/download-artifact@master
+      - name: Download release artifact
+        uses: actions/download-artifact@master
         with:
           name: animation-tool-release
-          path: build
+
+      - name: Download jsdoc artifact
+        uses: actions/download-artifact@master
+        with:
+          name: animation-tool-jsdoc
+
+      - name: Display structure of workspace
+        run: ls -alh
+        working-directory: .
 
       - name: Run deploy helper script
         run: |

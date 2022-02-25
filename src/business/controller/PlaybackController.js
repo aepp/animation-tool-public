@@ -5,6 +5,9 @@ import {
   PlayBackDirectionType
 } from '../../config/constants';
 
+/**
+ * @class
+ */
 export class PlaybackController {
   /**
    *
