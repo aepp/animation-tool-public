@@ -27,7 +27,7 @@ jobs:
         shell: bash
 
       - name: Pack (.tar) node_modules
-        run: tar -zcvf node_modules.tar.gz node_modules
+        run: tar -zcf node_modules.tar.gz node_modules
         shell: bash
 
       - name: Upload build artifact for the next job
@@ -56,7 +56,7 @@ jobs:
           name: animation-tool-node-modules-tar
 
       - name: Unpack node_modules
-        run: tar -xvzf node_modules.tar.gz
+        run: tar -xzf node_modules.tar.gz
         shell: bash
 
       - name: Build application
@@ -87,7 +87,7 @@ jobs:
           name: animation-tool-node-modules-tar
 
       - name: Unpack node_modules
-        run: tar -xvzf node_modules.tar.gz
+        run: tar -xzf node_modules.tar.gz
         shell: bash
 
       - name: Generate jsdoc
@@ -95,7 +95,7 @@ jobs:
         shell: bash
 
       - name: Pack (.tar) generated jsdoc
-        run: tar -zcvf out.tar.gz out
+        run: tar -zvcf out.tar.gz out
         shell: bash
 
       - name: Upload build artifact for the next job
