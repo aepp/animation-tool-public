@@ -52,7 +52,7 @@
     "build:cra": "react-scripts build && yarn _cp-plugin",
     "_cp-plugin": ". .env && mkdir -p build/dist && cp build/static/js/*main*.js \"$_\"/\"${PLUGIN_FILE_NAME}\"",
     "start-server": "node server/main.js",
-    "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
+    "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose .",
     "p": "npx prettier 'src/**/*' --write",
     "l": "npx eslint --ext .js --ext .jsx src/ --fix",
     "test": "craco test",
