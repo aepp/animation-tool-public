@@ -110,6 +110,10 @@ jobs:
       - 'generate-doc'
     environment: production
     runs-on: ubuntu-latest
+    env:
+      ARTIFACT_TAR_NAME_FINAL: releaseArtifact
+      ARTIFACT_TAR_NAME_BUILD: build
+      ARTIFACT_TAR_NAME_JSDOC: out
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -135,16 +139,16 @@ jobs:
         with:
           name: animation-tool-jsdoc-tar
 
-      - name: Display structure of workspace
-        run: ls -alh
-        working-directory: .
+#      - name: Unpack build archive
+#        run: tar -xvzf build.tar.gz
+#        shell: bash
+#
+#      - name: Unpack jsdoc archive
+#        run: tar -xvzf out.tar.gz
+#        shell: bash
 
-      - name: Unpack build archive
-        run: tar -xvzf build.tar.gz
-        shell: bash
-
-      - name: Unpack jsdoc archive
-        run: tar -xvzf out.tar.gz
+      - name: Pack (.tar) everything needed for release
+        run: tar -zvcf ${ARTIFACT_TAR_NAME_FINAL}.tar.gz ${ARTIFACT_TAR_NAME_JSDOC}.tar.gz ${ARTIFACT_TAR_NAME_BUILD}.tar.gz *ocker* package.json server .env
         shell: bash
 
       - name: Run deploy helper script

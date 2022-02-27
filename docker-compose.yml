@@ -10,6 +10,7 @@ services:
     volumes:
       - ./server:/usr/src/app/server
       - ./build/:/usr/src/app/build
+      - ./out/:/usr/src/app/out
       - ./.yarn_cache:/usr/src/app/.yarn_cache
       - ./package.json:/usr/src/app/package.json
       - ./integrations-demo/:/usr/src/app/integrations-demo
