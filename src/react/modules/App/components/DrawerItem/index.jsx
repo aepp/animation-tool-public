@@ -5,6 +5,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
+  ListItemSecondaryAction,
   ListItemText,
   useTheme
 } from '@mui/material';
@@ -17,7 +18,8 @@ export const DrawerItem = ({
   icon,
   component,
   onClick = () => {},
-  componentProps = {}
+  componentProps = {},
+  secondaryAction = ''
 }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -55,6 +57,7 @@ export const DrawerItem = ({
           secondary={secondary ? secondary : undefined}
         />
       </ListItemButton>
+      {secondaryAction}
     </ListItem>
   );
 };

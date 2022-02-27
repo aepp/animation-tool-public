@@ -1,6 +1,12 @@
+const externalLocationSameOrigin = path => `${window.location.origin}/${path}`;
+
 export const routes = {
   root: '/',
-  estimate: '/estimateFromVideo'
+  estimate: '/estimateFromVideo',
+  external: {
+    demo: externalLocationSameOrigin('integrations-demo'),
+    docs: externalLocationSameOrigin('jsdoc')
+  }
 };
 
 export default routes;
