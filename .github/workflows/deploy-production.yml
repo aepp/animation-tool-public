@@ -148,7 +148,7 @@ jobs:
 #        shell: bash
 
       - name: Pack (.tar) everything needed for release
-        run: tar -zvcf ${ARTIFACT_TAR_NAME_FINAL}.tar.gz ${ARTIFACT_TAR_NAME_JSDOC}.tar.gz ${ARTIFACT_TAR_NAME_BUILD}.tar.gz *ocker* package.json server .env
+        run: tar -zvcf ${ARTIFACT_TAR_NAME_FINAL}.tar.gz ${ARTIFACT_TAR_NAME_JSDOC}.tar.gz ${ARTIFACT_TAR_NAME_BUILD}.tar.gz *ocker* package.json yarn.lock server .env
         shell: bash
 
       - name: Run deploy helper script

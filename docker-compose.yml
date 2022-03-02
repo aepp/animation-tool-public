@@ -13,6 +13,7 @@ services:
       - ./out/:/usr/src/app/out
       - ./.yarn_cache:/usr/src/app/.yarn_cache
       - ./package.json:/usr/src/app/package.json
+      - ./yarn.lock:/usr/src/app/yarn.lock
       - ./integrations-demo/:/usr/src/app/integrations-demo
       - ./docker-cmd.sh:/usr/src/app/docker-cmd.sh
     environment:
