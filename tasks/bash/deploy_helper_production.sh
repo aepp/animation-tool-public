@@ -25,4 +25,6 @@ ssh deploy@${DEPLOY_SERVER_URL} "\
     cd $APP_ROOT/${RELEASES_DIR} && ls -1tr | head -n -$KEEP_RELEASES | xargs -d '\n' rm -rf --; \
     cd $APP_ROOT/root && docker-compose up -d --build; \
     rm -rf ${APP_ROOT}/${TEMP_DIR} \
+    docker image prune -a -f \
+    docker container prune -f \
 "
