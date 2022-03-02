@@ -202,8 +202,8 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
   preProcess = () => {
     this.determinePersonIndices();
     let framesPerPerson = this.frames
-      .map(this.processFrame)
-      .filter(this.notEmptyFrame);
+      .map(this.processFrame);
+      // .filter(this.notEmptyFrame);
 
     this.calculateNormalScaleFactor3D();
     this.calculateTranslations();
