@@ -12,12 +12,15 @@ import rootSaga from './react/rootSaga';
 import {theme} from './react/theme/muiTheme';
 import {setAppConfig} from './react/modules/App/actions';
 import {setDataFile} from './react/views/Visualization/modules/Upload/actions';
-import {updateCurrentFrameIdxToThree} from './react/views/Visualization/modules/AnimationControls/actions';
+import {
+  updateCurrentFrameIdx,
+  updateCurrentFrameIdxToThree
+} from './react/views/Visualization/modules/AnimationControls/actions';
 
 /**
  * @class
  */
-export default class AnimationTool {
+class AnimationTool {
   _store;
   _sagaMiddleware;
 
@@ -29,7 +32,7 @@ export default class AnimationTool {
   _isCreated = false;
 
   /**
-   * @type {HTMLElement | undefined}
+   * @type {HTMLElement}
    * @private
    */
   _container = document.getElementById('root');
@@ -61,7 +64,7 @@ export default class AnimationTool {
    * @param {number} frameIdx
    * @public
    */
-  frameUpdateCallback = frameIdx => {};
+  frameUpdateCallback(frameIdx) {}
 
   /**
    * @type {number}
@@ -75,6 +78,7 @@ export default class AnimationTool {
    * @public
    */
   updateFrameIdx(frameIdx) {
+    this._store.dispatch(updateCurrentFrameIdx(frameIdx));
     this._store.dispatch(updateCurrentFrameIdxToThree(frameIdx));
   }
 
@@ -234,3 +238,5 @@ export default class AnimationTool {
     return this;
   }
 }
+
+export default AnimationTool;
