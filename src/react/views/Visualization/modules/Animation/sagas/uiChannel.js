@@ -1,7 +1,11 @@
-import {fork, put, take, takeLatest} from 'redux-saga/effects';
+import {fork, put, take, takeLatest, throttle} from 'redux-saga/effects';
 import {eventChannel} from 'redux-saga';
 import {LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE} from '../../../../../../config/constants';
-import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
+import {
+  closeUiChannel,
+  openUiChannel,
+  updateCurrentFrameIndexFromThree
+} from '../actions/uiChannel';
 
 function* handleStartUiChannel() {
   const animationControllerInstance =
@@ -33,9 +37,19 @@ function* handleStartUiChannel() {
 function* watchStartUiChannel() {
   yield takeLatest(openUiChannel.type, handleStartUiChannel);
 }
+function* watchUpdateCurrentFrameIdxFromThree() {
+  yield throttle(
+    window._AnimationToolInstance.frameUpdateCallbackThrottleTimeout,
+    updateCurrentFrameIndexFromThree.type,
+    action => {
+      window._AnimationToolInstance.frameUpdateCallback(action.payload);
+    }
+  );
+}
 
 function* rootSaga() {
   yield fork(watchStartUiChannel);
+  yield fork(watchUpdateCurrentFrameIdxFromThree);
 }
 
 export default rootSaga;

@@ -12,7 +12,11 @@ import rootSaga from './react/rootSaga';
 import {theme} from './react/theme/muiTheme';
 import {setAppConfig} from './react/modules/App/actions';
 import {setDataFile} from './react/views/Visualization/modules/Upload/actions';
+import {updateCurrentFrameIdxToThree} from './react/views/Visualization/modules/AnimationControls/actions';
 
+/**
+ * @class
+ */
 export default class AnimationTool {
   _store;
   _sagaMiddleware;
@@ -52,15 +56,41 @@ export default class AnimationTool {
    */
   _rootSagaTask;
 
+  /**
+   * Can be used to update anything in external context when three js renders new animation frame
+   * @param {number} frameIdx
+   * @public
+   */
+  frameUpdateCallback = frameIdx => {};
+
+  /**
+   * @type {number}
+   * @private
+   */
+  _frameUpdateCallbackThrottleTimeout;
+
+  /**
+   * Can be called from external context to update the index of the frame currently being rendered
+   * @param {number} frameIdx
+   * @public
+   */
+  updateFrameIdx(frameIdx) {
+    this._store.dispatch(updateCurrentFrameIdxToThree(frameIdx));
+  }
+
   constructor(
     {
       container = undefined,
       appConfig = undefined,
-      dataSetFileInput = undefined
+      dataSetFileInput = undefined,
+      frameUpdateCallback = () => {},
+      frameUpdateCallbackThrottleTimeout = 1000
     } = {
       container: undefined,
       appConfig: undefined,
-      dataSetFileInput: undefined
+      dataSetFileInput: undefined,
+      frameUpdateCallback: () => {},
+      frameUpdateCallbackThrottleTimeout: 1000
     }
   ) {
     if (container !== undefined) {
@@ -70,6 +100,9 @@ export default class AnimationTool {
           : document.querySelector(container);
 
       this._container = container || this._container;
+      this.frameUpdateCallback = frameUpdateCallback;
+      this._frameUpdateCallbackThrottleTimeout =
+        frameUpdateCallbackThrottleTimeout;
     }
 
     this._dataSetFileInput = dataSetFileInput;
@@ -80,6 +113,8 @@ export default class AnimationTool {
     // create global variable to access this instance from external context
     window._AnimationToolInstance = this;
     return this;
+    this._frameUpdateCallbackThrottleTimeout =
+      frameUpdateCallbackThrottleTimeout;
   }
 
   /**
@@ -156,6 +191,22 @@ export default class AnimationTool {
   set config(value) {
     this._config = {...this._config, ...value};
     this._store.dispatch(setAppConfig(this._config));
+  }
+
+  /**
+   * @public
+   * @returns {number}
+   */
+  get frameUpdateCallbackThrottleTimeout() {
+    return this._frameUpdateCallbackThrottleTimeout;
+  }
+
+  /**
+   * @public
+   * @param {number} value
+   */
+  set frameUpdateCallbackThrottleTimeout(value) {
+    this._frameUpdateCallbackThrottleTimeout = value;
   }
 
   /**
