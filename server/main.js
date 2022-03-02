@@ -6,12 +6,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(
-  '/integrations-demo/build/dist',
-  express.static(fs.realpathSync('./build/dist'))
-);
-app.use(
-  '/integrations-demo/build/integration-example',
-  express.static(fs.realpathSync('./build/integration-example'))
+  '/integrations-demo/build',
+  express.static(fs.realpathSync('./build'))
 );
 
 app.use(
