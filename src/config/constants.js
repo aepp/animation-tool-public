@@ -18,7 +18,7 @@ export const PlayBackDirectionType = {
   REVERSE: 'REVERSE'
 };
 
-export const BASE_FPS = 60;
+export const BASE_FPS = 30;
 export const DEFAULT_FPS_MULTIPLIER = 1;
 export const FPS_SPEED_UPS = [1.5, 2, 2.5, 3];
 
