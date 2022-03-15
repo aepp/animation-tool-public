@@ -5,13 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
     appConfig: {
       standalone: false
     },
-    frameUpdateCallback: frameIdx =>
+    frameUpdateCallback: async frameIdx => {
       window.chart.xgrids([
         {
-          value: Math.floor(frameIdx / 30),
+          value: frameIdx / 30,
           class: 'currentTime'
         }
-      ])
+      ]);
+    }
   });
   window._AnimationToolInstance.create();
 });
