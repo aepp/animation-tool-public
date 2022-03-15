@@ -7,6 +7,9 @@ import animationReducer, {
 import dataSetReducer, {
   reducerKey as dataSetReducerKey
 } from './views/Visualization/modules/DataSet/reducers';
+import c3ChartReducer, {
+  reducerKey as c3ChartReducerKey
+} from './views/Visualization/modules/C3Chart/reducers';
 import uploadReducer, {
   reducerKey as uploadReducerKey
 } from './views/Visualization/modules/Upload/reducers';
@@ -33,6 +36,7 @@ export const initStore = sagaMiddleware =>
       [uploadReducerKey]: uploadReducer,
       [animationControlsReducerKey]: animationControlsReducer,
       [dataSetReducerKey]: dataSetReducer,
+      [c3ChartReducerKey]: c3ChartReducer,
       // estimation view
       [estimationViewReducerKey]: estimationViewReducer
     },

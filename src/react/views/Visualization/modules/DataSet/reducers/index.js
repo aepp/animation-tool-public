@@ -11,10 +11,18 @@ const defaultState = {
   framesPerPerson: [],
   personIndices: [],
   extremes: {},
-  normalization: {}
+  normalization: {},
+  original: undefined
 };
 const r = createReducer(defaultState, {
-  [setDataSet]: (state, action) => action.payload,
+  [setDataSet]: (state, action) => {
+    state.framesPerPerson = action.payload.framesPerPerson;
+    state.personIndices = action.payload.personIndices;
+    state.extremes = action.payload.extremes;
+    state.normalization = action.payload.normalization;
+    state.dataSource = action.payload.dataSource;
+    state.original = action.payload.original;
+  },
   [resetDataSet]: () => ({...defaultState})
 });
 
@@ -26,3 +34,7 @@ export default r;
  */
 const selectSelf = state => state[reducerKey];
 export const selectDataSet = createSelector(selectSelf, state => state);
+export const selectOriginalDataSet = createSelector(
+  selectSelf,
+  state => state.original
+);

@@ -17,6 +17,7 @@ import {
   selectIsFileUploading
 } from './modules/Upload/reducers';
 import Video from './modules/Video';
+// import {JointsCoordinateChart} from './modules/C3Chart';
 
 export const Visualization = () => {
   const dispatch = useDispatch();
@@ -72,6 +73,7 @@ export const Visualization = () => {
             }}
             item>
             {/*<DataSet />*/}
+            {/*{isFileUploaded && <JointsCoordinateChart />}*/}
           </Grid>
         )}
       </Grid>

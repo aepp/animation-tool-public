@@ -1,4 +1,12 @@
-import {fork, put, take, takeLatest, throttle} from 'redux-saga/effects';
+import {
+  fork,
+  put,
+  take,
+  takeLatest,
+  throttle,
+  // cancel,
+  // spawn
+} from 'redux-saga/effects';
 import {eventChannel} from 'redux-saga';
 import {LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE} from '../../../../../../config/constants';
 import {
@@ -41,10 +49,20 @@ function* watchUpdateCurrentFrameIdxFromThree() {
   yield throttle(
     window._AnimationToolInstance.frameUpdateCallbackThrottleTimeout,
     updateCurrentFrameIndexFromThree.type,
-    action => {
+    function* (action) {
       window._AnimationToolInstance.frameUpdateCallback(action.payload);
+      // yield spawn(function* () {
+      //   window._AnimationToolInstance.frameUpdateCallback(action.payload);
+      //   yield cancel();
+      // });
     }
   );
+  // yield takeLatest(updateCurrentFrameIndexFromThree.type, function*(action){
+  //   yield fork(function*(){
+  //     window._AnimationToolInstance.frameUpdateCallback(action.payload)
+  //     yield cancel();
+  //   });
+  // });
 }
 
 function* rootSaga() {

@@ -116,9 +116,9 @@ class AnimationTool {
 
     // create global variable to access this instance from external context
     window._AnimationToolInstance = this;
-    return this;
     this._frameUpdateCallbackThrottleTimeout =
       frameUpdateCallbackThrottleTimeout;
+    return this;
   }
 
   /**
@@ -134,17 +134,17 @@ class AnimationTool {
     this.configureDataSetFileInput();
 
     ReactDOM.render(
-      <React.StrictMode>
-        <HashRouter>
-          <Provider store={this._store}>
-            <ScopedCssBaseline style={{height: '100%'}}>
-              <ThemeProvider theme={theme}>
-                <App />
-              </ThemeProvider>
-            </ScopedCssBaseline>
-          </Provider>
-        </HashRouter>
-      </React.StrictMode>,
+      // <React.StrictMode>
+      <HashRouter>
+        <Provider store={this._store}>
+          <ScopedCssBaseline style={{height: '100%'}}>
+            <ThemeProvider theme={theme}>
+              <App />
+            </ThemeProvider>
+          </ScopedCssBaseline>
+        </Provider>
+      </HashRouter>,
+      // </React.StrictMode>,
       this.container
     );
 

@@ -84,7 +84,8 @@ function* handleStartAnimationInit(action) {
       personIndices,
       extremes,
       normalization,
-      dataSource
+      dataSource,
+      original: dataSet
     })
   );
 
