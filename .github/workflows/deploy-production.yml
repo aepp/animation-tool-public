@@ -38,9 +38,9 @@ jobs:
 
   build:
     needs: 'install'
-    env:
-      DISABLE_ESLINT_PLUGIN: true
-      ESLINT_NO_DEV_ERRORS: true
+#    env:
+#      DISABLE_ESLINT_PLUGIN: true
+#      ESLINT_NO_DEV_ERRORS: true
 
     environment: production
     runs-on: ubuntu-latest
