@@ -33,7 +33,7 @@ export const CoordinatesPlot = () => {
   const isInitialized = useSelector(selectIsAnimationInitialized);
 
   /**
-   * @type {[]}
+   * @type {object[]}
    */
   const framesPerPerson = useSelector(selectFramesPerPerson);
 
