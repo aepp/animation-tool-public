@@ -3,12 +3,11 @@ import {LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE} from '../../../../config/co
 import {cleanUpAnimationView} from '../actions/view';
 import {resetAnimation} from '../modules/Animation/actions/animation';
 import {resetAnimationControls} from '../modules/AnimationControls/actions';
-import {resetDataSet} from '../modules/DataSet/actions';
+import {resetDataSet} from '../modules/CoordinatesChart/actions';
 import {resetUpload} from '../modules/Upload/actions';
 import {closeUiChannel} from '../modules/Animation/actions/uiChannel';
 
 function* handleCleanup() {
-  console.log('cleanup animation view');
   yield put(closeUiChannel());
   yield put(resetAnimation());
   yield put(resetAnimationControls());

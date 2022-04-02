@@ -2,6 +2,8 @@ import {
   // eslint-disable-next-line no-unused-vars
   Object3D
 } from 'three';
+// eslint-disable-next-line no-unused-vars
+import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {
   DataSourceType,
   ORBIT_CONTROLS_Z_LIMIT_ADDITION,
@@ -89,6 +91,7 @@ export class AnimationController extends PlaybackController {
    * @param {Array.<object>} framesPerPerson
    * @param {number} framesCount
    * @param {number[]} personIndices
+   * @param {SupportedModels|null} tfModel If provided dataset was created with tensorflow, it should contain the model used for its creation
    * @returns {AnimationController}
    */
   setup({
@@ -97,7 +100,8 @@ export class AnimationController extends PlaybackController {
     normalization,
     framesPerPerson,
     framesCount,
-    personIndices
+    personIndices,
+    tfModel = null
   }) {
     const dataSetModel = new DataSetModel({
       extremes,
@@ -112,7 +116,7 @@ export class AnimationController extends PlaybackController {
         this._renderHelper = new RenderHelper3D({dataSetModel});
         break;
       case DataSourceType.DATA_SOURCE_TF:
-        this._renderHelper = new RenderHelper2D({dataSetModel});
+        this._renderHelper = new RenderHelper2D({dataSetModel, tfModel});
         break;
       default:
         throw new Error(UNKNOWN_DATA_SOURCE);

@@ -3,7 +3,7 @@ import {
   put,
   take,
   takeLatest,
-  throttle,
+  throttle
   // cancel,
   // spawn
 } from 'redux-saga/effects';
@@ -49,6 +49,7 @@ function* watchUpdateCurrentFrameIdxFromThree() {
   yield throttle(
     window._AnimationToolInstance.frameUpdateCallbackThrottleTimeout,
     updateCurrentFrameIndexFromThree.type,
+    // eslint-disable-next-line require-yield
     function* (action) {
       window._AnimationToolInstance.frameUpdateCallback(action.payload);
       // yield spawn(function* () {

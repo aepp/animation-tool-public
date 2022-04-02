@@ -14,7 +14,7 @@ import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
 import {validateSelectedDataSet} from '../../../util/dataSetUtil';
 import {finishVisualizationViewInit} from '../../../actions/view';
 import {selectDataFileUrl} from '../../Upload/reducers';
-import {setDataSet} from '../../DataSet/actions';
+import {setDataSet} from '../../CoordinatesChart/actions';
 import {resetAnimationControls} from '../../AnimationControls/actions';
 import {
   beginAnimationInit,
@@ -24,6 +24,7 @@ import {
 } from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
+import {resetCoordinatesChartControls} from '../../CoordinatesChartControls/actions';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
@@ -45,10 +46,8 @@ function* handleStartAnimationInit(action) {
     return;
   }
 
-  const {dataSource, frames, model, isValid, message} = yield call(
-    validateSelectedDataSet,
-    dataSet
-  );
+  const {dataSource, frames, tfModel, frameStamps, isValid, message} =
+    yield call(validateSelectedDataSet, dataSet);
 
   if (!isValid) {
     yield put(showErrorMessage(message || UNKNOWN_DATA_SOURCE));
@@ -64,7 +63,7 @@ function* handleStartAnimationInit(action) {
     case DataSourceType.DATA_SOURCE_TF:
       ProcessorInstance = new TFProcessor({
         frames,
-        model
+        tfModel
       });
       break;
     default:
@@ -73,10 +72,11 @@ function* handleStartAnimationInit(action) {
       return;
   }
 
-  const {framesPerPerson, personIndices, extremes, normalization} = yield call({
-    context: ProcessorInstance,
-    fn: ProcessorInstance.preProcess
-  });
+  const {framesPerPerson, personIndices, extremes, normalization, jointNames} =
+    yield call({
+      context: ProcessorInstance,
+      fn: ProcessorInstance.preProcess
+    });
 
   yield put(
     setDataSet({
@@ -85,7 +85,9 @@ function* handleStartAnimationInit(action) {
       extremes,
       normalization,
       dataSource,
-      original: dataSet
+      original: dataSet,
+      jointNames,
+      frameStamps
     })
   );
 
@@ -102,6 +104,7 @@ function* handleStartAnimationInit(action) {
       fn: animationControllerInstance.softReset
     });
     yield put(resetAnimationControls());
+    yield put(resetCoordinatesChartControls());
     yield put(closeUiChannel());
   } else {
     animationControllerInstance = new AnimationController({rootElement});
@@ -118,7 +121,8 @@ function* handleStartAnimationInit(action) {
       normalization,
       framesPerPerson,
       framesCount: framesPerPerson.length,
-      personIndices
+      personIndices,
+      tfModel
     }
   );
 

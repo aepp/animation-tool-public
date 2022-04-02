@@ -201,9 +201,8 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
 
   preProcess = () => {
     this.determinePersonIndices();
-    let framesPerPerson = this.frames
-      .map(this.processFrame);
-      // .filter(this.notEmptyFrame);
+    let framesPerPerson = this.frames.map(this.processFrame);
+    // .filter(this.notEmptyFrame);
 
     this.calculateNormalScaleFactor3D();
     this.calculateTranslations();
@@ -227,7 +226,8 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
           translateY: this.translateY,
           translateZ: this.translateZ
         },
-        dataSource: DataSourceType.DATA_SOURCE_KINECT
+        dataSource: DataSourceType.DATA_SOURCE_KINECT,
+        jointNames: LHLegacyProcessor._jointNamesArray
       })
     );
   };
@@ -343,14 +343,14 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
 
   /**
    * To support multiple input formats, this method tries CameCase and underscore-separated joint name styles.
-   * Furthermore "person index"-prefixed names and those index-less are considered as well.
-   * Therefore the supported formats are:
+   * Furthermore, "person index"-prefixed names and those index-less are considered as well.
+   * Therefore, the supported formats are:
    *    - {personIdx: Number}_BodyPart{vectorComponent: X | Y | Z} (e.g. 0_Hand_Right_X)
    *    - {personIdx: Number}_Body_Part{vectorComponent: _X | _Y | _Z} (e.g. 0_HandRightX)
    *    - BodyPart{vectorComponent: X | Y | Z} (e.g.Hand_Right_X)
    *    - Body_Part{vectorComponent: _X | _Y | _Z} (e.g. HandRightX)
    *
-   * @param {object} frameJoints all joint points of teh current frame
+   * @param {object} frameJoints all joint points of the current frame
    *        (e.g. {Ankle_Left_X: ..., Left_Arm_Y: ... etc.} or prefixed with person index {0_Ankle_Left_X: ..., _3_Left_Arm_Y: ... etc.})
    * @param {number} personIdx index of a person the point is required from
    *        (e.g. 0, 1, 2, 3 etc.)
@@ -382,6 +382,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
   getSingleFramePointsForPerson = ({frameJoints, jointNames, personIdx}) => {
     const keyPoints = [];
     let zeroPointsCounter = 0;
+
     for (const jointName of jointNames) {
       const values = [
         this.getJointVectorComponent({
@@ -408,7 +409,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
         (sum, v) => sum + (v === 0 && 1 / 3),
         0
       );
-      if (zeroPointsCounter > 3) break;
+      // if (zeroPointsCounter > 3) break;
 
       if (values[0] < this.extremes.xMin) this.extremes.xMin = values[0];
       if (values[1] < this.extremes.yMin) this.extremes.yMin = values[1];
@@ -419,7 +420,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
       if (values[2] > this.extremes.zMax) this.extremes.zMax = values[2];
 
       const labeledValues = {
-        name: jointName,
+        name: this.jointNames[jointName] || jointName,
         [this.vectorComponents.x.toLowerCase()]: values[0],
         [this.vectorComponents.y.toLowerCase()]: values[1],
         [this.vectorComponents.z.toLowerCase()]: values[2]

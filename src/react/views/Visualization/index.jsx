@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Box, Grid, Typography, useTheme} from '@mui/material';
-// import {DataSet} from './modules/DataSet';
+import {Box, Grid, Stack, Typography, useTheme} from '@mui/material';
 import {
   MimeTypeLabel,
   SupportedInputFileFormat
@@ -17,6 +16,8 @@ import {
   selectIsFileUploading
 } from './modules/Upload/reducers';
 import Video from './modules/Video';
+import {CoordinatesChart} from './modules/CoordinatesChart';
+import {CoordinatesChartControls} from './modules/CoordinatesChartControls';
 // import {JointsCoordinateChart} from './modules/C3Chart';
 
 export const Visualization = () => {
@@ -72,7 +73,10 @@ export const Visualization = () => {
               borderLeft: `solid 1px ${theme.palette.divider}`
             }}
             item>
-            {/*<DataSet />*/}
+            <Stack direction={'column'} sx={{height: '100%'}}>
+              <CoordinatesChartControls />
+              <CoordinatesChart />
+            </Stack>
             {/*{isFileUploaded && <JointsCoordinateChart />}*/}
           </Grid>
         )}

@@ -15,9 +15,19 @@ export class TFProcessor extends CommonDataSetProcessor {
    */
   _model;
 
-  constructor({frames, model}) {
+  /**
+   * For a good performance save joints in a jointName => jointName map and return the keys of that
+   * map when joints array is needed. This way we avoid the check whether a jointName is already in the
+   * joints list or not when iterating through dataset.
+   *
+   * @type {object}
+   * @private
+   */
+  _joints = {};
+
+  constructor({frames, tfModel}) {
     super({frames});
-    this._model = model;
+    this._model = tfModel;
   }
 
   /**
@@ -65,10 +75,13 @@ export class TFProcessor extends CommonDataSetProcessor {
       .filter(frame => frame.length)
       .map(frame =>
         frame.map(({keypoints, score}) => ({
-          keyPoints: keypoints.map(point => ({
-            ...this.getNormalizedCenteredPoint(point),
-            z: 0
-          })),
+          keyPoints: keypoints.map(point => {
+            this._addJoint(point.name);
+            return {
+              ...this.getNormalizedCenteredPoint(point),
+              z: 0
+            };
+          }),
           score
         }))
       );
@@ -86,11 +99,28 @@ export class TFProcessor extends CommonDataSetProcessor {
           translateY: this.translateY,
           scaleFactor: this.normalScaleFactor
         },
-        dataSource: DataSourceType.DATA_SOURCE_TF
+        dataSource: DataSourceType.DATA_SOURCE_TF,
+        jointNames: this._getJointNames()
       };
       return resolve(processedDataSet);
     });
   };
+
+  /**
+   * @private
+   * @returns {string[]}
+   */
+  _getJointNames() {
+    return Object.keys(this._joints);
+  }
+
+  /**
+   * @private
+   * @param {string} joint
+   */
+  _addJoint(joint) {
+    this._joints[joint] = joint;
+  }
 
   get model() {
     return this._model;

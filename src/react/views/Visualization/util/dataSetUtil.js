@@ -14,7 +14,7 @@ export const validateSelectedDataSet = (dataSet = {}) => {
   if (!dataSource || dataSource === '')
     return generateBadFormatCheckResult("can't identify data source");
 
-  let model = null;
+  let tfModel = null;
   let checkFramesIsArrayOfArrays = false;
   // if dealing with datasource from tensor flow estimation, determine the tensor flow model used for estimation
   if (source && dataSource === DataSourceType.DATA_SOURCE_TF) {
@@ -22,12 +22,12 @@ export const validateSelectedDataSet = (dataSet = {}) => {
     const details = source.details;
     const modelFromDataSet =
       details && details.model ? details.model : undefined;
-    // if if model is defined in dataset file and is supported - we're fine
+    // if model is defined in dataset file and is supported - we're fine
     if (
       modelFromDataSet &&
       Object.keys(SupportedModels).includes(modelFromDataSet)
     ) {
-      model = modelFromDataSet;
+      tfModel = modelFromDataSet;
     } else {
       return generateBadFormatCheckResult("can't read tensorflow model");
     }
@@ -46,8 +46,14 @@ export const validateSelectedDataSet = (dataSet = {}) => {
       'frames array should be an array of arrays with frames per person'
     );
 
-  // format seems fine
-  return {dataSource, frames, model, isValid: true};
+  // format seems to be fine
+  return {
+    dataSource,
+    frames,
+    frameStamps: frames.map(frame => frame.frameStamp),
+    tfModel,
+    isValid: true
+  };
 };
 
 const generateBadFormatCheckResult = message => ({

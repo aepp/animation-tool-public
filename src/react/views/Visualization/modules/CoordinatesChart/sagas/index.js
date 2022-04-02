@@ -7,9 +7,7 @@ function* handlePlotDataSet(action) {
   const {
     payload: {containerElem}
   } = action;
-  console.log(action);
   const dataSet = yield select(selectDataSet);
-  console.log('dataSet', dataSet);
   const x = [];
   const y = [];
   dataSet.framesPerPerson.forEach(frame =>

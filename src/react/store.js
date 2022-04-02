@@ -4,12 +4,12 @@ import appReducer, {reducerKey as appReducerKey} from './modules/App/reducers';
 import animationReducer, {
   reducerKey as animationReducerKey
 } from './views/Visualization/modules/Animation/reducers';
-import dataSetReducer, {
-  reducerKey as dataSetReducerKey
-} from './views/Visualization/modules/DataSet/reducers';
-import c3ChartReducer, {
-  reducerKey as c3ChartReducerKey
-} from './views/Visualization/modules/C3Chart/reducers';
+import coordinatesChartReducer, {
+  reducerKey as coordinatesChartKey
+} from './views/Visualization/modules/CoordinatesChart/reducers';
+import coordinatesChartControlsReducer, {
+  reducerKey as coordinatesChartControlsReducerKey
+} from './views/Visualization/modules/CoordinatesChartControls/reducers';
 import uploadReducer, {
   reducerKey as uploadReducerKey
 } from './views/Visualization/modules/Upload/reducers';
@@ -35,8 +35,8 @@ export const initStore = sagaMiddleware =>
       [animationReducerKey]: animationReducer,
       [uploadReducerKey]: uploadReducer,
       [animationControlsReducerKey]: animationControlsReducer,
-      [dataSetReducerKey]: dataSetReducer,
-      [c3ChartReducerKey]: c3ChartReducer,
+      [coordinatesChartKey]: coordinatesChartReducer,
+      [coordinatesChartControlsReducerKey]: coordinatesChartControlsReducer,
       // estimation view
       [estimationViewReducerKey]: estimationViewReducer
     },
