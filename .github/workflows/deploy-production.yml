@@ -38,9 +38,10 @@ jobs:
 
   build:
     needs: 'install'
-#    env:
+    env:
 #      DISABLE_ESLINT_PLUGIN: true
 #      ESLINT_NO_DEV_ERRORS: true
+      NODE_OPTIONS: --max_old_space_size=8192
 
     environment: production
     runs-on: ubuntu-latest
