@@ -19,6 +19,7 @@ export const PlayBackDirectionType = {
 };
 
 export const BASE_FPS = 30;
+export const BASE_FPS_TF = 60;
 export const DEFAULT_FPS_MULTIPLIER = 1;
 export const FPS_SPEED_UPS = [1.5, 2, 2.5, 3];
 
@@ -69,6 +70,7 @@ export const IgnoredFileNamesPatterns = ['DS_Store', '__MACOSX'];
  * @property {string} DATA_SOURCE_KINECT
  * @property {string} DATA_SOURCE_KINECT_AZURE
  * @property {string} DATA_SOURCE_TF
+ * @property {string} DATA_SOURCE_TF_MOCK_LH
  */
 export const DataSourceType = {
   /** @member {string} */
@@ -76,7 +78,9 @@ export const DataSourceType = {
   /** @member {string} */
   DATA_SOURCE_KINECT_AZURE: 'Kinect Azure',
   /** @member {string} */
-  DATA_SOURCE_TF: 'TensorFlow'
+  DATA_SOURCE_TF: 'TensorFlow',
+  /** @member {string} */
+  DATA_SOURCE_TF_MOCK_LH: 'LearningHub'
 };
 
 // three.js

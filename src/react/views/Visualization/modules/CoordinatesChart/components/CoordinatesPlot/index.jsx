@@ -105,33 +105,40 @@ export const CoordinatesPlot = () => {
     if (isInitialized) {
       const tracesObj = {};
       framesPerPerson.forEach((frame, frameIdx) =>
-        frame.forEach(person =>
+        frame.forEach((person, pId) => {
+          const personIdx = person.personIdx || pId;
           person.keyPoints.forEach(point => {
-            const selectedComponents = selectedJoints
+            const selectedComponents = (selectedJoints[personIdx] || [])
               .filter(j => j.name === point.name)
               .map(j => j.component);
 
             selectedComponents.forEach(selectedComponent => {
-              tracesObj[point.name + selectedComponent] =
-                tracesObj[point.name + selectedComponent] || {};
-              tracesObj[point.name + selectedComponent].name =
-                point.name + ' ' + selectedComponent.toUpperCase();
-              tracesObj[point.name + selectedComponent].mode = 'lines+markers';
-              tracesObj[point.name + selectedComponent].type = 'scattergl';
-              tracesObj[point.name + selectedComponent].x =
-                tracesObj[point.name + selectedComponent].x || [];
-              tracesObj[point.name + selectedComponent].y =
-                tracesObj[point.name + selectedComponent].y || [];
-              tracesObj[point.name + selectedComponent].x.push(
+              tracesObj[personIdx + point.name + selectedComponent] =
+                tracesObj[personIdx + point.name + selectedComponent] || {};
+              tracesObj[
+                personIdx + point.name + selectedComponent
+              ].name = `P${personIdx} ${
+                point.name
+              } ${selectedComponent.toUpperCase()}`;
+              tracesObj[personIdx + point.name + selectedComponent].mode =
+                'lines+markers';
+              tracesObj[personIdx + point.name + selectedComponent].type =
+                'scattergl';
+              tracesObj[personIdx + point.name + selectedComponent].x =
+                tracesObj[personIdx + point.name + selectedComponent].x || [];
+              tracesObj[personIdx + point.name + selectedComponent].y =
+                tracesObj[personIdx + point.name + selectedComponent].y || [];
+              tracesObj[personIdx + point.name + selectedComponent].x.push(
                 frameStamps[frameIdx]
               );
-              tracesObj[point.name + selectedComponent].y.push(
+              tracesObj[personIdx + point.name + selectedComponent].y.push(
                 point[selectedComponent]
               );
             });
-          })
-        )
+          });
+        })
       );
+
       const data = Object.keys(tracesObj).reduce((array, trace) => {
         array.push(tracesObj[trace]);
         return array;

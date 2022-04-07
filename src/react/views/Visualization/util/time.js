@@ -3,12 +3,15 @@
  * @param {string} frameStamp
  */
 export const getMillisecondsFromFrameStamp = frameStamp => {
-  const timestamp = Date.parse(`2019-01-01T${frameStamp}Z`);
-  return (
-    new Date(timestamp).getMinutes() * 60 * 1000 +
-    new Date(timestamp).getSeconds() * 1000 +
-    new Date(timestamp).getMilliseconds()
-  );
+  if (typeof frameStamp === 'string' && frameStamp.indexOf(':') > -1) {
+    const timestamp = Date.parse(`2019-01-01T${frameStamp}Z`);
+    return (
+      new Date(timestamp).getMinutes() * 60 * 1000 +
+      new Date(timestamp).getSeconds() * 1000 +
+      new Date(timestamp).getMilliseconds()
+    );
+  }
+  return frameStamp * 1000;
 };
 
 export const millisecondsToTime = milliseconds => {

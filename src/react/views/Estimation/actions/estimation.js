@@ -8,5 +8,10 @@ export const startEstimation = createAction('startEstimation');
 export const pauseEstimation = createAction('pauseEstimation');
 export const endEstimation = createAction('endEstimation');
 export const addEstimatedPose = createAction('addEstimatedPose');
+export const addEstimationFrameStamp = createAction('addEstimationFrameStamp');
+export const setDetectionModel = createAction('setDetectionModel');
+export const setDetectionModelType = createAction('setDetectionModelType');
+export const setEstimationConfig = createAction('setEstimationConfig');
+export const setDetectionFps = createAction('setDetectionFps');
 
 export const resetEstimation = createAction('resetEstimation');

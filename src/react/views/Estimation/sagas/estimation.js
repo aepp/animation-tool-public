@@ -14,6 +14,7 @@ import {fill} from '@tensorflow/tfjs-core';
 import {LOCAL_STORAGE_POSE_DETECTOR_INSTANCE} from '../../../../config/constants';
 import {DetectorConfigs} from '../../../../config/tensorFlow';
 import {
+  selectDetectionFps,
   selectDetectionModel,
   selectEstimationConfig,
   selectEstimationVideoOriginalDimensions,
@@ -21,6 +22,7 @@ import {
 } from '../reducers';
 import {
   addEstimatedPose,
+  addEstimationFrameStamp,
   beginWarmUpModel,
   endEstimation,
   finishWarmUpModel,
@@ -33,6 +35,7 @@ import {
   stopEstimationVideo
 } from '../actions/estimationPlayback';
 import {cleanupEstimationView} from '../actions/view';
+import {VIDEO_ELEMENT_ID_ORIGINAL} from '../components/EstimationVideo';
 
 function* handleWarmUpModel() {
   const dimensions = yield select(selectEstimationVideoOriginalDimensions);
@@ -68,19 +71,26 @@ function* handleWarmUpModel() {
   yield put(finishWarmUpModel());
 }
 
-// const estimate = async (videoElementOriginal, estimationConfig) => {
-//   const poses = await window[LOCAL_STORAGE_POSE_DETECTOR_INSTANCE].estimatePoses(videoElementOriginal, estimationConfig);
-//   console.log(poses);
-//   return poses;
-// };
-// let rafId;
-// const runFrame = async (videoElementOriginal, estimationConfig) => {
-//   await estimate(videoElementOriginal, estimationConfig);
-//   rafId = requestAnimationFrame(() => runFrame(videoElementOriginal, estimationConfig))
-// }
-// const detect = async (videoElementOriginal, estimationConfig) => {
-//   await runFrame(videoElementOriginal, estimationConfig);
-// };
+window.poses = [];
+window.frameStamps = [];
+const estimate = async (videoElementOriginal, estimationConfig) => {
+  const poses = await window[
+    LOCAL_STORAGE_POSE_DETECTOR_INSTANCE
+  ].estimatePoses(videoElementOriginal, estimationConfig);
+  window.poses.push(poses);
+  window.frameStamps.push(videoElementOriginal.currentTime);
+  return poses;
+};
+let rafId;
+const runFrame = async (videoElementOriginal, estimationConfig) => {
+  await estimate(videoElementOriginal, estimationConfig);
+  rafId = requestAnimationFrame(() =>
+    runFrame(videoElementOriginal, estimationConfig)
+  );
+};
+const detect = async (videoElementOriginal, estimationConfig) => {
+  await runFrame(videoElementOriginal, estimationConfig);
+};
 
 function* handleStartDetection(action) {
   const isDetecting = yield select(selectIsDetecting);
@@ -97,20 +107,32 @@ function* handleStartDetection(action) {
   );
 
   const detector = window[LOCAL_STORAGE_POSE_DETECTOR_INSTANCE];
+  // const videoElementOriginal = document.getElementById(VIDEO_ELEMENT_ID_ORIGINAL);
   const detectionLoop = yield fork(function* () {
     // yield call(detect, videoElementOriginal, estimationConfig);
+    const detectionFps = yield select(selectDetectionFps);
+    const detectionDelay = 1000 / detectionFps; // ~11-16 FPS is max for MBP 2020
+    const videoElement = document.getElementById(VIDEO_ELEMENT_ID_ORIGINAL);
     console.log('estimation started');
     while (true) {
+      yield put(addEstimationFrameStamp(videoElement.currentTime));
+
       const poses = yield call(
         {
           context: detector,
           fn: detector.estimatePoses
         },
-        action.payload,
+        videoElement, // -> video element
         estimationConfig
       );
-      yield put(addEstimatedPose(poses));
-      yield delay(16);
+      yield put(
+        addEstimatedPose({poses})
+        // addEstimatedPose({
+        //   poses,
+        //   frameStamp: videoElement.currentTime
+        // })
+      );
+      yield delay(detectionDelay);
     }
   });
 
@@ -132,6 +154,7 @@ function* handleStartDetection(action) {
 }
 
 function* handlePauseDetection() {
+  // cancelAnimationFrame(rafId);
   yield put(
     setEstimationStatus({
       isDetecting: false
@@ -140,6 +163,7 @@ function* handlePauseDetection() {
 }
 
 function* handleEndDetection() {
+  // cancelAnimationFrame(rafId);
   yield put(
     setEstimationStatus({
       hasDetectionFinished: true,
@@ -150,13 +174,13 @@ function* handleEndDetection() {
   const detector = window[LOCAL_STORAGE_POSE_DETECTOR_INSTANCE];
 
   if (detector) {
+    // yield call({
+    //   context: detector,
+    //   fn: detector.reset
+    // });
     yield call({
       context: detector,
       fn: detector.dispose
-    });
-    yield call({
-      context: detector,
-      fn: detector.reset
     });
   }
 }

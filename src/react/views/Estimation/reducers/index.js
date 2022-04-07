@@ -29,8 +29,14 @@ export const selectIsModelWarmedUp = state =>
   estimationSelectors.selectIsModelWarmedUp(state[reducerKey]);
 export const selectDetectionModel = state =>
   estimationSelectors.selectDetectionModel(state[reducerKey]);
+export const selectDetectionModelType = state =>
+  estimationSelectors.selectDetectionModelType(state[reducerKey]);
 export const selectEstimationConfig = state =>
   estimationSelectors.selectEstimationConfig(state[reducerKey]);
+export const selectDetectionFps = state =>
+  estimationSelectors.selectDetectionFps(state[reducerKey]);
+export const selectEstimationFrameStamps = state =>
+  estimationSelectors.selectEstimationFrameStamps(state[reducerKey]);
 
 export const selectIsEstimationVideoInitialized = state =>
   estimationPlaybackSelectors.selectIsEstimationVideoInitialized(

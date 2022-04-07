@@ -5,6 +5,7 @@ import {
 // eslint-disable-next-line no-unused-vars
 import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {
+  BASE_FPS,
   DataSourceType,
   ORBIT_CONTROLS_Z_LIMIT_ADDITION,
   PlayBackDirectionType
@@ -73,13 +74,15 @@ export class AnimationController extends PlaybackController {
 
   /**
    * @param {HTMLElement} rootElement
+   * @param {number} baseFps
    */
   constructor(
-    {rootElement = document.body} = {
-      rootElement: document.body
+    {rootElement = document.body, baseFps = BASE_FPS} = {
+      rootElement: document.body,
+      baseFps: BASE_FPS
     }
   ) {
-    super();
+    super({baseFps});
     this._threeRenderService = new ThreeRenderService({rootElement});
   }
 
@@ -113,6 +116,7 @@ export class AnimationController extends PlaybackController {
 
     switch (dataSource) {
       case DataSourceType.DATA_SOURCE_KINECT:
+      case DataSourceType.DATA_SOURCE_TF_MOCK_LH:
         this._renderHelper = new RenderHelper3D({dataSetModel});
         break;
       case DataSourceType.DATA_SOURCE_TF:
@@ -193,13 +197,14 @@ export class AnimationController extends PlaybackController {
    * @returns {AnimationController}
    */
   _renderCurrentFrame() {
-    const newSceneObjects =
+    const {toAdd: newSceneObjects, toRemove} =
       this._renderHelper.generateAnimationObjectsFromFrame({
         frameIdx: this._currentFrameIdx
       });
 
     this._threeRenderService.updateScene({
-      objectsToAdd: newSceneObjects
+      objectsToAdd: newSceneObjects,
+      objectsToRemove: toRemove
     });
 
     return this;
@@ -247,16 +252,17 @@ export class AnimationController extends PlaybackController {
 
   /**
    * @public
+   * @param {number} baseFps
    * @returns {AnimationController}
    */
-  softReset() {
+  softReset({baseFps = BASE_FPS} = {baseFps: BASE_FPS}) {
     cancelAnimationFrame(this._requestAnimationFrameId);
     this._threeRenderService.softReset();
     this._room = undefined;
     this._currentFrameObjects = [];
     this.currentFrameIdx = 0;
     this._sendFrameIdxToUi();
-    this.resetPlayback();
+    this.resetPlayback({baseFps});
     this._threeRenderService.updateScene();
 
     return this;

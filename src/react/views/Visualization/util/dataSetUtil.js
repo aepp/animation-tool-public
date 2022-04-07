@@ -1,5 +1,9 @@
 import {SupportedModels} from '@tensorflow-models/pose-detection';
-import {DataSourceType} from '../../../../config/constants';
+import {
+  BASE_FPS,
+  BASE_FPS_TF,
+  DataSourceType
+} from '../../../../config/constants';
 
 export const validateSelectedDataSet = (dataSet = {}) => {
   const source = dataSet.source;
@@ -15,10 +19,17 @@ export const validateSelectedDataSet = (dataSet = {}) => {
     return generateBadFormatCheckResult("can't identify data source");
 
   let tfModel = null;
-  let checkFramesIsArrayOfArrays = false;
+  let baseFps = BASE_FPS;
+  if (
+    [
+      DataSourceType.DATA_SOURCE_TF,
+      DataSourceType.DATA_SOURCE_TF_MOCK_LH
+    ].includes(dataSource)
+  ) {
+    baseFps = BASE_FPS_TF;
+  }
   // if dealing with datasource from tensor flow estimation, determine the tensor flow model used for estimation
   if (source && dataSource === DataSourceType.DATA_SOURCE_TF) {
-    checkFramesIsArrayOfArrays = true;
     const details = source.details;
     const modelFromDataSet =
       details && details.model ? details.model : undefined;
@@ -41,17 +52,16 @@ export const validateSelectedDataSet = (dataSet = {}) => {
     return generateBadFormatCheckResult('frames should be in an array');
   if (!frames.length)
     return generateBadFormatCheckResult('frames array is empty');
-  if (checkFramesIsArrayOfArrays && !Array.isArray(frames[0]))
-    return generateBadFormatCheckResult(
-      'frames array should be an array of arrays with frames per person'
-    );
 
   // format seems to be fine
+  const frameStamps = frames.map(frame => frame.frameStamp);
+
   return {
     dataSource,
     frames,
-    frameStamps: frames.map(frame => frame.frameStamp),
+    frameStamps,
     tfModel,
+    baseFps,
     isValid: true
   };
 };

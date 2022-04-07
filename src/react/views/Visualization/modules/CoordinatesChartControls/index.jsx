@@ -12,7 +12,10 @@ import {
   Select
 } from '@mui/material';
 import {selectIsAnimationInitialized} from '../Animation/reducers';
-import {selectJointNames} from '../CoordinatesChart/reducers';
+import {
+  selectJointNames,
+  selectPersonIndices
+} from '../CoordinatesChart/reducers';
 import {selectSelectedJoints} from './reducers';
 import {deselectJoint, selectJoint} from './actions';
 
@@ -44,77 +47,96 @@ export const CoordinatesChartControls = () => {
    */
   const jointNames = useSelector(selectJointNames);
   /**
-   * @type {object[]}
+   * @type {number[]}
+   */
+  const personIndices = useSelector(selectPersonIndices);
+  /**
+   * @type {Array.<object[]>}
    */
   const selectedJoints = useSelector(selectSelectedJoints);
-  /**
-   * @type {string[]}
-   */
-  const selectedJointsTransformed = selectedJoints.map(
-    j => j.name + separator + j.component
-  );
+
   if (!isInitialized) return '';
   return (
-    <Box sx={{mb: 1}}>
-      <FormControl sx={{width: 300}} color={'secondary'}>
-        <InputLabel id='select-joints-checkbox-label' color={'secondary'}>
-          Select joints
-        </InputLabel>
-        <Select
-          color={'secondary'}
-          labelId='select-joints-checkbox-label'
-          value={selectedJointsTransformed}
-          input={<OutlinedInput label='Select joints' />}
-          renderValue={selected =>
-            selected
-              .map(t =>
-                t
-                  .split(separator)
-                  .map(p => upperCaseFirst(p))
-                  .join(' ')
-              )
-              .join(', ')
+    <Box sx={{mb: 1, display: 'flex', flexWrap: 'wrap'}}>
+      {personIndices.map(personIdx => {
+        const label = `Person ${personIdx}`;
+        const labelId = `select-joints-checkbox-label-${personIdx}`;
+        /**
+         * @type {string[]}
+         */
+        const selectedJointsTransformed = (selectedJoints[personIdx] || []).map(
+          j => {
+            return j.name + separator + j.component;
           }
-          multiple>
-          {jointNames.map(jointName => {
-            return [
-              <ListSubheader key={jointName}>{jointName}</ListSubheader>,
-              ...vectorComponents.map(c => {
-                /**
-                 * @type {string}
-                 */
-                const value = jointName + separator + c;
-                return (
-                  <MenuItem
-                    key={value}
-                    value={value}
-                    onClick={() => {
-                      if (selectedJointsTransformed.indexOf(value) > -1) {
-                        return dispatch(
-                          deselectJoint({
-                            name: jointName,
-                            component: c
-                          })
-                        );
-                      }
-                      return dispatch(
-                        selectJoint({
-                          name: jointName,
-                          component: c
-                        })
+        );
+        return (
+          <Box sx={{width: 'calc(100% / 6)', p: 0.5}} key={personIdx}>
+            <FormControl color={'secondary'} sx={{width: '100%'}}>
+              <InputLabel id={labelId} color={'secondary'}>
+                {label}
+              </InputLabel>
+              <Select
+                color={'secondary'}
+                labelId={labelId}
+                value={selectedJointsTransformed}
+                input={<OutlinedInput label={label} />}
+                renderValue={selected =>
+                  selected
+                    .map(t =>
+                      t
+                        .split(separator)
+                        .map(p => upperCaseFirst(p))
+                        .join(' ')
+                    )
+                    .join(', ')
+                }
+                multiple>
+                {jointNames.map(jointName => {
+                  return [
+                    <ListSubheader key={jointName}>{jointName}</ListSubheader>,
+                    ...vectorComponents.map(c => {
+                      /**
+                       * @type {string}
+                       */
+                      const value = jointName + separator + c;
+                      return (
+                        <MenuItem
+                          key={value}
+                          value={value}
+                          onClick={() => {
+                            if (selectedJointsTransformed.indexOf(value) > -1) {
+                              return dispatch(
+                                deselectJoint({
+                                  personIdx,
+                                  name: jointName,
+                                  component: c
+                                })
+                              );
+                            }
+                            return dispatch(
+                              selectJoint({
+                                personIdx,
+                                name: jointName,
+                                component: c
+                              })
+                            );
+                          }}>
+                          <Checkbox
+                            checked={
+                              selectedJointsTransformed.indexOf(value) > -1
+                            }
+                          />
+                          <ListItemText primary={c} />
+                        </MenuItem>
                       );
-                    }}>
-                    <Checkbox
-                      checked={selectedJointsTransformed.indexOf(value) > -1}
-                    />
-                    <ListItemText primary={c} />
-                  </MenuItem>
-                );
-              })
-            ];
-          })}
-        </Select>
-      </FormControl>
+                    })
+                  ];
+                })}
+              </Select>
+            </FormControl>
+          </Box>
+        );
+      })}
     </Box>
   );
 };

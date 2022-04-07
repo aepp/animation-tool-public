@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import {DataSourceType} from '../../config/constants';
 import {CommonDataSetProcessor} from './CommonDataSetProcessor';
 
@@ -201,20 +202,53 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
 
   preProcess = () => {
     this.determinePersonIndices();
-    let framesPerPerson = this.frames.map(this.processFrame);
-    // .filter(this.notEmptyFrame);
+
+    const personsEmptyIndex = [];
+    for (let pId of this.personIndices) {
+      personsEmptyIndex[pId] = 0;
+    }
+    let framesPerPerson = this.frames
+      .map(this.processFrame)
+      .map(personsFrames => {
+        return personsFrames.filter(frame => {
+          const z = frame.keyPoints.reduce((zeroCounter, keyPoint) => {
+            if (keyPoint.x === 0) zeroCounter++;
+            return zeroCounter;
+          }, 0);
+          if (z > Object.keys(this.jointNames).length / 2) {
+            personsEmptyIndex[frame.personIdx]++;
+            return false;
+          }
+          return true;
+        });
+      });
+
+    // if a person was not present but is still in the dataset with zero values (like in Kinect datasets)
+    // - remove it from dataset (not the data, but don't list its index so UI doesn't render it
+    // since it iterates through person indices in the render loop)
+    for (let pId of this.personIndices) {
+      if (personsEmptyIndex[pId] === framesPerPerson.length) {
+        delete this.personIndices[pId];
+      }
+    }
 
     this.calculateNormalScaleFactor3D();
     this.calculateTranslations();
-
     framesPerPerson = framesPerPerson.map(personsFrames =>
       personsFrames.map(frame => {
         return {
           ...frame,
-          keyPoints: frame.keyPoints.map(this.getNormalizedCenteredPoint)
+          keyPoints: frame.keyPoints
+            .map(this.getNormalizedCenteredPoint)
+            .sort(
+              (k1, k2) =>
+                LHLegacyProcessor._jointNamesArray.indexOf(k1.name) -
+                LHLegacyProcessor._jointNamesArray.indexOf(k2.name)
+            )
         };
       })
     );
+
     return new Promise(resolve =>
       resolve({
         framesPerPerson,
@@ -226,7 +260,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
           translateY: this.translateY,
           translateZ: this.translateZ
         },
-        dataSource: DataSourceType.DATA_SOURCE_KINECT,
+        dataSource: this._dataSource,
         jointNames: LHLegacyProcessor._jointNamesArray
       })
     );
@@ -263,17 +297,20 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
 
     const pointsPerPerson = [];
     for (const personIdx of this.personIndices) {
+      if (isNaN(personIdx)) continue;
       const keyPoints = this.getSingleFramePointsForPerson({
         frameJoints,
         jointNames,
         personIdx
       });
-
       if (
         !keyPoints ||
-        (Array.isArray(keyPoints) && keyPoints.length < this.jointNames.length)
-      )
+        (Array.isArray(keyPoints) &&
+          keyPoints.length < Object.keys(this.jointNames).length)
+      ) {
         continue;
+      }
+
       pointsPerPerson.push({
         personIdx,
         keyPoints
@@ -285,6 +322,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
 
   setHipMidPoint = ({frameJoints}) => {
     for (const personIdx of this.personIndices) {
+      if (isNaN(personIdx)) continue;
       // set hip_mid x coordinate by determining the distance between hip_left and hip_right vectors
       frameJoints[
         `${personIdx}_${this.jointNames.HipMid}_${this.vectorComponents.x}`
@@ -335,7 +373,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
             jointName: this.jointNames.HipRight,
             vectorComponent: this.vectorComponents.z
           })) /
-        2;
+          2 || 0;
     }
 
     return frameJoints;
@@ -366,22 +404,24 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
     vectorComponent,
     personIdx
   }) => {
-    return [jointName, jointName.replaceAll('_', '')].reduce(
-      (v, label) =>
-        v ||
-        Number(
-          frameJoints[`${personIdx}_${label}_${vectorComponent}`] ||
-            frameJoints[`${personIdx}${label}${vectorComponent}`] ||
-            frameJoints[`${label}_${vectorComponent}`] ||
-            frameJoints[`${label}${vectorComponent}`]
-        ),
-      NaN
-    );
+    return [jointName, jointName.replaceAll('_', '')].reduce((v, label) => {
+      if (!isNaN(frameJoints[`${personIdx}_${label}_${vectorComponent}`]))
+        return Number(frameJoints[`${personIdx}_${label}_${vectorComponent}`]);
+      if (!isNaN(frameJoints[`${personIdx}${label}${vectorComponent}`]))
+        return Number(frameJoints[`${personIdx}${label}${vectorComponent}`]);
+      if (!isNaN(frameJoints[`${personIdx}${label}_${vectorComponent}`]))
+        return Number(frameJoints[`${personIdx}${label}_${vectorComponent}`]);
+      if (!isNaN(frameJoints[`${label}_${vectorComponent}`]))
+        return Number(frameJoints[`${label}_${vectorComponent}`]);
+      if (!isNaN(frameJoints[`${label}${vectorComponent}`]))
+        return Number(frameJoints[`${label}${vectorComponent}`]);
+      return v;
+    }, NaN);
   };
 
   getSingleFramePointsForPerson = ({frameJoints, jointNames, personIdx}) => {
     const keyPoints = [];
-    let zeroPointsCounter = 0;
+    // let zeroPointsCounter = 0;
 
     for (const jointName of jointNames) {
       const values = [
@@ -405,11 +445,14 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
         })
       ];
       if (values.reduce((flag, v) => isNaN(v), false)) continue;
-      zeroPointsCounter += values.reduce(
-        (sum, v) => sum + (v === 0 && 1 / 3),
-        0
-      );
-      // if (zeroPointsCounter > 3) break;
+      // const l = Object.keys(this.jointNames).length;
+      // zeroPointsCounter += values.reduce(
+      //   (sum, v) => sum + (v === 0 && 1 / l),
+      //   0
+      // );
+      // id 2D case (record with tensorflow but save it LH format) all z's are zero
+      // so a "person" is considered empty if it has more zeros than body part count
+      // if (zeroPointsCounter > l) break;
 
       if (values[0] < this.extremes.xMin) this.extremes.xMin = values[0];
       if (values[1] < this.extremes.yMin) this.extremes.yMin = values[1];
@@ -428,7 +471,7 @@ export class LHLegacyProcessor extends CommonDataSetProcessor {
       keyPoints.push(labeledValues);
     }
 
-    if (zeroPointsCounter > 3) return null;
+    // if (zeroPointsCounter > 3) return null;
 
     return keyPoints;
   };

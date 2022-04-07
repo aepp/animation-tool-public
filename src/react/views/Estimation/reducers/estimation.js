@@ -1,23 +1,31 @@
 import {createReducer} from '@reduxjs/toolkit';
-import {SupportedModels} from '@tensorflow-models/pose-detection';
+import {SupportedModels, movenet} from '@tensorflow-models/pose-detection';
 import {ScoreThreshHold} from '../../../../config/tensorFlow';
+import {BASE_FPS_TF} from '../../../../config/constants';
 import {
   setEstimationStatus,
   setHasEstimationStarted,
   addEstimatedPose,
   beginWarmUpModel,
   finishWarmUpModel,
-  resetEstimation
+  resetEstimation,
+  setDetectionModel,
+  setDetectionModelType,
+  setEstimationConfig,
+  setDetectionFps,
+  addEstimationFrameStamp
 } from '../actions/estimation';
 
 export const reducerKey = 'recording';
 
-const detectionModel = SupportedModels.MoveNet; // SupportedModels.PoseNet
+const detectionModel = SupportedModels.MoveNet;
+const maxPoses = 2;
 const defaultState = {
   detectionModel,
+  detectionModelType: movenet.modelType.MULTIPOSE_LIGHTNING,
+  maxPoses,
   estimationConfig: {
-    maxPoses: 1,
-    flipHorizontal: false,
+    maxPoses,
     scoreThreshold: ScoreThreshHold[detectionModel]
   },
   isModelWarmingUp: false,
@@ -25,7 +33,9 @@ const defaultState = {
   hasDetectionStarted: false,
   hasDetectionFinished: false,
   isDetecting: false,
-  detectedPoses: []
+  detectedPoses: [],
+  frameStamps: [],
+  detectionFps: BASE_FPS_TF
 };
 
 const r = createReducer(defaultState, {
@@ -49,6 +59,9 @@ const r = createReducer(defaultState, {
   [addEstimatedPose]: (state, action) => {
     state.detectedPoses.push(action.payload);
   },
+  [addEstimationFrameStamp]: (state, action) => {
+    state.frameStamps.push(action.payload);
+  },
   [beginWarmUpModel]: state => {
     state.isModelWarmedUp = false;
     state.isModelWarmingUp = true;
@@ -56,6 +69,18 @@ const r = createReducer(defaultState, {
   [finishWarmUpModel]: state => {
     state.isModelWarmedUp = true;
     state.isModelWarmingUp = false;
+  },
+  [setDetectionModel]: (state, action) => {
+    state.detectionModel = action.payload;
+  },
+  [setDetectionModelType]: (state, action) => {
+    state.detectionModelType = action.payload;
+  },
+  [setEstimationConfig]: (state, action) => {
+    state.estimationConfig = action.payload;
+  },
+  [setDetectionFps]: (state, action) => {
+    state.detectionFps = action.payload;
   },
   [resetEstimation]: () => ({
     ...defaultState
@@ -72,5 +97,8 @@ export const selectors = {
   selectIsModelWarmingUp: state => state[reducerKey].isModelWarmingUp,
   selectIsModelWarmedUp: state => state[reducerKey].isModelWarmedUp,
   selectDetectionModel: state => state[reducerKey].detectionModel,
-  selectEstimationConfig: state => state[reducerKey].estimationConfig
+  selectDetectionModelType: state => state[reducerKey].detectionModelType,
+  selectEstimationConfig: state => state[reducerKey].estimationConfig,
+  selectDetectionFps: state => state[reducerKey].detectionFps,
+  selectEstimationFrameStamps: state => state[reducerKey].frameStamps
 };

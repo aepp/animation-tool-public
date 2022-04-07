@@ -3,10 +3,19 @@ import {VERSION} from '@mediapipe/pose';
 
 export const ScoreThreshHold = {
   [SupportedModels.PoseNet]: 0.9,
-  [SupportedModels.MoveNet]: 0.5,
+  [SupportedModels.MoveNet]: 0.7,
   [SupportedModels.BlazePose]: 0.5
 };
 
+export const modelTypes = {
+  [SupportedModels.PoseNet]: [],
+  [SupportedModels.MoveNet]: [
+    movenet.modelType.MULTIPOSE_LIGHTNING,
+    movenet.modelType.SINGLEPOSE_LIGHTNING,
+    movenet.modelType.SINGLEPOSE_THUNDER
+  ],
+  [SupportedModels.BlazePose]: ['lite', 'full', 'heavy']
+};
 export const DetectorConfigs = {
   [SupportedModels.PoseNet]: {
     quantBytes: 4,
@@ -26,6 +35,12 @@ export const DetectorConfigs = {
   },
   [SupportedModels.MoveNet]: {
     // runtime: 'tfjs-webgl',
-    modelType: movenet.modelType.SINGLEPOSE_LIGHTNING // movenet.modelType.SINGLEPOSE_THUNDER, movenet.modelType.MULTIPOSE_LIGHTNING
+    modelType: movenet.modelType.MULTIPOSE_LIGHTNING,
+    enableTracking: true,
+    minPoseScore: 0.3,
+    multiPoseMaxDimension: 512
   }
 };
+
+export const hasModelTypes = model =>
+  [SupportedModels.BlazePose, SupportedModels.MoveNet].includes(model);

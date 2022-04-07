@@ -9,7 +9,7 @@ export const reducerKey = 'coordinatesChartControls';
 
 /**
  * @typedef CoordinatesChartControlsState
- * @type {string[]} selectedJoints
+ * @type {Array.<string[]>} selectedJoints
  */
 
 /**
@@ -20,10 +20,14 @@ const defaultState = {
 };
 const r = createReducer(defaultState, {
   [selectJoint]: (state, action) => {
-    state.selectedJoints.push(action.payload);
+    state.selectedJoints[action.payload.personIdx] =
+      state.selectedJoints[action.payload.personIdx] || [];
+    state.selectedJoints[action.payload.personIdx].push(action.payload);
   },
   [deselectJoint]: (state, action) => {
-    state.selectedJoints = state.selectedJoints.filter(j => {
+    state.selectedJoints[action.payload.personIdx] = state.selectedJoints[
+      action.payload.personIdx
+    ].filter(j => {
       if (j.name !== action.payload.name) return true;
       return j.component !== action.payload.component;
     });

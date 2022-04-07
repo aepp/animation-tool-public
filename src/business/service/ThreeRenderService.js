@@ -116,7 +116,7 @@ export class ThreeRenderService {
    * @param {Object3D[]} objects
    */
   addObjects(objects) {
-    objects.forEach(this.addObject.bind(this));
+    objects.filter(o => Boolean(o)).forEach(this.addObject.bind(this));
   }
 
   /**

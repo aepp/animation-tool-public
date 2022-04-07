@@ -4,6 +4,7 @@ import {
   getMillisecondsFromFrameStamp,
   millisecondsToTime
 } from '../../../util/time';
+import {BASE_FPS} from '../../../../../../config/constants';
 
 export const reducerKey = 'coordinatesChart';
 
@@ -17,6 +18,7 @@ export const reducerKey = 'coordinatesChart';
  * @property {object} frameIdsByFormattedStamps
  * @property {boolean} isUsingFrameStamps
  * @property {number} firstNoneEmptyFrameIdx
+ * @property {number} baseFps
  */
 /**
  * @typedef {PreProcessedDataSet | CoordinatesChartPartialState} CoordinatesChartState
@@ -34,7 +36,8 @@ const defaultState = {
   frameStampsFormatted: [],
   frameIdsByFormattedStamps: {},
   isUsingFrameStamps: false,
-  firstNoneEmptyFrameIdx: 0
+  firstNoneEmptyFrameIdx: 0,
+  baseFps: BASE_FPS
 };
 const r = createReducer(defaultState, {
   [setDataSet]: (state, action) => {
@@ -48,6 +51,7 @@ const r = createReducer(defaultState, {
     state.dataSource = action.payload.dataSource;
     state.original = action.payload.original;
     state.jointNames = action.payload.jointNames;
+    state.baseFps = action.payload.baseFps;
     state.frameStamps = state.isUsingFrameStamps
       ? action.payload.frameStamps.map(frameStamp =>
           getMillisecondsFromFrameStamp(frameStamp)
@@ -125,3 +129,8 @@ export const selectFirstNoneEmptyFrameIdx = createSelector(
   selectSelf,
   state => state.firstNoneEmptyFrameIdx
 );
+export const selectPersonIndices = createSelector(
+  selectSelf,
+  state => state.personIndices
+);
+export const selectBaseFps = createSelector(selectSelf, state => state.baseFps);

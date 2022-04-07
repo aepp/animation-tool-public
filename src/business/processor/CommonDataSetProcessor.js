@@ -32,11 +32,19 @@
  * @property {Normalization} normalization
  * @property {DataSourceType} dataSource
  */
+import {DataSourceType} from '../../config/constants';
+
 /**
  * @class
  * @abstract
  */
 export class CommonDataSetProcessor {
+  /**
+   * @type {DataSourceType}
+   * @protected
+   */
+  _dataSource = undefined;
+
   /**
    * @type {RegExp}
    * @private
@@ -92,8 +100,14 @@ export class CommonDataSetProcessor {
    */
   _translateZ = undefined;
 
-  constructor({frames}) {
+  constructor(
+    {frames = [], dataSource = DataSourceType.DATA_SOURCE_KINECT} = {
+      frames: [],
+      dataSource: DataSourceType.DATA_SOURCE_KINECT
+    }
+  ) {
     this._frames = frames;
+    this._dataSource = dataSource;
   }
 
   preProcess = () => {};

@@ -8,6 +8,7 @@ import {
   selectEstimationVideoTotalTime,
   selectIsDetecting
 } from '../../reducers';
+import {DataSourceType} from '../../../../../config/constants';
 
 export const DetectionProgress = () => {
   const dispatch = useDispatch();
@@ -34,17 +35,30 @@ export const DetectionProgress = () => {
           </Box>
         </Box>
       </Box>
-      <Button
-        color={'secondary'}
-        variant={'contained'}
-        disabled={isDetecting}
-        sx={{mt: 2}}
-        onClick={() => dispatch(downloadEstimationResult())}
-        startIcon={
-          <FileDownloadIcon color={isDetecting ? 'disabled' : 'primary'} />
-        }>
-        {!isDetecting ? 'Download results' : 'Detecting poses...'}
-      </Button>
+      <Box sx={{display: 'flex', mt: 2, width: '100%'}}>
+        {[
+          DataSourceType.DATA_SOURCE_TF,
+          DataSourceType.DATA_SOURCE_TF_MOCK_LH
+        ].map(dataSource => (
+          <Box key={dataSource} sx={{width: '50%', '&:first-child': {mr: 1}}}>
+            <Button
+              color={'secondary'}
+              variant={'contained'}
+              disabled={isDetecting}
+              sx={{width: '100%'}}
+              onClick={() => dispatch(downloadEstimationResult(dataSource))}
+              startIcon={
+                <FileDownloadIcon
+                  color={isDetecting ? 'disabled' : 'primary'}
+                />
+              }>
+              {!isDetecting
+                ? `Download ${dataSource} .json`
+                : 'Detecting poses...'}
+            </Button>
+          </Box>
+        ))}
+      </Box>
     </>
   );
 };

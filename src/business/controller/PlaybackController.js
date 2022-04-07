@@ -37,19 +37,29 @@ export class PlaybackController {
    */
   _frameIdxIncrement = DEFAULT_FPS_MULTIPLIER;
 
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  _baseFps = BASE_FPS;
+
   constructor(
     {
       isPlaying = undefined,
       playbackDirection = undefined,
-      fpsMultiplier = undefined
+      fpsMultiplier = undefined,
+      baseFps = BASE_FPS
     } = {
       isPlaying: undefined,
       playbackDirection: undefined,
-      fpsMultiplier: undefined
+      fpsMultiplier: undefined,
+      baseFps: BASE_FPS
     }
   ) {
     this._isPlaying = isPlaying || this._isPlaying;
     this._playbackDirection = playbackDirection || this._playbackDirection;
+    this._baseFps = baseFps;
     this.fpsMultiplier = fpsMultiplier || this._fpsMultiplier;
   }
 
@@ -67,7 +77,7 @@ export class PlaybackController {
    * @returns {number}
    */
   getTimeoutByCurrentFps() {
-    return 1000 / (this._fpsMultiplier * BASE_FPS);
+    return 1000 / ((this.fpsMultiplier * 1000) / this.baseFps);
   }
 
   get isPlaying() {
@@ -99,8 +109,20 @@ export class PlaybackController {
     return this._frameIdxIncrement;
   }
 
-  resetPlayback() {
+  get baseFps() {
+    return this._baseFps;
+  }
+
+  set baseFps(value) {
+    this._baseFps = value;
+  }
+
+  /**
+   * @param {number} baseFps
+   */
+  resetPlayback({baseFps = BASE_FPS} = {baseFps: BASE_FPS}) {
     this._playbackDirection = PlayBackDirectionType.DEFAULT;
     this.fpsMultiplier = DEFAULT_FPS_MULTIPLIER;
+    this.baseFps = baseFps;
   }
 }

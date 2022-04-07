@@ -16,6 +16,7 @@ import {finishVisualizationViewInit} from '../../../actions/view';
 import {selectDataFileUrl} from '../../Upload/reducers';
 import {setDataSet} from '../../CoordinatesChart/actions';
 import {resetAnimationControls} from '../../AnimationControls/actions';
+import {resetCoordinatesChartControls} from '../../CoordinatesChartControls/actions';
 import {
   beginAnimationInit,
   cancelAnimationInit,
@@ -24,7 +25,6 @@ import {
 } from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
-import {resetCoordinatesChartControls} from '../../CoordinatesChartControls/actions';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
@@ -46,7 +46,7 @@ function* handleStartAnimationInit(action) {
     return;
   }
 
-  const {dataSource, frames, tfModel, frameStamps, isValid, message} =
+  const {dataSource, frames, tfModel, frameStamps, baseFps, isValid, message} =
     yield call(validateSelectedDataSet, dataSet);
 
   if (!isValid) {
@@ -58,11 +58,14 @@ function* handleStartAnimationInit(action) {
   let ProcessorInstance;
   switch (dataSource) {
     case DataSourceType.DATA_SOURCE_KINECT:
-      ProcessorInstance = new LHLegacyProcessor({frames});
+    case DataSourceType.DATA_SOURCE_TF_MOCK_LH:
+      // console.log('frames', frames);
+      ProcessorInstance = new LHLegacyProcessor({frames, dataSource});
       break;
     case DataSourceType.DATA_SOURCE_TF:
       ProcessorInstance = new TFProcessor({
         frames,
+        dataSource,
         tfModel
       });
       break;
@@ -87,7 +90,8 @@ function* handleStartAnimationInit(action) {
       dataSource,
       original: dataSet,
       jointNames,
-      frameStamps
+      frameStamps,
+      baseFps
     })
   );
 
@@ -99,15 +103,21 @@ function* handleStartAnimationInit(action) {
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
   if (animationControllerInstance) {
     console.log('replacing dataset...');
-    yield call({
-      context: animationControllerInstance,
-      fn: animationControllerInstance.softReset
-    });
+    yield call(
+      {
+        context: animationControllerInstance,
+        fn: animationControllerInstance.softReset
+      },
+      {baseFps}
+    );
     yield put(resetAnimationControls());
     yield put(resetCoordinatesChartControls());
     yield put(closeUiChannel());
   } else {
-    animationControllerInstance = new AnimationController({rootElement});
+    animationControllerInstance = new AnimationController({
+      rootElement,
+      baseFps
+    });
   }
 
   yield call(

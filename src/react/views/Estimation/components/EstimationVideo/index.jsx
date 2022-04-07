@@ -17,6 +17,8 @@ import {
   updateEstimationVideoTotalTime
 } from '../../actions/estimationPlayback';
 import {useWindowSize} from '../../../../modules/App/hooks/useWindowSize';
+export const VIDEO_ELEMENT_ID_ORIGINAL = 'original-video';
+export const VIDEO_ELEMENT_ID_PREVIEW = 'preview-video';
 
 export const EstimationVideo = () => {
   const theme = useTheme();
@@ -96,7 +98,7 @@ export const EstimationVideo = () => {
         <video
           ref={videoRefPreview}
           {...previewVideoDimensions}
-          id={'preview-video'}
+          id={VIDEO_ELEMENT_ID_PREVIEW}
           onLoadedMetadata={e =>
             dispatch(updateEstimationVideoTotalTime(e.target.duration))
           }
@@ -121,7 +123,7 @@ export const EstimationVideo = () => {
         style={{visibility: 'hidden', zIndex: -1}}
         {...originalVideoDimensions}
         ref={videoRefOriginal}
-        id={'original-video'}
+        id={VIDEO_ELEMENT_ID_ORIGINAL}
         onLoadedMetadata={e => {
           dispatch(
             setEstimationVideoOriginalDimensions({

@@ -130,60 +130,99 @@ export class RenderHelper {
   /**
    *
    * @param {number} frameIdx
-   * @returns {Object3D[]}
+   * @returns {{toAdd: Object3D[], [toRemove]: Object3D[]}}
    */
   generateAnimationObjectsFromFrame = ({frameIdx}) => {
     const frame = this.dataSetModel.framesPerPerson[frameIdx];
-    let objectIdx = 0;
+    const objectIdsPerPerson = this.dataSetModel.personIndices.reduce(
+      (objectIds, personIdx) => {
+        objectIds[personIdx] = 0;
+        return objectIds;
+      },
+      []
+    );
 
+    const nonOrphanPersonIds = [];
     this.getAdjacentJointPairs().forEach(([i, j]) => {
       for (const [personIdx, person] of frame.entries()) {
+        if (!person.keyPoints.length) continue;
+        const pId =
+          typeof person.personIdx !== 'undefined'
+            ? person.personIdx
+            : personIdx;
+        nonOrphanPersonIds.push(pId);
         // fat lines
-        this._lineGeometries[personIdx][objectIdx] =
-          this._lineGeometries[personIdx][objectIdx] || new LineGeometry();
+        const objectIdx = objectIdsPerPerson[pId];
+        this._lineGeometries[pId][objectIdx] =
+          this._lineGeometries[pId][objectIdx] || new LineGeometry();
 
-        this._lineGeometries[personIdx][objectIdx].setPositions([
+        this._lineGeometries[pId][objectIdx].setPositions([
           ...this.getPositions(person.keyPoints[i]),
           ...this.getPositions(person.keyPoints[j])
         ]);
 
         // geometry.setColors( [255, 0, 0, 0, 255, 20] );
 
-        this._lines[personIdx][objectIdx] =
-          this._lines[personIdx][objectIdx] ||
+        this._lines[pId][objectIdx] =
+          this._lines[pId][objectIdx] ||
           new Line2(
-            this._lineGeometries[personIdx][objectIdx],
+            this._lineGeometries[pId][objectIdx],
             this._fatLineMaterial
           );
-        this._lines[personIdx][objectIdx].geometry =
-          this._lineGeometries[personIdx][objectIdx];
-        this._lines[personIdx][objectIdx].updateMorphTargets();
+        this._lines[pId][objectIdx].geometry =
+          this._lineGeometries[pId][objectIdx];
+        this._lines[pId][objectIdx].updateMorphTargets();
 
         // spheres
         this._updateSphere({
-          personIdx,
+          personIdx: pId,
           sphereIdx: i,
           keyPoints: person.keyPoints
         });
         this._updateSphere({
-          personIdx,
+          personIdx: pId,
           sphereIdx: j,
           keyPoints: person.keyPoints
         });
 
-        objectIdx++;
+        objectIdsPerPerson[pId]++;
       }
     });
-    return [
-      ...this._spheres.reduce(
-        (allSpheres, personsSpheres) => [...allSpheres, ...personsSpheres],
-        []
-      ),
-      ...this._lines.reduce(
-        (allLines, personsLines) => [...allLines, ...personsLines],
-        []
-      )
-    ];
+
+    const orphanPersonIds = this.dataSetModel.personIndices.filter(
+      pId => !nonOrphanPersonIds.includes(pId)
+    );
+
+    return {
+      toAdd: [
+        ...this._spheres
+          .filter((s, i) => !orphanPersonIds.includes(i))
+          .reduce(
+            (allSpheres, personsSpheres) => [...allSpheres, ...personsSpheres],
+            []
+          ),
+        ...this._lines
+          .filter((l, i) => !orphanPersonIds.includes(i))
+          .reduce(
+            (allLines, personsLines) => [...allLines, ...personsLines],
+            []
+          )
+      ],
+      toRemove: [
+        ...this._spheres
+          .filter((s, i) => orphanPersonIds.includes(i))
+          .reduce(
+            (allSpheres, personsSpheres) => [...allSpheres, ...personsSpheres],
+            []
+          ),
+        ...this._lines
+          .filter((l, i) => orphanPersonIds.includes(i))
+          .reduce(
+            (allLines, personsLines) => [...allLines, ...personsLines],
+            []
+          )
+      ]
+    };
   };
 
   /**

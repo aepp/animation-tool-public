@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-unused-vars
 import {SupportedModels} from '@tensorflow-models/pose-detection';
-import {DataSourceType} from '../../config/constants';
 import {ScoreThreshHold} from '../../config/tensorFlow';
 import {CommonDataSetProcessor} from './CommonDataSetProcessor';
 
@@ -37,7 +36,7 @@ export class TFProcessor extends CommonDataSetProcessor {
     const scoreThreshold = ScoreThreshHold[this._model] || 0.5;
 
     this.frames.forEach(persons =>
-      persons.forEach(({keypoints}) =>
+      persons.poses.forEach(({keypoints}) =>
         keypoints.forEach(({x, y, score}) => {
           this.extremes.xMax =
             this.extremes.xMax < x && score > scoreThreshold
@@ -63,27 +62,32 @@ export class TFProcessor extends CommonDataSetProcessor {
     this.calculateNormalScaleFactor2D();
     this.calculateTranslations();
 
+    const personIndices = [];
     const framesPerPerson = this.frames
+      // .map(frame =>
+      //   frame.reduce((framesPerPersonReduced, personsFrame) => {
+      //     if (personsFrame.score >= ScoreThreshHold[this._model]) {
+      //       framesPerPersonReduced.push(personsFrame);
+      //     }
+      //     return framesPerPersonReduced;
+      //   }, [])
+      // )
+      // .filter(frame => frame.length)
       .map(frame =>
-        frame.reduce((framesPerPersonReduced, personsFrame) => {
-          if (personsFrame.score >= ScoreThreshHold[this._model]) {
-            framesPerPersonReduced.push(personsFrame);
-          }
-          return framesPerPersonReduced;
-        }, [])
-      )
-      .filter(frame => frame.length)
-      .map(frame =>
-        frame.map(({keypoints, score}) => ({
-          keyPoints: keypoints.map(point => {
-            this._addJoint(point.name);
-            return {
-              ...this.getNormalizedCenteredPoint(point),
-              z: 0
-            };
-          }),
-          score
-        }))
+        frame.poses.map(({keypoints, score, id = 0}) => {
+          if (!personIndices.includes(id)) personIndices.push(id);
+          return {
+            keyPoints: keypoints.map(point => {
+              this._addJoint(point.name);
+              return {
+                ...this.getNormalizedCenteredPoint(point),
+                z: 0
+              };
+            }),
+            score,
+            personIdx: id
+          };
+        })
       );
 
     return new Promise(resolve => {
@@ -92,14 +96,14 @@ export class TFProcessor extends CommonDataSetProcessor {
        */
       const processedDataSet = {
         framesPerPerson,
-        personIndices: [0],
+        personIndices,
         extremes: this.extremes,
         normalization: {
           translateX: this.translateX,
           translateY: this.translateY,
           scaleFactor: this.normalScaleFactor
         },
-        dataSource: DataSourceType.DATA_SOURCE_TF,
+        dataSource: this._dataSource,
         jointNames: this._getJointNames()
       };
       return resolve(processedDataSet);

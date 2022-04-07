@@ -1,13 +1,14 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Box, FormHelperText, Stack} from '@mui/material';
+import {selectBaseFps} from '../../../CoordinatesChart/reducers';
 import Progress from '../Progress';
 import PaceControl from '../PaceControl';
 import FramesCounter from '../FramesCounter';
-import {BASE_FPS} from '../../../../../../../config/constants';
-import {useSelector} from 'react-redux';
 import {selectFpsMultiplier} from '../../reducers';
 
 export const PlaybackControlsInline = () => {
+  const baseFps = useSelector(selectBaseFps);
   const fpsMultiplier = useSelector(selectFpsMultiplier);
 
   return (
@@ -25,7 +26,7 @@ export const PlaybackControlsInline = () => {
       <Box width={'100%'} position={'relative'} mt={0.5}>
         <Box position={'absolute'} bottom={0}>
           <FormHelperText sx={{margin: 0, width: '100%', textAlign: 'center'}}>
-            {BASE_FPS * fpsMultiplier} FPS
+            {baseFps * fpsMultiplier} FPS
           </FormHelperText>
         </Box>
       </Box>
