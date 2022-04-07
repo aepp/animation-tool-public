@@ -130,7 +130,7 @@ export class RenderHelper {
   /**
    *
    * @param {number} frameIdx
-   * @returns {{toAdd: Object3D[], [toRemove]: Object3D[]}}
+   * @returns {{toAdd: Object3D[], toRemove: Object3D[]}}
    */
   generateAnimationObjectsFromFrame = ({frameIdx}) => {
     const frame = this.dataSetModel.framesPerPerson[frameIdx];

@@ -75,23 +75,25 @@ function* handleSelectDataSetFile(action) {
     // if zip contains multiple files
     if (allFileNames.length > 1) {
       // find all files, which names contain datasource specification and have the supported file format
-      let supportedFileNames = allFileNames.filter(
-        fileName =>
-          new RegExp(
-            Object.values(DataSourceType)
-              .map(ds => ds.toLowerCase())
-              .join('|')
-          ).test(fileName.toLowerCase()) &&
-          new RegExp(
-            SupportedDataSetFileFormats.map(dsf => dsf.toLowerCase()).join('|')
-          ).test(fileName.toLowerCase())
+      let supportedFileNames = allFileNames.filter(fileName =>
+        new RegExp(SupportedInputFileFormat.MP4.toLowerCase()).test(
+          fileName.toLowerCase()
+        )
       );
       if (!supportedFileNames.length) {
         // if no supported dataset files found in the archive, check if there's a video file provided as fallback
-        supportedFileNames = allFileNames.filter(fileName =>
-          new RegExp(SupportedInputFileFormat.MP4.toLowerCase()).test(
-            fileName.toLowerCase()
-          )
+        supportedFileNames = allFileNames.filter(
+          fileName =>
+            new RegExp(
+              Object.values(DataSourceType)
+                .map(ds => ds.toLowerCase())
+                .join('|')
+            ).test(fileName.toLowerCase()) &&
+            new RegExp(
+              SupportedDataSetFileFormats.map(dsf => dsf.toLowerCase()).join(
+                '|'
+              )
+            ).test(fileName.toLowerCase())
         );
         if (!supportedFileNames.length) {
           yield put(showErrorMessage(NO_SUPPORTED_DATASET_FILES_FOUND));
@@ -117,15 +119,15 @@ function* handleSelectDataSetFile(action) {
     });
   }
 
-  if (file.type.indexOf(SupportedInputFileFormat.JSON.replace('.', '')) >= 0) {
-    // dealing with json file
-    dataFileType = SupportedInputFileFormat.JSON;
-    dataFile = file;
-  } else if (
-    file.type.indexOf(SupportedInputFileFormat.MP4.replace('.', '')) >= 0
-  ) {
+  if (file.type.indexOf(SupportedInputFileFormat.MP4.replace('.', '')) >= 0) {
     // dealing with a video file
     dataFileType = SupportedInputFileFormat.MP4;
+    dataFile = file;
+  } else if (
+    file.type.indexOf(SupportedInputFileFormat.JSON.replace('.', '')) >= 0
+  ) {
+    // dealing with json file
+    dataFileType = SupportedInputFileFormat.JSON;
     dataFile = file;
   } else {
     // provided file format is not supported

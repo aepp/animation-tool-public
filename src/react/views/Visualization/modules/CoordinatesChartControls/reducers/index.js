@@ -9,7 +9,7 @@ export const reducerKey = 'coordinatesChartControls';
 
 /**
  * @typedef CoordinatesChartControlsState
- * @type {Array.<string[]>} selectedJoints
+ * @type {Array.<string[]>}
  */
 
 /**

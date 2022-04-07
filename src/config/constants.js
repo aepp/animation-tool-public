@@ -68,6 +68,7 @@ export const IgnoredFileNamesPatterns = ['DS_Store', '__MACOSX'];
  * @readonly
  * @enum {string}
  * @property {string} DATA_SOURCE_KINECT
+ * @property {string} DATA_SOURCE_KINECT_READER
  * @property {string} DATA_SOURCE_KINECT_AZURE
  * @property {string} DATA_SOURCE_TF
  * @property {string} DATA_SOURCE_TF_MOCK_LH
@@ -75,6 +76,7 @@ export const IgnoredFileNamesPatterns = ['DS_Store', '__MACOSX'];
 export const DataSourceType = {
   /** @member {string} */
   DATA_SOURCE_KINECT: 'Kinect',
+  DATA_SOURCE_KINECT_READER: 'KinectReader',
   /** @member {string} */
   DATA_SOURCE_KINECT_AZURE: 'Kinect Azure',
   /** @member {string} */

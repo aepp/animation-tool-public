@@ -58,6 +58,7 @@ function* handleStartAnimationInit(action) {
   let ProcessorInstance;
   switch (dataSource) {
     case DataSourceType.DATA_SOURCE_KINECT:
+    case DataSourceType.DATA_SOURCE_KINECT_READER:
     case DataSourceType.DATA_SOURCE_TF_MOCK_LH:
       // console.log('frames', frames);
       ProcessorInstance = new LHLegacyProcessor({frames, dataSource});

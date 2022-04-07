@@ -116,6 +116,7 @@ export class AnimationController extends PlaybackController {
 
     switch (dataSource) {
       case DataSourceType.DATA_SOURCE_KINECT:
+      case DataSourceType.DATA_SOURCE_KINECT_READER:
       case DataSourceType.DATA_SOURCE_TF_MOCK_LH:
         this._renderHelper = new RenderHelper3D({dataSetModel});
         break;
