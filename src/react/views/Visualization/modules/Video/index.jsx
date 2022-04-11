@@ -25,7 +25,7 @@ export const Video = () => {
           justifyContent: 'center',
           boxSizing: 'border-box'
         }}>
-        <video style={{height: '100%'}} controls>
+        <video style={{height: '100%', width: '100%'}} controls>
           <source src={dataFileUrl} type='video/mp4' />
         </video>
       </Box>
