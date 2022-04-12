@@ -9,6 +9,7 @@ import {
 } from 'redux-saga/effects';
 import {createDetector} from '@tensorflow-models/pose-detection';
 // Register one of the TF.js backends.
+// import '@tensorflow/tfjs-backend-cpu';
 import '@tensorflow/tfjs-backend-webgl';
 import {fill} from '@tensorflow/tfjs-core';
 import {LOCAL_STORAGE_POSE_DETECTOR_INSTANCE} from '../../../../config/constants';
@@ -115,7 +116,8 @@ function* handleStartDetection(action) {
     const videoElement = document.getElementById(VIDEO_ELEMENT_ID_ORIGINAL);
     console.log('estimation started');
     while (true) {
-      yield put(addEstimationFrameStamp(videoElement.currentTime));
+      const t = videoElement.currentTime;
+      yield put(addEstimationFrameStamp(t));
 
       const poses = yield call(
         {

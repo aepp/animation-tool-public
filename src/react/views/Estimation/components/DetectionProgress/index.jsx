@@ -40,7 +40,7 @@ export const DetectionProgress = () => {
           DataSourceType.DATA_SOURCE_TF,
           DataSourceType.DATA_SOURCE_TF_MOCK_LH
         ].map(dataSource => (
-          <Box key={dataSource} sx={{width: '50%', '&:first-child': {mr: 1}}}>
+          <Box key={dataSource} sx={{width: '50%', '&:first-of-type': {mr: 1}}}>
             <Button
               color={'secondary'}
               variant={'contained'}

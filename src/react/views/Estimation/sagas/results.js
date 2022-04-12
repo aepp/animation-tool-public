@@ -9,23 +9,29 @@ import {
   selectEstimationFrameStamps
 } from '../reducers';
 import {VIDEO_ELEMENT_ID_ORIGINAL} from '../components/EstimationVideo';
+import {millisecondsToTime} from '../../Visualization/util/time';
 
+const frameDiffSpineMidX = 250;
+const frameDiffSpineMidY = 250;
+const jMap = LHLegacyProcessor._jointNames;
 const tfToLhMap = {
-  right_ankle: LHLegacyProcessor._jointNames.AnkleRight,
-  left_ankle: LHLegacyProcessor._jointNames.AnkleLeft,
-  right_elbow: LHLegacyProcessor._jointNames.ElbowRight,
-  left_elbow: LHLegacyProcessor._jointNames.ElbowLeft,
-  right_wrist: LHLegacyProcessor._jointNames.HandRight,
-  left_wrist: LHLegacyProcessor._jointNames.HandLeft,
-  nose: LHLegacyProcessor._jointNames.Head,
-  right_hip: LHLegacyProcessor._jointNames.HipRight,
-  left_hip: LHLegacyProcessor._jointNames.HipLeft,
-  right_shoulder: LHLegacyProcessor._jointNames.ShoulderRight,
-  left_shoulder: LHLegacyProcessor._jointNames.ShoulderLeft
-  // right_wrist: LHLegacyProcessor._jointNames.HandRightTip,
-  // left_wrist: LHLegacyProcessor._jointNames.HandLeftTip,
-  // ['']: LHLegacyProcessor._jointNames.SpineMid,
-  // ['']: LHLegacyProcessor._jointNames.SpineShoulder,
+  right_ankle: Object.keys(jMap).find(key => jMap[key] === jMap.AnkleRight),
+  left_ankle: Object.keys(jMap).find(key => jMap[key] === jMap.AnkleLeft),
+  right_elbow: Object.keys(jMap).find(key => jMap[key] === jMap.ElbowRight),
+  left_elbow: Object.keys(jMap).find(key => jMap[key] === jMap.ElbowLeft),
+  right_wrist: Object.keys(jMap).find(key => jMap[key] === jMap.HandRight),
+  left_wrist: Object.keys(jMap).find(key => jMap[key] === jMap.HandLeft),
+  nose: Object.keys(jMap).find(key => jMap[key] === jMap.Head),
+  right_hip: Object.keys(jMap).find(key => jMap[key] === jMap.HipRight),
+  left_hip: Object.keys(jMap).find(key => jMap[key] === jMap.HipLeft),
+  right_shoulder: Object.keys(jMap).find(
+    key => jMap[key] === jMap.ShoulderRight
+  ),
+  left_shoulder: Object.keys(jMap).find(key => jMap[key] === jMap.ShoulderLeft)
+  // right_wrist: Object.keys(jMap).find(key => jMap[key] === jMap.HandRightTip),
+  // left_wrist: Object.keys(jMap).find(key => jMap[key] === jMap.HandLeftTip),
+  // ['']: Object.keys(jMap).find(key => jMap[key] === jMap.SpineMid),
+  // ['']: Object.keys(jMap).find(key => jMap[key] === jMap.SpineShoulder),
 };
 
 function* handleDownloadResults(action) {
@@ -52,6 +58,8 @@ function* handleDownloadResults(action) {
       frames: poses
     });
   } else {
+    let prevSpineMidX = [];
+    let prevSpineMidY = [];
     json = JSON.stringify({
       RecordingID: new Date(Date.now()).toLocaleString(),
       ApplicationName: DataSourceType.DATA_SOURCE_TF_MOCK_LH,
@@ -89,110 +97,200 @@ function* handleDownloadResults(action) {
             if (isNaN(personId)) continue;
             // set hand tips equal hands positions
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.HandRightTip}_X`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.HandRightTip
+              )}_X`
             ] =
               frameAttributes[
-                `${personId}_${LHLegacyProcessor._jointNames.HandRight}_X`
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.HandRight
+                )}_X`
               ];
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.HandRightTip}_Y`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.HandRightTip
+              )}_Y`
             ] =
               frameAttributes[
-                `${personId}_${LHLegacyProcessor._jointNames.HandRight}_Y`
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.HandRight
+                )}_Y`
               ];
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.HandRightTip}_Z`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.HandRightTip
+              )}_Z`
             ] = 0;
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.HandLeftTip}_X`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.HandLeftTip
+              )}_X`
             ] =
               frameAttributes[
-                `${personId}_${LHLegacyProcessor._jointNames.HandLeft}_X`
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.HandLeft
+                )}_X`
               ];
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.HandLeftTip}_Y`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.HandLeftTip
+              )}_Y`
             ] =
               frameAttributes[
-                `${personId}_${LHLegacyProcessor._jointNames.HandLeft}_Y`
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.HandLeft
+                )}_Y`
               ];
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.HandLeftTip}_Z`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.HandLeftTip
+              )}_Z`
             ] = 0;
 
             // calculate shoulders center point
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.SpineShoulder}_X`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.SpineShoulder
+              )}_X`
             ] =
               (frameAttributes[
-                `${personId}_${LHLegacyProcessor._jointNames.ShoulderLeft}_X`
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.ShoulderLeft
+                )}_X`
               ] +
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.ShoulderRight}_X`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.ShoulderRight
+                  )}_X`
                 ]) /
               2;
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.SpineShoulder}_Y`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.SpineShoulder
+              )}_Y`
             ] =
               (frameAttributes[
-                `${personId}_${LHLegacyProcessor._jointNames.ShoulderLeft}_Y`
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.ShoulderLeft
+                )}_Y`
               ] +
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.ShoulderRight}_Y`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.ShoulderRight
+                  )}_Y`
                 ]) /
               2;
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.SpineShoulder}_Z`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.SpineShoulder
+              )}_Z`
             ] = 0;
 
             // calculate spine mid
             const spineMidVector = intersect(
               [
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.ShoulderLeft}_X`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.ShoulderLeft
+                  )}_X`
                 ],
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.ShoulderLeft}_Y`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.ShoulderLeft
+                  )}_Y`
                 ]
               ],
               [
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.HipRight}_X`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.HipRight
+                  )}_X`
                 ],
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.HipRight}_Y`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.HipRight
+                  )}_Y`
                 ]
               ],
               [
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.ShoulderRight}_X`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.ShoulderRight
+                  )}_X`
                 ],
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.ShoulderRight}_Y`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.ShoulderRight
+                  )}_Y`
                 ]
               ],
               [
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.HipLeft}_X`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.HipLeft
+                  )}_X`
                 ],
                 frameAttributes[
-                  `${personId}_${LHLegacyProcessor._jointNames.HipLeft}_Y`
+                  `${personId}_${Object.keys(jMap).find(
+                    key => jMap[key] === jMap.HipLeft
+                  )}_Y`
                 ]
               ]
             );
 
+            prevSpineMidX[personId] =
+              prevSpineMidX[personId] || spineMidVector[0];
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.SpineMid}_X`
-            ] = spineMidVector[0];
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.SpineMid
+              )}_X`
+            ] =
+              Math.abs(spineMidVector[0] - prevSpineMidX[personId]) <
+              frameDiffSpineMidX
+                ? spineMidVector[0]
+                : frameAttributes[
+                    `${personId}_${Object.keys(jMap).find(
+                      key => jMap[key] === jMap.HipLeft
+                    )}_X`
+                  ];
+            prevSpineMidX[personId] =
+              frameAttributes[
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.SpineMid
+                )}_X`
+              ];
+
+            prevSpineMidY[personId] =
+              prevSpineMidY[personId] || spineMidVector[1];
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.SpineMid}_Y`
-            ] = spineMidVector[1];
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.SpineMid
+              )}_Y`
+            ] =
+              Math.abs(spineMidVector[1] - prevSpineMidY[personId]) <
+              frameDiffSpineMidY
+                ? spineMidVector[1]
+                : frameAttributes[
+                    `${personId}_${Object.keys(jMap).find(
+                      key => jMap[key] === jMap.HipLeft
+                    )}_Y`
+                  ];
+            prevSpineMidY[personId] =
+              frameAttributes[
+                `${personId}_${Object.keys(jMap).find(
+                  key => jMap[key] === jMap.SpineMid
+                )}_Y`
+              ];
+
             frameAttributes[
-              `${personId}_${LHLegacyProcessor._jointNames.SpineMid}_Z`
+              `${personId}_${Object.keys(jMap).find(
+                key => jMap[key] === jMap.SpineMid
+              )}_Z`
             ] = 0;
           }
 
           return {
-            frameStamp: frameStamps[i],
+            frameStamp: millisecondsToTime(frameStamps[i] * 1000),
             Volume: pose.score,
             frameAttributes
           };
