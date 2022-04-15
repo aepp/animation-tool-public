@@ -23,9 +23,9 @@ export const UploadButton = () => {
         onChange={e => dispatch(setDataFile(e.target.files[0]))}
       />
       <Button
-        variant={'outlined'}
+        variant={'contained'}
         component='span'
-        color={'inherit'}
+        color={'secondary'}
         disabled={isLoading}>
         {isInitialized ? 'Replace' : 'Open'}&nbsp;dataSet
       </Button>

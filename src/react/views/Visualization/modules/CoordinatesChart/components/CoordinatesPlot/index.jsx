@@ -71,17 +71,17 @@ export const CoordinatesPlot = () => {
 
   const [layout] = useState({
     showlegend: true,
-    title: 'Joints coordinates',
+    title: 'Kinematic data',
     legend: {
       x: 1,
       xanchor: 'right',
       y: 1
     },
     xaxis: {
-      title: isUsingFrameStamps ? 'Time' : 'Frame ID'
+      title: isUsingFrameStamps ? 'Time (mm:ss.ms)' : 'Frame ID'
     },
     yaxis: {
-      title: 'Attribute value (normalized position)'
+      title: 'Joints attribute value (normalized)'
     },
     shapes: [
       {

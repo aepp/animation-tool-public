@@ -19,7 +19,7 @@ import {
   stopEstimationVideo
 } from '../../actions/estimationPlayback';
 
-export const VideoButton = ({videoElementOriginal}) => {
+export const EstimationControlButton = () => {
   const dispatch = useDispatch();
   const isModelWarmingUp = useSelector(selectIsModelWarmingUp);
   const isModelWarmedUp = useSelector(selectIsModelWarmedUp);
@@ -49,22 +49,13 @@ export const VideoButton = ({videoElementOriginal}) => {
   }
 
   return (
-    <Box
-      left={0}
-      top={0}
-      width={'100%'}
-      height={'100%'}
-      position={'absolute'}
-      display={'flex'}
-      alignItems={'center'}
-      justifyContent={'center'}
-      zIndex={2}>
+    <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
       {!hasDetectionFinished && (
         <Button
           id={'video-button'}
           variant={'contained'}
           color={'primary'}
-          onClick={() => dispatch(action(videoElementOriginal))}
+          onClick={() => dispatch(action())}
           startIcon={icon}
           disabled={disabled}>
           {label}
@@ -74,4 +65,4 @@ export const VideoButton = ({videoElementOriginal}) => {
   );
 };
 
-export default VideoButton;
+export default EstimationControlButton;

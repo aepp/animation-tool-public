@@ -8,7 +8,7 @@ import {
   selectEstimationVideoUrl,
   selectIsModelWarmingUp
 } from '../../reducers';
-import VideoButton from '../../components/VideoButton';
+import EstimationControlButton from '../EstimationControlButton';
 import {
   endEstimationVideo,
   setEstimationVideoOriginalDimensions,
@@ -78,9 +78,6 @@ export const EstimationVideo = () => {
         borderBottomLeftRadius: `${theme.shape.borderRadius}px`
       }}>
       <Box sx={{position: 'relative'}}>
-        {videoRefOriginal && videoRefOriginal.current && (
-          <VideoButton videoElementOriginal={videoRefOriginal.current} />
-        )}
         <Fade in={isModelWarmingUp}>
           <Box
             left={0}

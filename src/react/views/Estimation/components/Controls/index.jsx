@@ -4,6 +4,7 @@ import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {
   Box,
   Button,
+  Chip,
   Divider,
   FormControl,
   InputLabel,
@@ -14,6 +15,7 @@ import {
   Stack,
   Typography
 } from '@mui/material';
+import {MovieCreationTwoTone as VideoIcon} from '@mui/icons-material';
 import {
   hasModelTypes,
   modelTypes,
@@ -37,6 +39,7 @@ import {
   setDetectionModelType,
   setEstimationConfig
 } from '../../actions/estimation';
+import EstimationControlButton from '../EstimationControlButton';
 
 const ID = 'upload-estimation-video__button';
 
@@ -58,27 +61,38 @@ export const EstimationControls = () => {
         mb: 'auto',
         alignItems: 'center'
       }}>
-      <label htmlFor={ID}>
-        <InputFile
-          accept='video/mp4'
-          id={ID}
-          onChange={e => dispatch(updateEstimationVideoFile(e.target.files[0]))}
-        />
-        <Button
-          variant={'outlined'}
-          component='span'
-          color={'inherit'}
-          disabled={isModelWarmingUp || isDetecting}>
-          {estimationVideoUrl ? 'Replace' : 'Open'}&nbsp;video for pose
-          estimation
-        </Button>
-      </label>
+      <Stack direction={'row'} width={'100%'}>
+        <Chip color={'info'} sx={{mr: 2}} label={1} />
+        <label htmlFor={ID}>
+          <InputFile
+            accept='video/mp4'
+            id={ID}
+            onChange={e =>
+              dispatch(updateEstimationVideoFile(e.target.files[0]))
+            }
+          />
+          <Button
+            startIcon={<VideoIcon color={'secondary'} />}
+            variant={'contained'}
+            component='span'
+            color={'primary'}
+            disabled={
+              isModelWarmingUp || isDetecting || Boolean(estimationVideoUrl)
+            }>
+            {/*{estimationVideoUrl ? 'Replace' : 'Open'}&nbsp;video for pose*/}
+            Open video for pose estimation
+          </Button>
+        </label>
+      </Stack>
       {estimationVideoUrl && (
         <>
           <Divider sx={{my: 4}} flexItem />
-          <Typography sx={{mb: 2}} variant={'h6'}>
-            Setup estimation model
-          </Typography>
+          <Stack direction={'row'} width={'100%'}>
+            <Chip color={'info'} sx={{mr: 2}} label={2} />
+            <Typography sx={{mb: 2}} variant={'h6'}>
+              Setup estimation model
+            </Typography>
+          </Stack>
           <Box
             sx={{
               display: 'flex',
@@ -231,6 +245,12 @@ export const EstimationControls = () => {
             {/*  </Select>*/}
             {/*</FormControl>*/}
           </Box>
+          <Divider sx={{my: 4}} flexItem />
+          <Stack direction={'row'} width={'100%'}>
+            <Chip color={'info'} sx={{mr: 2}} label={3} />
+            <EstimationControlButton />
+          </Stack>
+          <Divider sx={{my: 4}} flexItem />
         </>
       )}
     </Stack>

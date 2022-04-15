@@ -58,7 +58,10 @@ const r = createReducer(defaultState, {
         )
       : state.framesPerPerson.map((f, i) => i);
     state.frameStampsFormatted = state.isUsingFrameStamps
-      ? state.frameStamps.map(frameStamp => millisecondsToTime(frameStamp))
+      ? state.frameStamps.map(frameStamp => {
+          const ms = millisecondsToTime(frameStamp);
+          return ms.substring(3, ms.length - 1);
+        })
       : state.framesPerPerson.map((f, i) => i);
     state.frameIdsByStamps = state.frameStamps.reduce(
       (idsByStamps, frameStamp, frameIdx) => {
