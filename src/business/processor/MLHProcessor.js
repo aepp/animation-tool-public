@@ -179,7 +179,7 @@ export class MLHProcessor extends CommonDataSetProcessor {
   }
 
   /**
-   * @type {[]}
+   * @type {object[]}
    * @private
    */
   _framesPerPerson = [];
