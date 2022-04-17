@@ -7,7 +7,10 @@ import {
   resetAnimation,
   updateFramesCount
 } from '../actions/animation';
-import {updateCurrentFrameIndexFromThree} from '../actions/uiChannel';
+import {
+  updateCurrentFrameIndexFromThree,
+  updateHoveredJointDataFromThree
+} from '../actions/uiChannel';
 
 export const reducerKey = 'animation';
 
@@ -18,11 +21,13 @@ export const reducerKey = 'animation';
  * @property {boolean} isInitialized
  * @property {number} currentFrameIdx
  * @property {number} framesCount
+ * @property {object} hoveredJointData
  */
 const defaultState = {
   isLoading: false,
   isInitialized: false,
   currentFrameIdx: 0,
+  hoveredJointData: null,
   framesCount: 0
 };
 const r = createReducer(defaultState, {
@@ -46,6 +51,9 @@ const r = createReducer(defaultState, {
   },
   [updateFramesCount]: (state, action) => {
     state.framesCount = action.payload;
+  },
+  [updateHoveredJointDataFromThree]: (state, action) => {
+    state.hoveredJointData = action.payload;
   },
   [resetAnimation]: () => ({
     ...defaultState
@@ -74,4 +82,8 @@ export const selectCurrentFrameIdx = createSelector(
 export const selectFramesCount = createSelector(
   selectSelf,
   /** @param {AnimationState} state */ state => state.framesCount
+);
+export const selectHoveredJointData = createSelector(
+  selectSelf,
+  /** @param {AnimationState} state */ state => state.hoveredJointData
 );

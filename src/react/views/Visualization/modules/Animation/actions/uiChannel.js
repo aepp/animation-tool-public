@@ -5,3 +5,6 @@ export const closeUiChannel = createAction('closeUiChannel');
 export const updateCurrentFrameIndexFromThree = createAction(
   'updateCurrentFrameIndexFromThree'
 );
+export const updateHoveredJointDataFromThree = createAction(
+  'updateHoveredJointDataFromThree'
+);

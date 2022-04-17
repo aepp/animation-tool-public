@@ -231,6 +231,7 @@ export class AnimationController extends PlaybackController {
    */
   set sendToUi(value) {
     this._sendToUi = value;
+    this._threeRenderService._sendToUi = value;
   }
 
   /**

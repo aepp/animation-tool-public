@@ -12,7 +12,8 @@ import {LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE} from '../../../../../../con
 import {
   closeUiChannel,
   openUiChannel,
-  updateCurrentFrameIndexFromThree
+  updateCurrentFrameIndexFromThree,
+  updateHoveredJointDataFromThree
 } from '../actions/uiChannel';
 
 function* handleStartUiChannel() {
@@ -42,9 +43,19 @@ function* handleStartUiChannel() {
   channelTask.cancel();
 }
 
+function* handleHoveredJointNameUpdate(action) {}
 function* watchStartUiChannel() {
   yield takeLatest(openUiChannel.type, handleStartUiChannel);
 }
+
+function* watch() {
+  yield throttle(
+    500,
+    updateHoveredJointDataFromThree.type,
+    handleHoveredJointNameUpdate
+  );
+}
+
 function* watchUpdateCurrentFrameIdxFromThree() {
   yield throttle(
     window._AnimationToolInstance.frameUpdateCallbackThrottleTimeout,

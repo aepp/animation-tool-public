@@ -80,13 +80,6 @@ export class RenderHelper {
   });
 
   /**
-   * @constant
-   * @type {MeshBasicMaterial}
-   * @private
-   */
-  _meshMaterial = new MeshBasicMaterial({color: 0xff0000});
-
-  /**
    *
    * @type {DataSetModel}
    * @private
@@ -185,6 +178,9 @@ export class RenderHelper {
           keyPoints: person.keyPoints
         });
 
+        this._lines[pId][objectIdx].castShadow = true;
+        this._lines[pId][objectIdx].receiveShadow = true;
+
         objectIdsPerPerson[pId]++;
       }
     });
@@ -235,8 +231,13 @@ export class RenderHelper {
   _updateSphere({personIdx, sphereIdx, keyPoints}) {
     this._spheres[personIdx][sphereIdx] =
       this._spheres[personIdx][sphereIdx] ||
-      new Mesh(new SphereGeometry(0.005, 32, 16), this._meshMaterial);
-
+      new Mesh(
+        new SphereGeometry(0.005, 32, 16),
+        new MeshBasicMaterial({color: 0xff0000})
+      );
+    this._spheres[personIdx][sphereIdx].userData = {
+      ...keyPoints[sphereIdx]
+    };
     this._spheres[personIdx][sphereIdx].position.set(
       ...this.getPositions(keyPoints[sphereIdx])
     );

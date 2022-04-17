@@ -4,10 +4,14 @@ import {
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
+  Raycaster,
+  SphereGeometry,
   // eslint-disable-next-line no-unused-vars
-  Object3D
+  Object3D,
+  Vector2
 } from 'three';
 import {BACKGROUND_COLOR} from '../../react/theme/constants';
+import {updateHoveredJointDataFromThree} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
 
 /**
  * @class
@@ -50,6 +54,12 @@ export class ThreeRenderService {
    */
   _controls;
 
+  /**
+   * hacky ui communication channel injection
+   * @public
+   */
+  _sendToUi = () => {};
+
   constructor(
     {rootElement = document.body} = {
       rootElement: document.body
@@ -72,7 +82,65 @@ export class ThreeRenderService {
     );
 
     this.createCameraControls();
+
+    this._raycaster = new Raycaster();
+    this._mouse = new Vector2();
+
+    this._renderer.domElement.addEventListener(
+      'pointermove',
+      this._onPointerMove.bind(this),
+      false
+    );
   }
+
+  _onPointerMove = e => {
+    e.preventDefault();
+
+    let rect = this._renderer.domElement.getBoundingClientRect();
+
+    this._mouse.x =
+      ((e.clientX - rect.left) / this._renderer.domElement.offsetWidth) * 2 - 1;
+    this._mouse.y =
+      -((e.clientY - rect.top) / this._renderer.domElement.offsetHeight) * 2 +
+      1;
+
+    this._raycaster.setFromCamera(this._mouse, this._camera);
+
+    const intersects = this._raycaster.intersectObjects(
+      this._scene.children,
+      true
+    );
+
+    const activeObjects = [];
+    let userData = null;
+    if (intersects.length) {
+      for (let intersect of intersects) {
+        if ('object' in intersect && 'geometry' in intersect.object) {
+          if (intersect.object.geometry instanceof SphereGeometry) {
+            // intersect.object.geometry.parameters.radius = 0.008;
+            intersect.object.scale.set(2, 2, 2);
+            intersect.object.material.color = new Color(0, 255, 0);
+            userData = intersect.object.userData;
+            activeObjects[intersect.object.uuid] = true;
+          }
+        }
+      }
+    }
+    this._sendToUi({
+      type: updateHoveredJointDataFromThree.type,
+      payload: userData
+    });
+    for (let sceneObject of this._scene.children) {
+      if (
+        sceneObject.geometry instanceof SphereGeometry &&
+        !activeObjects[sceneObject.uuid]
+      ) {
+        sceneObject.material.color = new Color(255, 0, 0);
+        sceneObject.scale.set(1, 1, 1);
+      }
+    }
+    this.updateScene();
+  };
 
   updateCameraPosition({x, y, z}) {
     this._camera.position.set(x, y, z);
