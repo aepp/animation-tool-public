@@ -498,7 +498,7 @@ export class MLHProcessor extends CommonDataSetProcessor {
                 deviation > MAX_JOINT_COORDINATE_DEVIATION &&
                 values[i] !== 0
               ) {
-                correctedValues[i] = prevValue;
+                // correctedValues[i] = prevValue;
               }
             });
           }
