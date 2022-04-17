@@ -1,6 +1,6 @@
 {
   "name": "@aepp/animation-tool",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.3",
