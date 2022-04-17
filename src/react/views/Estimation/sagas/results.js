@@ -1,10 +1,10 @@
 import {fork, takeLatest, select} from 'redux-saga/effects';
 import {intersect} from 'mathjs';
 import {DataSourceType} from '../../../../config/constants';
-import {LHLegacyProcessor} from '../../../../business/processor/LHLegacyProcessor';
+import {MLHProcessor} from '../../../../business/processor/MLHProcessor';
 import {downloadEstimationResult} from '../actions/estimationResult';
 import {
-  selectDetectedPoses,
+  selectEstimationFrames,
   selectDetectionModel,
   selectEstimationFrameStamps
 } from '../reducers';
@@ -13,7 +13,7 @@ import {millisecondsToTime} from '../../Visualization/util/time';
 
 const frameDiffSpineMidX = 250;
 const frameDiffSpineMidY = 250;
-const jMap = LHLegacyProcessor._jointNames;
+const jMap = MLHProcessor._jointNames;
 const tfToLhMap = {
   right_ankle: Object.keys(jMap).find(key => jMap[key] === jMap.AnkleRight),
   left_ankle: Object.keys(jMap).find(key => jMap[key] === jMap.AnkleLeft),
@@ -37,7 +37,7 @@ const tfToLhMap = {
 function* handleDownloadResults(action) {
   const dataSource = action.payload;
 
-  const poses = yield select(selectDetectedPoses);
+  const frames = yield select(selectEstimationFrames);
   const model = yield select(selectDetectionModel);
   const frameStamps = yield select(selectEstimationFrameStamps);
 
@@ -48,27 +48,33 @@ function* handleDownloadResults(action) {
       source: {
         id: DataSourceType.DATA_SOURCE_TF,
         detectionFps: Math.floor(
-          poses.length /
+          frames.length /
             document.getElementById(VIDEO_ELEMENT_ID_ORIGINAL).totalTime
         ),
         details: {
           model
         }
       },
-      frames: poses
+      frames: frames.map((frame, i) => {
+        return {
+          ...frame,
+          frameStamp: millisecondsToTime(frameStamps[i] * 1000)
+        };
+      })
     });
   } else {
     let prevSpineMidX = [];
     let prevSpineMidY = [];
+
     json = JSON.stringify({
       RecordingID: new Date(Date.now()).toLocaleString(),
       ApplicationName: DataSourceType.DATA_SOURCE_TF_MOCK_LH,
       OenName: null,
       frames: [
-        ...poses.map((pose, i) => {
+        ...frames.map((frame, i) => {
           const personIds = [];
           const frameAttributes = {
-            ...pose.poses.reduce((allAttributes, personsPose) => {
+            ...frame.poses.reduce((allAttributes, personsPose) => {
               if (!personsPose) return allAttributes;
               personIds[personsPose.id] = personsPose.id;
               allAttributes = {
@@ -291,7 +297,7 @@ function* handleDownloadResults(action) {
 
           return {
             frameStamp: millisecondsToTime(frameStamps[i] * 1000),
-            Volume: pose.score,
+            Volume: frame.score,
             frameAttributes
           };
         })

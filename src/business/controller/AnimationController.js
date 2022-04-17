@@ -156,10 +156,12 @@ export class AnimationController extends PlaybackController {
     await new Promise(resolve =>
       setTimeout(resolve, this.getTimeoutByCurrentFps())
     );
+
+    this._playAnimation();
+
     this._requestAnimationFrameId = requestAnimationFrame(
       this.animationLoop.bind(this)
     );
-    this._playAnimation();
     return this;
   }
 
@@ -257,13 +259,13 @@ export class AnimationController extends PlaybackController {
    * @returns {AnimationController}
    */
   softReset({baseFps = BASE_FPS} = {baseFps: BASE_FPS}) {
-    cancelAnimationFrame(this._requestAnimationFrameId);
     this._threeRenderService.softReset();
     this._room = undefined;
     this._currentFrameObjects = [];
     this.currentFrameIdx = 0;
     this._sendFrameIdxToUi();
     this.resetPlayback({baseFps});
+    this.isPlaying = false;
     this._threeRenderService.updateScene();
 
     return this;

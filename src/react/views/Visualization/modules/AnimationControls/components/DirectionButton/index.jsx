@@ -18,7 +18,7 @@ import {
   selectFpsMultiplier
 } from '../../reducers';
 
-export const DirectionButton = ({playbackDirection}) => {
+export const DirectionButton = ({playbackDirection, size = 'medium'}) => {
   const dispatch = useDispatch();
   const isPlaying = useSelector(selectIsPlaying);
   const isInitialized = useSelector(selectIsAnimationInitialized);
@@ -27,6 +27,7 @@ export const DirectionButton = ({playbackDirection}) => {
 
   const button = (
     <IconButton
+      size={size}
       onClick={() => dispatch(increaseFps(playbackDirection))}
       disabled={!isPlaying || !isInitialized}>
       {playbackDirection === PlayBackDirectionType.DEFAULT ? (

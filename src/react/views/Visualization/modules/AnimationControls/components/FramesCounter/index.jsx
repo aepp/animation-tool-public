@@ -6,13 +6,22 @@ import {
   selectFramesCount
 } from '../../../Animation/reducers';
 
-export const FramesCounter = ({sx = {}}) => {
+export const FramesCounter = ({sx = {}, compact = false}) => {
   const currentFrameIdx = useSelector(selectCurrentFrameIdx);
   const framesCount = useSelector(selectFramesCount);
 
   return (
     <FormHelperText sx={sx}>
-      Frame&nbsp;{currentFrameIdx}&nbsp;of&nbsp;{framesCount - 1}
+      {!compact && `Frame ${currentFrameIdx} of ${framesCount}`}
+      {compact && (
+        <>
+          <span style={{whiteSpace: 'nowrap'}}>
+            {currentFrameIdx} / {framesCount}
+          </span>
+          <br />
+          Frames
+        </>
+      )}
     </FormHelperText>
   );
 };

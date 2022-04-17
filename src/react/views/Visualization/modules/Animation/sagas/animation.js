@@ -9,8 +9,8 @@ import {
   UNKNOWN_DATA_SOURCE
 } from '../../../../../../i18n/messages';
 import {showErrorMessage} from '../../../../../modules/App/actions';
-import {LHLegacyProcessor} from '../../../../../../business/processor/LHLegacyProcessor';
-import {TFProcessor} from '../../../../../../business/processor/TFProcessor';
+import {MLHProcessor} from '../../../../../../business/processor/MLHProcessor';
+import {ATProcessor} from '../../../../../../business/processor/ATProcessor';
 import {validateSelectedDataSet} from '../../../util/dataSetUtil';
 import {finishVisualizationViewInit} from '../../../actions/view';
 import {selectDataFileUrl} from '../../Upload/reducers';
@@ -60,11 +60,10 @@ function* handleStartAnimationInit(action) {
     case DataSourceType.DATA_SOURCE_KINECT:
     case DataSourceType.DATA_SOURCE_KINECT_READER:
     case DataSourceType.DATA_SOURCE_TF_MOCK_LH:
-      // console.log('frames', frames);
-      ProcessorInstance = new LHLegacyProcessor({frames, dataSource});
+      ProcessorInstance = new MLHProcessor({frames, dataSource});
       break;
     case DataSourceType.DATA_SOURCE_TF:
-      ProcessorInstance = new TFProcessor({
+      ProcessorInstance = new ATProcessor({
         frames,
         dataSource,
         tfModel
@@ -102,7 +101,10 @@ function* handleStartAnimationInit(action) {
 
   let animationControllerInstance =
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
+  let shouldStartAnimationLoop = true;
   if (animationControllerInstance) {
+    // loop already initiated, don't need to start it again
+    shouldStartAnimationLoop = false;
     console.log('replacing dataset...');
     yield call(
       {
@@ -137,10 +139,11 @@ function* handleStartAnimationInit(action) {
     }
   );
 
-  yield call({
-    context: animationControllerInstance,
-    fn: animationControllerInstance.animationLoop
-  });
+  if (shouldStartAnimationLoop)
+    yield call({
+      context: animationControllerInstance,
+      fn: animationControllerInstance.animationLoop
+    });
 
   window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE] =
     animationControllerInstance;

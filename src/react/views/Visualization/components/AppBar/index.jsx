@@ -1,12 +1,17 @@
 import React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 // import {useSelector} from 'react-redux';
-import {Box} from '@mui/material';
+import {Box, Divider, FormControlLabel, FormGroup, Switch} from '@mui/material';
 import UploadButton from '../../modules/Upload/Button';
 // import PlaybackControls from '../../modules/AnimationControls/components/Playback';
-// import {selectIsAnimationInitialized} from '../../modules/Animation/reducers';
+import {selectIsAnimationInitialized} from '../../modules/Animation/reducers';
+import {selectAreMiniControls} from '../../modules/AnimationControls/reducers';
+import {toggleMiniControls} from '../../modules/AnimationControls/actions';
 
 export const VisualizationAppbar = () => {
-  // const isInitialized = useSelector(selectIsAnimationInitialized);
+  const dispatch = useDispatch();
+  const isInitialized = useSelector(selectIsAnimationInitialized);
+  const areMiniControls = useSelector(selectAreMiniControls);
 
   return (
     <>
@@ -22,7 +27,24 @@ export const VisualizationAppbar = () => {
       {/*    <PlaybackControls />*/}
       {/*  </Box>*/}
       {/*)}*/}
-      <Box sx={{ml: 'auto'}}>
+      <Box sx={{ml: 'auto', display: 'flex'}}>
+        {isInitialized && (
+          <Box sx={{display: 'flex'}}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    color={'secondary'}
+                    checked={areMiniControls}
+                    onChange={() => dispatch(toggleMiniControls())}
+                  />
+                }
+                label='Compact controls'
+              />
+            </FormGroup>
+            <Divider sx={{mr: 2}} orientation={'vertical'} flexItem />
+          </Box>
+        )}
         <UploadButton />
       </Box>
     </>

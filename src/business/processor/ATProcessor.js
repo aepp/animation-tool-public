@@ -7,7 +7,7 @@ import {CommonDataSetProcessor} from './CommonDataSetProcessor';
  * @class
  * @extends {CommonDataSetProcessor}
  */
-export class TFProcessor extends CommonDataSetProcessor {
+export class ATProcessor extends CommonDataSetProcessor {
   /**
    * @type {SupportedModels}
    * @private

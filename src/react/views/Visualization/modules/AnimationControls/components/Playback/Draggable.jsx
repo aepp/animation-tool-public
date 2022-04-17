@@ -7,7 +7,7 @@ import PaceControl from '../PaceControl';
 import FramesCounter from '../FramesCounter';
 import {selectFpsMultiplier} from '../../reducers';
 
-export const PlaybackControlsInline = () => {
+export const DraggablePlaybackControls = () => {
   const baseFps = useSelector(selectBaseFps);
   const fpsMultiplier = useSelector(selectFpsMultiplier);
 
@@ -34,4 +34,4 @@ export const PlaybackControlsInline = () => {
   );
 };
 
-export default PlaybackControlsInline;
+export default DraggablePlaybackControls;

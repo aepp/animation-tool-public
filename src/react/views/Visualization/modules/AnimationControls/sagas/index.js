@@ -19,10 +19,13 @@ import {selectIsPlaying, selectPlaybackDirection} from '../reducers';
 import {selectBaseFps} from '../../CoordinatesChart/reducers';
 
 function* handleTogglePlay() {
-  const isPlaying = yield select(selectIsPlaying);
-  const baseFps = yield select(selectBaseFps);
   const animationControllerInstance =
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
+  if (!animationControllerInstance) return;
+
+  const isPlaying = yield select(selectIsPlaying);
+  const baseFps = yield select(selectBaseFps);
+
   yield put(setIsPlaying(!isPlaying));
   if (isPlaying === true) {
     yield put(resetFpsMultiplierAndDirection());

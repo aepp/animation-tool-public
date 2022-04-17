@@ -3,15 +3,23 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Box, Typography} from '@mui/material';
 import {selectDataFileUrl} from '../Upload/reducers';
 import AnimationControls from '../AnimationControls';
-import {toggleInlineAnimationControlsVisibility} from '../AnimationControls/actions';
+import {
+  toggleInlineAnimationControlsVisibility,
+  togglePlay
+} from '../AnimationControls/actions';
 import {selectIsAnimationInitialized} from './reducers';
 import {startAnimation} from './actions/animation';
+import {selectIsSpaceTogglingRegistered} from '../../../../modules/App/reducers';
+import {registerSpaceToggling} from '../../../../modules/App/actions';
 
 export const Animation = () => {
   const dataFileUrl = useSelector(selectDataFileUrl);
   const dispatch = useDispatch();
   const ref = useRef();
   const isInitialized = useSelector(selectIsAnimationInitialized);
+  const isSpaceTogglingRegistered = useSelector(
+    selectIsSpaceTogglingRegistered
+  );
   const [isDrag, setIsDrag] = useState(false);
 
   useEffect(() => {
@@ -19,6 +27,17 @@ export const Animation = () => {
       dispatch(startAnimation({rootElement: ref.current}));
     }
   }, [dispatch, dataFileUrl]);
+
+  useEffect(() => {
+    if (!isSpaceTogglingRegistered && isInitialized) {
+      window.addEventListener('keyup', e => {
+        if (e.key === ' ' || e.code === 'Space') {
+          dispatch(togglePlay());
+        }
+      });
+      dispatch(registerSpaceToggling());
+    }
+  }, [isInitialized, isSpaceTogglingRegistered, dispatch]);
 
   return (
     <Box

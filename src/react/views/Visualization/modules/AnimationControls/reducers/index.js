@@ -6,7 +6,8 @@ import {
   setFpsMultiplierAndDirection,
   setFpsMultiplier,
   resetFpsMultiplierAndDirection,
-  toggleInlineAnimationControlsVisibility
+  toggleInlineAnimationControlsVisibility,
+  toggleMiniControls
 } from '../actions';
 
 export const reducerKey = 'animationControls';
@@ -18,6 +19,7 @@ export const reducerKey = 'animationControls';
  * @property {boolean} isPlaying.
  * @property {PlayBackDirectionType} playbackDirection
  * @property {boolean} areInlineControlsVisible
+ * @property {boolean} areMiniControls
  */
 
 /**
@@ -27,7 +29,8 @@ const defaultState = {
   isPlaying: false,
   fpsMultiplier: 1,
   playbackDirection: PlayBackDirectionType.DEFAULT,
-  areInlineControlsVisible: true
+  areInlineControlsVisible: true,
+  areMiniControls: false
 };
 const r = createReducer(defaultState, {
   [setIsPlaying]: (state, action) => {
@@ -46,6 +49,9 @@ const r = createReducer(defaultState, {
   },
   [toggleInlineAnimationControlsVisibility]: state => {
     state.areInlineControlsVisible = !state.areInlineControlsVisible;
+  },
+  [toggleMiniControls]: state => {
+    state.areMiniControls = !state.areMiniControls;
   },
   [resetAnimationControls]: () => ({
     ...defaultState
@@ -75,4 +81,8 @@ export const selectAreInlineAnimationControlsVisible = createSelector(
   selectSelf,
   /** @param {AnimationControlsState} state */ state =>
     state.areInlineControlsVisible
+);
+export const selectAreMiniControls = createSelector(
+  selectSelf,
+  /** @param {AnimationControlsState} state */ state => state.areMiniControls
 );

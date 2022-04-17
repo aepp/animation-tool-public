@@ -15,8 +15,8 @@ const r = combineReducers({
 });
 export default r;
 
-export const selectDetectedPoses = state =>
-  estimationSelectors.selectDetectedPoses(state[reducerKey]);
+export const selectEstimationFrames = state =>
+  estimationSelectors.selectEstimationFrames(state[reducerKey]);
 export const selectHasDetectionStarted = state =>
   estimationSelectors.selectHasDetectionStarted(state[reducerKey]);
 export const selectHasDetectionFinished = state =>

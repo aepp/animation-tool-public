@@ -52,17 +52,13 @@ const r = createReducer(defaultState, {
     state.original = action.payload.original;
     state.jointNames = action.payload.jointNames;
     state.baseFps = action.payload.baseFps;
-    state.frameStamps = state.isUsingFrameStamps
-      ? action.payload.frameStamps.map(frameStamp =>
-          getMillisecondsFromFrameStamp(frameStamp)
-        )
-      : state.framesPerPerson.map((f, i) => i);
-    state.frameStampsFormatted = state.isUsingFrameStamps
-      ? state.frameStamps.map(frameStamp => {
-          const ms = millisecondsToTime(frameStamp);
-          return ms.substring(3, ms.length - 1);
-        })
-      : state.framesPerPerson.map((f, i) => i);
+    state.frameStamps = action.payload.frameStamps.map(frameStamp =>
+      getMillisecondsFromFrameStamp(frameStamp)
+    );
+    state.frameStampsFormatted = state.frameStamps.map(frameStamp => {
+      const ms = millisecondsToTime(frameStamp);
+      return ms.substring(3, ms.length - 1);
+    });
     state.frameIdsByStamps = state.frameStamps.reduce(
       (idsByStamps, frameStamp, frameIdx) => {
         idsByStamps[frameStamp] = frameIdx;

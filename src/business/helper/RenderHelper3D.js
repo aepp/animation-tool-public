@@ -1,5 +1,5 @@
 import {RenderHelper} from './RenderHelper';
-import {LHLegacyProcessor} from '../processor/LHLegacyProcessor';
+import {MLHProcessor} from '../processor/MLHProcessor';
 
 /**
  * RenderHelper for the 3D animation
@@ -8,5 +8,5 @@ import {LHLegacyProcessor} from '../processor/LHLegacyProcessor';
  * @extends {RenderHelper}
  */
 export class RenderHelper3D extends RenderHelper {
-  getAdjacentJointPairs = () => LHLegacyProcessor.getAdjacentJoints();
+  getAdjacentJointPairs = () => MLHProcessor.getAdjacentJoints();
 }

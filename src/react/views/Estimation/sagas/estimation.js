@@ -22,7 +22,7 @@ import {
   selectIsDetecting
 } from '../reducers';
 import {
-  addEstimatedPose,
+  addEstimationFrame,
   addEstimationFrameStamp,
   beginWarmUpModel,
   endEstimation,
@@ -128,7 +128,7 @@ function* handleStartDetection(action) {
         estimationConfig
       );
       yield put(
-        addEstimatedPose({poses})
+        addEstimationFrame({poses})
         // addEstimatedPose({
         //   poses,
         //   frameStamp: videoElement.currentTime

@@ -5,7 +5,7 @@ import {BASE_FPS_TF} from '../../../../config/constants';
 import {
   setEstimationStatus,
   setHasEstimationStarted,
-  addEstimatedPose,
+  addEstimationFrame,
   beginWarmUpModel,
   finishWarmUpModel,
   resetEstimation,
@@ -33,7 +33,7 @@ const defaultState = {
   hasDetectionStarted: false,
   hasDetectionFinished: false,
   isDetecting: false,
-  detectedPoses: [],
+  estimationFrames: [],
   frameStamps: [],
   detectionFps: BASE_FPS_TF
 };
@@ -56,8 +56,8 @@ const r = createReducer(defaultState, {
   [setHasEstimationStarted]: (state, action) => {
     state.hasDetectionStarted = action.payload;
   },
-  [addEstimatedPose]: (state, action) => {
-    state.detectedPoses.push(action.payload);
+  [addEstimationFrame]: (state, action) => {
+    state.estimationFrames.push(action.payload);
   },
   [addEstimationFrameStamp]: (state, action) => {
     state.frameStamps.push(action.payload);
@@ -90,7 +90,7 @@ const r = createReducer(defaultState, {
 export default r;
 
 export const selectors = {
-  selectDetectedPoses: state => state[reducerKey].detectedPoses,
+  selectEstimationFrames: state => state[reducerKey].estimationFrames,
   selectHasDetectionStarted: state => state[reducerKey].hasDetectionStarted,
   selectHasDetectionFinished: state => state[reducerKey].hasDetectionFinished,
   selectIsDetecting: state => state[reducerKey].isDetecting,

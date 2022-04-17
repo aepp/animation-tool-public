@@ -15,8 +15,7 @@ export const getMillisecondsFromFrameStamp = frameStamp => {
 };
 
 export const millisecondsToTime = milliseconds => {
-  // console.log('milliseconds', milliseconds);
-  if (isNaN(milliseconds)) return '00:00:00.00';
+  if (isNaN(milliseconds)) return '00:00:00.000';
   const ms = milliseconds % 1000;
   milliseconds = (milliseconds - ms) / 1000;
   const secs = milliseconds % 60;
@@ -31,7 +30,7 @@ export const millisecondsToTime = milliseconds => {
     (secs < 10 ? '0' : '') +
     secs +
     '.' +
-    `${(ms < 10 ? '0' : '') + ms}`.substring(0, 2);
+    `${(ms < 10 ? '00' : ms < 100 ? '0' : '') + ms}`.substring(0, 3);
   if (hrs <= 0) return '00:' + string;
   return (hrs < 10 ? '0' : '') + hrs + ':' + string;
 };

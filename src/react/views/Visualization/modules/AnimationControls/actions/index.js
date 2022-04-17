@@ -18,4 +18,5 @@ export const updateCurrentFrameIdxToThree = createAction(
 export const toggleInlineAnimationControlsVisibility = createAction(
   'toggleInlineAnimationControlsVisibility'
 );
+export const toggleMiniControls = createAction('toggleMiniControls');
 export const resetAnimationControls = createAction('resetAnimationControls');
