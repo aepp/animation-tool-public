@@ -9,8 +9,10 @@ import {
   Paper,
   useTheme
 } from '@mui/material';
-import {selectIsAnimationInitialized} from '../Animation/reducers';
-import {selectBaseFps} from '../CoordinatesChart/reducers';
+import {
+  selectIsAnimationInitialized,
+  selectOriginalFps
+} from '../Animation/reducers';
 import {
   selectAreInlineAnimationControlsVisible,
   selectFpsMultiplier
@@ -24,8 +26,8 @@ export const InlineAnimationControls = () => {
   const ref = useRef();
   const visible = useSelector(selectAreInlineAnimationControlsVisible);
   const isInitialized = useSelector(selectIsAnimationInitialized);
-  const baseFps = useSelector(selectBaseFps);
   const fpsMultiplier = useSelector(selectFpsMultiplier);
+  const originalFps = useSelector(selectOriginalFps);
 
   return (
     <>
@@ -57,7 +59,7 @@ export const InlineAnimationControls = () => {
               <FramesCounter sx={{textAlign: 'center'}} compact />
               <Divider orientation={'vertical'} sx={{mx: 1}} flexItem />
               <FormHelperText sx={{margin: 0, mr: 1, textAlign: 'center'}}>
-                {baseFps * fpsMultiplier} FPS
+                {Math.floor(originalFps * fpsMultiplier)} FPS
               </FormHelperText>
             </Box>
           </Paper>

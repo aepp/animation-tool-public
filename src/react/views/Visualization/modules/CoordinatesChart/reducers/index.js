@@ -1,10 +1,7 @@
 import {createSelector, createReducer} from '@reduxjs/toolkit';
 import {resetDataSet, setDataSet} from '../actions';
-import {
-  getMillisecondsFromFrameStamp,
-  millisecondsToTime
-} from '../../../util/time';
-import {BASE_FPS} from '../../../../../../config/constants';
+import {frameStampToMilliseconds, millisecondsToTime} from '../../../util/time';
+import {DEFAULT_PLAYBACK_FPS} from '../../../../../../config/constants';
 
 export const reducerKey = 'coordinatesChart';
 
@@ -18,7 +15,6 @@ export const reducerKey = 'coordinatesChart';
  * @property {object} frameIdsByFormattedStamps
  * @property {boolean} isUsingFrameStamps
  * @property {number} firstNoneEmptyFrameIdx
- * @property {number} baseFps
  */
 /**
  * @typedef {PreProcessedDataSet | CoordinatesChartPartialState} CoordinatesChartState
@@ -36,8 +32,7 @@ const defaultState = {
   frameStampsFormatted: [],
   frameIdsByFormattedStamps: {},
   isUsingFrameStamps: false,
-  firstNoneEmptyFrameIdx: 0,
-  baseFps: BASE_FPS
+  firstNoneEmptyFrameIdx: 0
 };
 const r = createReducer(defaultState, {
   [setDataSet]: (state, action) => {
@@ -51,9 +46,8 @@ const r = createReducer(defaultState, {
     state.dataSource = action.payload.dataSource;
     state.original = action.payload.original;
     state.jointNames = action.payload.jointNames;
-    state.baseFps = action.payload.baseFps;
     state.frameStamps = action.payload.frameStamps.map(frameStamp =>
-      getMillisecondsFromFrameStamp(frameStamp)
+      frameStampToMilliseconds(frameStamp)
     );
     state.frameStampsFormatted = state.frameStamps.map(frameStamp => {
       const ms = millisecondsToTime(frameStamp);
@@ -132,4 +126,3 @@ export const selectPersonIndices = createSelector(
   selectSelf,
   state => state.personIndices
 );
-export const selectBaseFps = createSelector(selectSelf, state => state.baseFps);

@@ -21,10 +21,13 @@ import {
   beginAnimationInit,
   cancelAnimationInit,
   finishAnimationInit,
+  setOriginalFps,
   startAnimation
 } from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
+import {frameStampToMilliseconds} from '../../../util/time';
+import {setDetectionFps} from '../../../../Estimation/actions/estimation';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
@@ -46,7 +49,7 @@ function* handleStartAnimationInit(action) {
     return;
   }
 
-  const {dataSource, frames, tfModel, frameStamps, baseFps, isValid, message} =
+  const {dataSource, frames, tfModel, frameStamps, isValid, message} =
     yield call(validateSelectedDataSet, dataSet);
 
   if (!isValid) {
@@ -75,11 +78,17 @@ function* handleStartAnimationInit(action) {
       return;
   }
 
-  const {framesPerPerson, personIndices, extremes, normalization, jointNames} =
-    yield call({
-      context: ProcessorInstance,
-      fn: ProcessorInstance.preProcess
-    });
+  const {
+    framesPerPerson,
+    personIndices,
+    extremes,
+    normalization,
+    jointNames,
+    detectionFps
+  } = yield call({
+    context: ProcessorInstance,
+    fn: ProcessorInstance.preProcess
+  });
 
   yield put(
     setDataSet({
@@ -90,8 +99,7 @@ function* handleStartAnimationInit(action) {
       dataSource,
       original: dataSet,
       jointNames,
-      frameStamps,
-      baseFps
+      frameStamps
     })
   );
 
@@ -106,22 +114,19 @@ function* handleStartAnimationInit(action) {
     // loop already initiated, don't need to start it again
     shouldStartAnimationLoop = false;
     console.log('replacing dataset...');
-    yield call(
-      {
-        context: animationControllerInstance,
-        fn: animationControllerInstance.softReset
-      },
-      {baseFps}
-    );
+    yield call({
+      context: animationControllerInstance,
+      fn: animationControllerInstance.softReset
+    });
     yield put(resetAnimationControls());
     yield put(resetCoordinatesChartControls());
     yield put(closeUiChannel());
   } else {
     animationControllerInstance = new AnimationController({
-      rootElement,
-      baseFps
+      rootElement
     });
   }
+  yield put(setOriginalFps(detectionFps));
 
   yield call(
     {
@@ -135,7 +140,8 @@ function* handleStartAnimationInit(action) {
       framesPerPerson,
       framesCount: framesPerPerson.length,
       personIndices,
-      tfModel
+      tfModel,
+      detectionFps
     }
   );
 

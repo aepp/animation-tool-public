@@ -5,7 +5,7 @@ import {
 // eslint-disable-next-line no-unused-vars
 import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {
-  BASE_FPS,
+  DEFAULT_PLAYBACK_FPS,
   DataSourceType,
   ORBIT_CONTROLS_Z_LIMIT_ADDITION,
   PlayBackDirectionType
@@ -74,15 +74,13 @@ export class AnimationController extends PlaybackController {
 
   /**
    * @param {HTMLElement} rootElement
-   * @param {number} baseFps
    */
   constructor(
-    {rootElement = document.body, baseFps = BASE_FPS} = {
-      rootElement: document.body,
-      baseFps: BASE_FPS
+    {rootElement = document.body} = {
+      rootElement: document.body
     }
   ) {
-    super({baseFps});
+    super();
     this._threeRenderService = new ThreeRenderService({rootElement});
   }
 
@@ -94,6 +92,7 @@ export class AnimationController extends PlaybackController {
    * @param {Array.<object>} framesPerPerson
    * @param {number} framesCount
    * @param {number[]} personIndices
+   * @param {number} detectionFps
    * @param {SupportedModels|null} tfModel If provided dataset was created with tensorflow, it should contain the model used for its creation
    * @returns {AnimationController}
    */
@@ -104,8 +103,11 @@ export class AnimationController extends PlaybackController {
     framesPerPerson,
     framesCount,
     personIndices,
-    tfModel = null
+    tfModel = null,
+    detectionFps = DEFAULT_PLAYBACK_FPS
   }) {
+    this.detectionFps = detectionFps;
+
     const dataSetModel = new DataSetModel({
       extremes,
       normalization,
@@ -256,16 +258,15 @@ export class AnimationController extends PlaybackController {
 
   /**
    * @public
-   * @param {number} baseFps
    * @returns {AnimationController}
    */
-  softReset({baseFps = BASE_FPS} = {baseFps: BASE_FPS}) {
+  softReset() {
     this._threeRenderService.softReset();
     this._room = undefined;
     this._currentFrameObjects = [];
     this.currentFrameIdx = 0;
     this._sendFrameIdxToUi();
-    this.resetPlayback({baseFps});
+    this.resetPlayback();
     this.isPlaying = false;
     this._threeRenderService.updateScene();
 

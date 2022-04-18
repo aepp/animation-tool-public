@@ -5,12 +5,14 @@ import {
   cancelAnimationInit,
   finishAnimationInit,
   resetAnimation,
+  setOriginalFps,
   updateFramesCount
 } from '../actions/animation';
 import {
   updateCurrentFrameIndexFromThree,
   updateHoveredJointDataFromThree
 } from '../actions/uiChannel';
+import {DEFAULT_PLAYBACK_FPS} from '../../../../../../config/constants';
 
 export const reducerKey = 'animation';
 
@@ -22,13 +24,15 @@ export const reducerKey = 'animation';
  * @property {number} currentFrameIdx
  * @property {number} framesCount
  * @property {object} hoveredJointData
+ * @property {number} originalFps
  */
 const defaultState = {
   isLoading: false,
   isInitialized: false,
   currentFrameIdx: 0,
   hoveredJointData: null,
-  framesCount: 0
+  framesCount: 0,
+  originalFps: DEFAULT_PLAYBACK_FPS
 };
 const r = createReducer(defaultState, {
   [beginAnimationInit]: state => {
@@ -54,6 +58,9 @@ const r = createReducer(defaultState, {
   },
   [updateHoveredJointDataFromThree]: (state, action) => {
     state.hoveredJointData = action.payload;
+  },
+  [setOriginalFps]: (state, action) => {
+    state.originalFps = action.payload;
   },
   [resetAnimation]: () => ({
     ...defaultState
@@ -86,4 +93,8 @@ export const selectFramesCount = createSelector(
 export const selectHoveredJointData = createSelector(
   selectSelf,
   /** @param {AnimationState} state */ state => state.hoveredJointData
+);
+export const selectOriginalFps = createSelector(
+  selectSelf,
+  /** @param {AnimationState} state */ state => state.originalFps
 );

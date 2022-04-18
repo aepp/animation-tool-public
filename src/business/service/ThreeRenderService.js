@@ -80,7 +80,6 @@ export class ThreeRenderService {
       0.01,
       10
     );
-
     this.createCameraControls();
 
     this._raycaster = new Raycaster();

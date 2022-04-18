@@ -2,7 +2,8 @@ import {createSelector, createReducer} from '@reduxjs/toolkit';
 import {
   resetCoordinatesChartControls,
   selectJoint,
-  deselectJoint
+  deselectJoint,
+  deselectAllJoints
 } from '../actions';
 
 export const reducerKey = 'coordinatesChartControls';
@@ -31,6 +32,9 @@ const r = createReducer(defaultState, {
       if (j.name !== action.payload.name) return true;
       return j.component !== action.payload.component;
     });
+  },
+  [deselectAllJoints]: (state, action) => {
+    state.selectedJoints[action.payload.personIdx] = [];
   },
   [resetCoordinatesChartControls]: () => ({...defaultState})
 });

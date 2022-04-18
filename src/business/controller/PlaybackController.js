@@ -1,7 +1,7 @@
 import {
-  BASE_FPS,
-  DEFAULT_FPS_MULTIPLIER,
-  FPS_SPEED_UPS,
+  DEFAULT_PLAYBACK_FPS,
+  DEFAULT_PLAYBACK_FPS_MULTIPLIER,
+  PLAYBACK_FPS_SPEED_UPS,
   PlayBackDirectionType
 } from '../../config/constants';
 
@@ -28,48 +28,50 @@ export class PlaybackController {
    * @type {number}
    * @private
    */
-  _fpsMultiplier = DEFAULT_FPS_MULTIPLIER;
+  _fpsMultiplier = DEFAULT_PLAYBACK_FPS_MULTIPLIER;
 
   /**
    *
    * @type {number}
    * @private
    */
-  _frameIdxIncrement = DEFAULT_FPS_MULTIPLIER;
+  _frameIdxIncrement = DEFAULT_PLAYBACK_FPS_MULTIPLIER;
 
   /**
    *
    * @type {number}
    * @private
    */
-  _baseFps = BASE_FPS;
+  _detectionFps = DEFAULT_PLAYBACK_FPS;
 
   constructor(
     {
       isPlaying = undefined,
       playbackDirection = undefined,
       fpsMultiplier = undefined,
-      baseFps = BASE_FPS
+      detectionFps = DEFAULT_PLAYBACK_FPS
     } = {
       isPlaying: undefined,
       playbackDirection: undefined,
       fpsMultiplier: undefined,
-      baseFps: BASE_FPS
+      detectionFps: DEFAULT_PLAYBACK_FPS
     }
   ) {
     this._isPlaying = isPlaying || this._isPlaying;
     this._playbackDirection = playbackDirection || this._playbackDirection;
-    this._baseFps = baseFps;
     this.fpsMultiplier = fpsMultiplier || this._fpsMultiplier;
+    this._detectionFps = detectionFps;
   }
 
   incrementFrameRate() {
-    const currentFpsMultiplierIdx = FPS_SPEED_UPS.indexOf(this._fpsMultiplier);
+    const currentFpsMultiplierIdx = PLAYBACK_FPS_SPEED_UPS.indexOf(
+      this._fpsMultiplier
+    );
     let nextFpsIdx =
-      currentFpsMultiplierIdx + 1 < FPS_SPEED_UPS.length
+      currentFpsMultiplierIdx + 1 < PLAYBACK_FPS_SPEED_UPS.length
         ? currentFpsMultiplierIdx + 1
         : 0;
-    this.fpsMultiplier = FPS_SPEED_UPS[nextFpsIdx];
+    this.fpsMultiplier = PLAYBACK_FPS_SPEED_UPS[nextFpsIdx];
     return this._fpsMultiplier;
   }
   /**
@@ -77,7 +79,7 @@ export class PlaybackController {
    * @returns {number}
    */
   getTimeoutByCurrentFps() {
-    return 1000 / ((this.fpsMultiplier * 1000) / this.baseFps);
+    return 1000 / (this.detectionFps * this.fpsMultiplier);
   }
 
   get isPlaying() {
@@ -109,20 +111,19 @@ export class PlaybackController {
     return this._frameIdxIncrement;
   }
 
-  get baseFps() {
-    return this._baseFps;
+  get detectionFps() {
+    return this._detectionFps;
   }
 
-  set baseFps(value) {
-    this._baseFps = value;
+  set detectionFps(value) {
+    this._detectionFps = value;
   }
 
   /**
-   * @param {number} baseFps
+   * @public
    */
-  resetPlayback({baseFps = BASE_FPS} = {baseFps: BASE_FPS}) {
+  resetPlayback() {
     this._playbackDirection = PlayBackDirectionType.DEFAULT;
-    this.fpsMultiplier = DEFAULT_FPS_MULTIPLIER;
-    this.baseFps = baseFps;
+    this.fpsMultiplier = DEFAULT_PLAYBACK_FPS_MULTIPLIER;
   }
 }

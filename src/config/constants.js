@@ -5,6 +5,8 @@ export const LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE =
 export const LOCAL_STORAGE_POSE_DETECTOR_INSTANCE =
   'LOCAL_STORAGE_POSE_DETECTOR_INSTANCE';
 
+export const MIN_SECS_PRESENCE_AMOUNT = 3;
+
 /**
  * @readonly
  * @enum {string}
@@ -18,10 +20,9 @@ export const PlayBackDirectionType = {
   REVERSE: 'REVERSE'
 };
 
-export const BASE_FPS = 30;
-export const BASE_FPS_TF = 60;
-export const DEFAULT_FPS_MULTIPLIER = 1;
-export const FPS_SPEED_UPS = [1.5, 2, 2.5, 3];
+export const DEFAULT_PLAYBACK_FPS = 30;
+export const DEFAULT_PLAYBACK_FPS_MULTIPLIER = 1;
+export const PLAYBACK_FPS_SPEED_UPS = [1.5, 2, 2.5, 3];
 
 /**
  * @readonly

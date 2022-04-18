@@ -7,7 +7,7 @@ import {
   FastRewind as FastRewindIcon
 } from '@mui/icons-material';
 import {
-  DEFAULT_FPS_MULTIPLIER,
+  DEFAULT_PLAYBACK_FPS_MULTIPLIER,
   PlayBackDirectionType
 } from '../../../../../../../config/constants';
 import {selectIsAnimationInitialized} from '../../../Animation/reducers';
@@ -39,7 +39,7 @@ export const DirectionButton = ({playbackDirection, size = 'medium'}) => {
   );
 
   if (
-    fpsMultiplier > DEFAULT_FPS_MULTIPLIER &&
+    fpsMultiplier > DEFAULT_PLAYBACK_FPS_MULTIPLIER &&
     currentPlaybackDirection === playbackDirection
   ) {
     return (

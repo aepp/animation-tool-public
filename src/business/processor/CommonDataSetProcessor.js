@@ -32,7 +32,8 @@
  * @property {Normalization} normalization
  * @property {DataSourceType} dataSource
  */
-import {DataSourceType} from '../../config/constants';
+import {DataSourceType, DEFAULT_PLAYBACK_FPS} from '../../config/constants';
+import {frameStampToMilliseconds} from '../../react/views/Visualization/util/time';
 
 /**
  * @class
@@ -100,6 +101,11 @@ export class CommonDataSetProcessor {
    */
   _translateZ = undefined;
 
+  /**
+   * @public
+   * @param frames
+   * @param dataSource
+   */
   constructor(
     {frames = [], dataSource = DataSourceType.DATA_SOURCE_KINECT} = {
       frames: [],
@@ -110,8 +116,33 @@ export class CommonDataSetProcessor {
     this._dataSource = dataSource;
   }
 
+  /**
+   * determine pose estimation FPS based on total frames count and the timestamp of the last frame
+   * @protected
+   * @returns {number}
+   */
+  getDetectionFps() {
+    if (!this._frames || !this._frames.length) return DEFAULT_PLAYBACK_FPS;
+    return (
+      this._frames.length /
+      (frameStampToMilliseconds(
+        this._frames[this._frames.length - 1]['frameStamp']
+      ) /
+        1000)
+    );
+  }
+
+  /**
+   * main entry point of a dataset processor; transforms a frames array to a format which is used by the render logic
+   * @public
+   */
   preProcess = () => {};
 
+  /**
+   * calculate the 2D scale factor to normalize joints' vectors size using extremes calculated previously
+   * @protected
+   * @returns {CommonDataSetProcessor}
+   */
   calculateNormalScaleFactor2D = () => {
     this.normalScaleFactor = Math.sqrt(
       Math.pow(this.extremes.xMax - this.extremes.xMin, 2) +
@@ -120,6 +151,11 @@ export class CommonDataSetProcessor {
     return this;
   };
 
+  /**
+   * calculate the 3D scale factor to normalize joints' vectors size using extremes calculated previously
+   * @protected
+   * @returns {CommonDataSetProcessor}
+   */
   calculateNormalScaleFactor3D = () => {
     this.normalScaleFactor = Math.sqrt(
       Math.pow(this.extremes.xMax - this.extremes.xMin, 2) +
@@ -129,6 +165,11 @@ export class CommonDataSetProcessor {
     return this;
   };
 
+  /**
+   * calculate the translation value to normalize joints' vectors position using extremes calculated previously
+   * @protected
+   * @returns {CommonDataSetProcessor}
+   */
   calculateTranslations = () => {
     this.translateX =
       this.extremes.xMin + (this.extremes.xMax - this.extremes.xMin) / 2;
@@ -138,14 +179,21 @@ export class CommonDataSetProcessor {
       this.extremes.zMin + (this.extremes.zMax - this.extremes.zMin) / 2;
   };
 
+  /**
+   * normalize given point by scaling and shifting it using normalization parameters previously calculated
+   * @protected
+   * @param point
+   * @returns {{x: number, y: number, z: number}}
+   */
   getNormalizedCenteredPoint = point => ({
     ...point,
     x: (point.x - this.translateX) / this.normalScaleFactor,
     y: (point.y - this.translateY) / this.normalScaleFactor,
     z: (point.z - this.translateZ) / this.normalScaleFactor
   });
+
   /**
-   * @public
+   * @protected
    * @returns {Array}
    */
   get frames() {
@@ -153,7 +201,7 @@ export class CommonDataSetProcessor {
   }
 
   /**
-   * @public
+   * @protected
    * @param {Array} value
    */
   set frames(value) {
@@ -161,7 +209,7 @@ export class CommonDataSetProcessor {
   }
 
   /**
-   * @public
+   * @protected
    * @returns {RegExp}
    */
   get startsWithNumberAndOptUnderscoreRegex() {
@@ -169,49 +217,89 @@ export class CommonDataSetProcessor {
   }
 
   /**
-   * @public
+   * @protected
    * @returns {RegExp}
    */
   get endsWithSingleCharacterAndUnderscoreRegex() {
     return this._endsWithSingleCharacterAndUnderscoreRegex;
   }
 
+  /**
+   * @protected
+   * @returns {Extremes}
+   */
   get extremes() {
     return this._extremes;
   }
 
+  /**
+   * @protected
+   * @param value
+   */
   set extremes(value) {
     this._extremes = value;
   }
 
+  /**
+   * @protected
+   * @returns {number}
+   */
   get normalScaleFactor() {
     return this._normalScaleFactor;
   }
 
+  /**
+   * @protected
+   * @param value
+   */
   set normalScaleFactor(value) {
     this._normalScaleFactor = value;
   }
 
+  /**
+   * @protected
+   * @returns {number}
+   */
   get translateX() {
     return this._translateX;
   }
 
+  /**
+   * @protected
+   * @param value
+   */
   set translateX(value) {
     this._translateX = value;
   }
 
+  /**
+   * @protected
+   * @returns {number}
+   */
   get translateY() {
     return this._translateY;
   }
 
+  /**
+   * @protected
+   * @param value
+   */
   set translateY(value) {
     this._translateY = value;
   }
 
+  /**
+   * @protected
+   * @returns {number}
+   */
   get translateZ() {
     return this._translateZ;
   }
 
+  /**
+   * @protected
+   * @param value
+   */
   set translateZ(value) {
     this._translateZ = value;
   }

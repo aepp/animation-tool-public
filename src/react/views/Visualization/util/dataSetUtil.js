@@ -1,9 +1,5 @@
 import {SupportedModels} from '@tensorflow-models/pose-detection';
-import {
-  BASE_FPS,
-  BASE_FPS_TF,
-  DataSourceType
-} from '../../../../config/constants';
+import {DataSourceType} from '../../../../config/constants';
 
 export const validateSelectedDataSet = (dataSet = {}) => {
   const source = dataSet.source;
@@ -19,15 +15,7 @@ export const validateSelectedDataSet = (dataSet = {}) => {
     return generateBadFormatCheckResult("can't identify data source");
 
   let tfModel = null;
-  let baseFps = BASE_FPS;
-  if (
-    [
-      DataSourceType.DATA_SOURCE_TF,
-      DataSourceType.DATA_SOURCE_TF_MOCK_LH
-    ].includes(dataSource)
-  ) {
-    baseFps = BASE_FPS_TF;
-  }
+
   // if dealing with datasource from tensor flow estimation, determine the tensor flow model used for estimation
   if (source && dataSource === DataSourceType.DATA_SOURCE_TF) {
     const details = source.details;
@@ -61,7 +49,6 @@ export const validateSelectedDataSet = (dataSet = {}) => {
     frames,
     frameStamps,
     tfModel,
-    baseFps,
     isValid: true
   };
 };

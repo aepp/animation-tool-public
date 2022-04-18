@@ -1,7 +1,7 @@
 import {createReducer} from '@reduxjs/toolkit';
 import {SupportedModels, movenet} from '@tensorflow-models/pose-detection';
 import {ScoreThreshHold} from '../../../../config/tensorFlow';
-import {BASE_FPS_TF} from '../../../../config/constants';
+import {DEFAULT_PLAYBACK_FPS} from '../../../../config/constants';
 import {
   setEstimationStatus,
   setHasEstimationStarted,
@@ -35,7 +35,7 @@ const defaultState = {
   isDetecting: false,
   estimationFrames: [],
   frameStamps: [],
-  detectionFps: BASE_FPS_TF
+  detectionFps: DEFAULT_PLAYBACK_FPS
 };
 
 const r = createReducer(defaultState, {

@@ -236,7 +236,8 @@ export class RenderHelper {
         new MeshBasicMaterial({color: 0xff0000})
       );
     this._spheres[personIdx][sphereIdx].userData = {
-      ...keyPoints[sphereIdx]
+      ...keyPoints[sphereIdx],
+      personIdx
     };
     this._spheres[personIdx][sphereIdx].position.set(
       ...this.getPositions(keyPoints[sphereIdx])

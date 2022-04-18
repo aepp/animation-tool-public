@@ -71,17 +71,25 @@ export const CoordinatesPlot = () => {
 
   const [layout] = useState({
     showlegend: true,
-    title: 'Kinematic data',
-    legend: {
-      x: 1,
+    title: {
+      text: 'Relative coordinate values',
       xanchor: 'right',
-      y: 1
+      y: 2
+    },
+    legend: {
+      x: 0,
+      y: 1.1,
+      height: 50,
+      orientation: 'h',
+      xanchor: 'left',
+      yanchor: 'top',
+      groupclick: 'toggleitem'
     },
     xaxis: {
       title: isUsingFrameStamps ? 'Time (mm:ss.ms)' : 'Frame ID'
     },
     yaxis: {
-      title: 'Joints attribute value (normalized)'
+      title: 'Coordinate value (normalized)'
     },
     shapes: [
       {
@@ -120,6 +128,15 @@ export const CoordinatesPlot = () => {
               ].name = `P${personIdx} ${
                 point.name
               } ${selectedComponent.toUpperCase()}`;
+
+              tracesObj[
+                personIdx + point.name + selectedComponent
+              ].legendgroup = personIdx;
+              tracesObj[
+                personIdx + point.name + selectedComponent
+              ].legendgrouptitle = {
+                text: `Person ${personIdx}`
+              };
               tracesObj[personIdx + point.name + selectedComponent].mode =
                 'lines+markers';
               tracesObj[personIdx + point.name + selectedComponent].type =

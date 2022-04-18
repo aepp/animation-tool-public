@@ -20,6 +20,9 @@ export const AnimationControls = () => {
               sx={{position: 'absolute', right: 0, top: 0}}>
               <Stack direction={'column'}>
                 <Stack direction={'row'}>
+                  <b>Person:</b>&nbsp;{hoveredJointData.personIdx}
+                </Stack>
+                <Stack direction={'row'}>
                   <b>Joint:</b>&nbsp;{hoveredJointData.name}
                 </Stack>
                 <Divider sx={{my: 1}} flexItem />

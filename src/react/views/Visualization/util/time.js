@@ -2,7 +2,7 @@
  * @public
  * @param {string} frameStamp
  */
-export const getMillisecondsFromFrameStamp = frameStamp => {
+export const frameStampToMilliseconds = frameStamp => {
   if (typeof frameStamp === 'string' && frameStamp.indexOf(':') > -1) {
     const timestamp = Date.parse(`2019-01-01T${frameStamp}Z`);
     return (

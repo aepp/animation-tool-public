@@ -12,11 +12,10 @@ import {
 import {
   LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE,
   PlayBackDirectionType,
-  FPS_SPEED_UPS
+  PLAYBACK_FPS_SPEED_UPS
 } from '../../../../../../config/constants';
 import {selectFramesCount} from '../../Animation/reducers';
 import {selectIsPlaying, selectPlaybackDirection} from '../reducers';
-import {selectBaseFps} from '../../CoordinatesChart/reducers';
 
 function* handleTogglePlay() {
   const animationControllerInstance =
@@ -24,12 +23,11 @@ function* handleTogglePlay() {
   if (!animationControllerInstance) return;
 
   const isPlaying = yield select(selectIsPlaying);
-  const baseFps = yield select(selectBaseFps);
 
   yield put(setIsPlaying(!isPlaying));
   if (isPlaying === true) {
     yield put(resetFpsMultiplierAndDirection());
-    animationControllerInstance.resetPlayback({baseFps});
+    animationControllerInstance.resetPlayback();
   }
   animationControllerInstance.isPlaying = !isPlaying;
 }
@@ -42,11 +40,11 @@ function* handleIncreaseFps(action) {
     window[LOCAL_STORAGE_ANIMATION_CONTROLLER_INSTANCE];
 
   if (currentPlaybackDirection !== playbackDirection) {
-    animationControllerInstance.fpsMultiplier = FPS_SPEED_UPS[0];
+    animationControllerInstance.fpsMultiplier = PLAYBACK_FPS_SPEED_UPS[0];
     animationControllerInstance.playbackDirection = playbackDirection;
     yield put(
       setFpsMultiplierAndDirection({
-        fpsMultiplier: FPS_SPEED_UPS[0],
+        fpsMultiplier: PLAYBACK_FPS_SPEED_UPS[0],
         playbackDirection
       })
     );

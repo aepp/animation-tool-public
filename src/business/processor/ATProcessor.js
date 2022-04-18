@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import {SupportedModels} from '@tensorflow-models/pose-detection';
 import {ScoreThreshHold} from '../../config/tensorFlow';
+import {MIN_SECS_PRESENCE_AMOUNT} from '../../config/constants';
 import {CommonDataSetProcessor} from './CommonDataSetProcessor';
 
 /**
@@ -33,6 +34,8 @@ export class ATProcessor extends CommonDataSetProcessor {
    * @returns {Promise<PreProcessedDataSet>}
    */
   preProcess = () => {
+    const detectionFps = this.getDetectionFps();
+
     const scoreThreshold = ScoreThreshHold[this._model] || 0.5;
 
     this.frames.forEach(persons =>
@@ -62,8 +65,9 @@ export class ATProcessor extends CommonDataSetProcessor {
     this.calculateNormalScaleFactor2D();
     this.calculateTranslations();
 
-    const personIndices = [];
-    const framesPerPerson = this.frames
+    let personIndices = [];
+    const personsPresenceCount = [];
+    let framesPerPerson = this.frames
       // .map(frame =>
       //   frame.reduce((framesPerPersonReduced, personsFrame) => {
       //     if (personsFrame.score >= ScoreThreshHold[this._model]) {
@@ -75,7 +79,12 @@ export class ATProcessor extends CommonDataSetProcessor {
       // .filter(frame => frame.length)
       .map(frame =>
         frame.poses.map(({keypoints, score, id = 0}) => {
-          if (!personIndices.includes(id)) personIndices.push(id);
+          if (!personIndices.includes(id)) {
+            personIndices.push(id);
+            personsPresenceCount[id] = 1;
+          } else {
+            personsPresenceCount[id]++;
+          }
           return {
             keyPoints: keypoints.map(point => {
               this._addJoint(point.name);
@@ -89,6 +98,21 @@ export class ATProcessor extends CommonDataSetProcessor {
           };
         })
       );
+
+    /** if a pearson appears in less than configured time interval in seconds, remove it from the dataset */
+    const redundantPersons = [];
+    personsPresenceCount.forEach((value, key) => {
+      if (value <= MIN_SECS_PRESENCE_AMOUNT * detectionFps) {
+        personIndices = personIndices.filter(id => id !== key);
+        redundantPersons.push(key);
+      }
+    });
+
+    framesPerPerson = framesPerPerson.map(persons => {
+      return persons.filter(
+        person => !redundantPersons.includes(person.personIdx)
+      );
+    });
 
     return new Promise(resolve => {
       /**
@@ -104,7 +128,8 @@ export class ATProcessor extends CommonDataSetProcessor {
           scaleFactor: this.normalScaleFactor
         },
         dataSource: this._dataSource,
-        jointNames: this._getJointNames()
+        jointNames: this._getJointNames(),
+        detectionFps
       };
       return resolve(processedDataSet);
     });

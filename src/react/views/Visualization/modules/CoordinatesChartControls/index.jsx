@@ -19,7 +19,7 @@ import {
   selectPersonIndices
 } from '../CoordinatesChart/reducers';
 import {selectSelectedJoints} from './reducers';
-import {deselectJoint, selectJoint} from './actions';
+import {deselectAllJoints, deselectJoint, selectJoint} from './actions';
 
 const vectorComponents = ['x', 'y', 'z'];
 const separator = '---';
@@ -61,7 +61,7 @@ export const CoordinatesChartControls = () => {
   return (
     <Box sx={{display: 'flex', flexDirection: 'column'}}>
       <Typography sx={{fontWeight: 'bold', width: '100%', textAlign: 'center'}}>
-        Plot relative joints' coordinates
+        Plot joints' coordinates
       </Typography>
       <Divider sx={{my: 1}} flexItem />
       <Box sx={{mb: 1, display: 'flex', flexWrap: 'wrap'}}>
@@ -98,9 +98,17 @@ export const CoordinatesChartControls = () => {
                       .join(', ')
                   }
                   multiple>
+                  <MenuItem
+                    onClick={() => dispatch(deselectAllJoints({personIdx}))}
+                    disabled={
+                      !selectedJoints[personIdx] ||
+                      !selectedJoints[personIdx].length
+                    }>
+                    Select none
+                  </MenuItem>
                   {jointNames.map(jointName => {
                     return [
-                      <ListSubheader key={jointName}>
+                      <ListSubheader key={jointName} sx={{fontWeight: 'bold'}}>
                         {jointName}
                       </ListSubheader>,
                       ...vectorComponents.map(c => {
@@ -110,6 +118,8 @@ export const CoordinatesChartControls = () => {
                         const value = jointName + separator + c;
                         return (
                           <MenuItem
+                            dense
+                            sx={{py: 0}}
                             key={value}
                             value={value}
                             onClick={() => {

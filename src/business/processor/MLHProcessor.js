@@ -2,9 +2,11 @@
 import {
   // eslint-disable-next-line no-unused-vars
   DataSourceType,
-  MAX_JOINT_COORDINATE_DEVIATION
+  MAX_JOINT_COORDINATE_DEVIATION,
+  MIN_SECS_PRESENCE_AMOUNT
 } from '../../config/constants';
 import {CommonDataSetProcessor} from './CommonDataSetProcessor';
+import {frameStampToMilliseconds} from '../../react/views/Visualization/util/time';
 
 /**
  * @typedef RawLHLegacyFrame
@@ -200,8 +202,10 @@ export class MLHProcessor extends CommonDataSetProcessor {
     this.determinePersonIndices();
 
     const personsEmptyIndex = [];
+    const personsPresenceIndex = [];
     for (let pId of this.personIndices) {
       personsEmptyIndex[pId] = 0;
+      personsPresenceIndex[pId] = 0;
     }
     let framesPerPerson = this.frames
       .map(this.processFrame)
@@ -217,34 +221,46 @@ export class MLHProcessor extends CommonDataSetProcessor {
             personsEmptyIndex[frame.personIdx]++;
             return false;
           }
+          personsPresenceIndex[frame.personIdx]++;
           return true;
         });
       });
 
+    const detectionFps = this.getDetectionFps();
+
     // if a person was not present but is still in the dataset with zero values (like in Kinect datasets)
     // - remove it from dataset (not the data, but don't list its index so UI doesn't render it
     // since it iterates through person indices in the render loop)
+    /** also, if a pearson appears in less than configured time interval in seconds, remove it from the dataset */
+    const redundantPersons = [];
     for (let pId of this.personIndices) {
-      if (personsEmptyIndex[pId] === framesPerPerson.length) {
+      if (
+        personsPresenceIndex[pId] <= MIN_SECS_PRESENCE_AMOUNT * detectionFps ||
+        personsEmptyIndex[pId] === framesPerPerson.length
+      ) {
         delete this.personIndices[pId];
+        redundantPersons.push(pId);
       }
     }
 
     this.calculateNormalScaleFactor3D();
     this.calculateTranslations();
+
     framesPerPerson = framesPerPerson.map(personsFrames =>
-      personsFrames.map(frame => {
-        return {
-          ...frame,
-          keyPoints: frame.keyPoints
-            .map(this.getNormalizedCenteredPoint)
-            .sort(
-              (k1, k2) =>
-                MLHProcessor._jointNamesArray.indexOf(k1.name) -
-                MLHProcessor._jointNamesArray.indexOf(k2.name)
-            )
-        };
-      })
+      personsFrames
+        .filter(person => !redundantPersons.includes(person.personIdx))
+        .map(person => {
+          return {
+            ...person,
+            keyPoints: person.keyPoints
+              .map(this.getNormalizedCenteredPoint)
+              .sort(
+                (k1, k2) =>
+                  MLHProcessor._jointNamesArray.indexOf(k1.name) -
+                  MLHProcessor._jointNamesArray.indexOf(k2.name)
+              )
+          };
+        })
     );
 
     return new Promise(resolve =>
@@ -259,7 +275,8 @@ export class MLHProcessor extends CommonDataSetProcessor {
           translateZ: this.translateZ
         },
         dataSource: this._dataSource,
-        jointNames: MLHProcessor._jointNamesArray
+        jointNames: MLHProcessor._jointNamesArray,
+        detectionFps
       })
     );
   };
