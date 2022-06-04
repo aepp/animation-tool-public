@@ -14,6 +14,8 @@ import {BACKGROUND_COLOR} from '../../react/theme/constants';
 import {updateHoveredJointDataFromThree} from '../../react/views/Visualization/modules/Animation/actions/uiChannel';
 
 /**
+ * A service class responsible for the rendering of the scene and the objects.
+ *
  * @class
  */
 export class ThreeRenderService {

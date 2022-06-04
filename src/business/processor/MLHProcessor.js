@@ -6,7 +6,6 @@ import {
   MIN_SECS_PRESENCE_AMOUNT
 } from '../../config/constants';
 import {CommonDataSetProcessor} from './CommonDataSetProcessor';
-import {frameStampToMilliseconds} from '../../react/views/Visualization/util/time';
 
 /**
  * @typedef RawLHLegacyFrame
@@ -27,6 +26,8 @@ import {frameStampToMilliseconds} from '../../react/views/Visualization/util/tim
  */
 
 /**
+ * A pre-processor for the data sets resulting from Multimodal Learning Hub.
+ *
  * @class
  * @extends {CommonDataSetProcessor}
  */

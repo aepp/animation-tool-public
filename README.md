@@ -35,9 +35,14 @@ animationToolInstance.create();
 ```javascript
 animationToolInstance.destroy();
 ```
+
+#### Example
+
+See an example integration script in `public/integration-example/initHelper.js`
+
 ## Development
 
-You need current lts version of **node.js** and **Yarn** package manager. 
+You need to install current LTS version of **node.js** and **Yarn** package manager. 
 
 Then run in the root of the project directory: 
 

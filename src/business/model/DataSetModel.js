@@ -1,4 +1,6 @@
 /**
+ * A helper class that holds the pre-processed input data set.
+ *
  * @class
  */
 export class DataSetModel {

@@ -24,6 +24,10 @@ import {Line2} from 'three/examples/jsm/lines/Line2';
  */
 
 /**
+ * This class is responsible for animation rendering. This is a generic class
+ * that provides the most common rendering features. The 2D and 3D rendering aspects
+ * are covered in the corresponding render helpers.
+ *
  * @abstract
  */
 export class RenderHelper {
@@ -34,6 +38,7 @@ export class RenderHelper {
    */
   getAdjacentJointPairs = () => [[0, 0]];
   /**
+   * Returns a Three.js vector object from provided coordinates.
    *
    * @param {number} x
    * @param {number} y
@@ -45,6 +50,8 @@ export class RenderHelper {
   }
 
   /**
+   * Returns a Three.js point object from provided coordinates.
+   *
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -55,6 +62,7 @@ export class RenderHelper {
   }
 
   /**
+   * Return coordinates object as a flat array where position 0 corresponds to X, 1 to Y and 2 to Z coordinate.
    *
    * @param {number} x
    * @param {number} y
@@ -67,6 +75,8 @@ export class RenderHelper {
   /* END "abstract" methods */
 
   /**
+   * A Three.js material object used for body joints.
+   *
    * @constant
    * @type {LineMaterial}
    * @private
@@ -80,6 +90,7 @@ export class RenderHelper {
   });
 
   /**
+   * An object holding the pre-processed data set.
    *
    * @type {DataSetModel}
    * @private
@@ -87,6 +98,7 @@ export class RenderHelper {
   _dataSetModel;
 
   /**
+   * An array of body joints connection points represented as spheres.
    *
    * @type {Mesh[]}
    * @private
@@ -94,6 +106,7 @@ export class RenderHelper {
   _spheres = [];
 
   /**
+   * An array of body joints represented as lines.
    *
    * @type {Line2[]}
    * @private

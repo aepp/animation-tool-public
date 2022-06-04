@@ -19,12 +19,22 @@ import {
 
 /**
  * @class
+ *
+ * This is the main class of the React's application. Instantiate it to render the Animation Tool.
  */
 class AnimationTool {
-  _store;
   _sagaMiddleware;
 
   /**
+   * Root redux store object holding the whole application's state.
+   *
+   * @type {object}
+   * @private
+   */
+  _store;
+
+  /**
+   * A flag indicating whether the app is created or not.
    *
    * @type {boolean}
    * @private
@@ -32,18 +42,23 @@ class AnimationTool {
   _isCreated = false;
 
   /**
+   * The wrapper HTML element that will hold the app.
+   *
    * @type {HTMLElement}
    * @private
    */
   _container = document.getElementById('root');
 
   /**
+   * An optional external file input. Useful when integrating current app in another app that already has a file input.
+   *
    * @type {HTMLElement | undefined}
    * @private
    */
   _dataSetFileInput = undefined;
 
   /**
+   * Configuration object. By default, specifies that the app is running in standalone mode.
    *
    * @type {{standalone: boolean}}
    * @private
@@ -53,6 +68,7 @@ class AnimationTool {
   };
 
   /**
+   * Holds the root redux-saga instance.
    *
    * @type {Task}
    * @private
@@ -67,6 +83,10 @@ class AnimationTool {
   frameUpdateCallback(frameIdx) {}
 
   /**
+   * Optional timeout in milliseconds to throttle the updates coming from the animation render loop.
+   * May be useful in the integrated mode if the updates are coming too fast causing latency in the rest
+   * of the parent application.
+   *
    * @type {number}
    * @private
    */
@@ -74,6 +94,7 @@ class AnimationTool {
 
   /**
    * Can be called from external context to update the index of the frame currently being rendered
+   *
    * @param {number} frameIdx
    * @public
    */
@@ -82,6 +103,15 @@ class AnimationTool {
     this._store.dispatch(updateCurrentFrameIdxToThree(frameIdx));
   }
 
+  /**
+   *
+   * @param container a wrapper HTML element or its ID to hold the application
+   * @param appConfig optional application config
+   * @param dataSetFileInput optional external file input element
+   * @param frameUpdateCallback callback function executed on frame render
+   * @param frameUpdateCallbackThrottleTimeout throttle timeout for frame update callback
+   * @returns {AnimationTool}
+   */
   constructor(
     {
       container = undefined,
@@ -122,6 +152,8 @@ class AnimationTool {
   }
 
   /**
+   * Main entry method. Should be called after instantiation. See ./src/index.js
+   *
    * @public
    * @returns {AnimationTool}
    */
@@ -154,6 +186,8 @@ class AnimationTool {
   }
 
   /**
+   * Use to destroy current application's instance.
+   *
    * @public
    * @returns {AnimationTool}
    */

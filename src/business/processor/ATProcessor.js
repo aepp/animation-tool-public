@@ -5,6 +5,8 @@ import {MIN_SECS_PRESENCE_AMOUNT} from '../../config/constants';
 import {CommonDataSetProcessor} from './CommonDataSetProcessor';
 
 /**
+ * A pre-processor for the data sets resulting from application's own pose estimation module.
+ *
  * @class
  * @extends {CommonDataSetProcessor}
  */

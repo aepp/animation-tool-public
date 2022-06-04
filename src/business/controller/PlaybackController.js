@@ -6,6 +6,8 @@ import {
 } from '../../config/constants';
 
 /**
+ * Playback control specifics are outsourced into this class to not overload the main AnimationController class.
+ *
  * @class
  */
 export class PlaybackController {

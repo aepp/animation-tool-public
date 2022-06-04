@@ -36,6 +36,8 @@ import {DataSourceType, DEFAULT_PLAYBACK_FPS} from '../../config/constants';
 import {frameStampToMilliseconds} from '../../react/views/Visualization/util/time';
 
 /**
+ * A class containing common pre-processing functionality.
+ *
  * @class
  * @abstract
  */
