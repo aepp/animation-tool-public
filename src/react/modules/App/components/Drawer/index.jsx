@@ -16,7 +16,8 @@ import {
   DirectionsRunRounded as AnimationIcon,
   DescriptionRounded as DescriptionIcon,
   PreviewRounded as PreviewIcon,
-  ArrowRight as ArrowRightIcon
+  ArrowRight as ArrowRightIcon,
+  BarChart as PlotIcon
 } from '@mui/icons-material';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
@@ -154,6 +155,16 @@ export const AppDrawer = () => {
                   </IconButton>
                 </ListItemSecondaryAction>
               }
+            />
+            <Divider component={'li'} sx={{my: 1}} />
+            <DrawerItem
+              primary={'Stats'}
+              secondary={<>Agreements plots for the thesis</>}
+              icon={<PlotIcon />}
+              component={NavLink}
+              componentProps={{
+                to: routes.stats
+              }}
             />
           </List>
         </nav>

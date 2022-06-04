@@ -9,6 +9,7 @@ import {
   Typography
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import StatsAppBar from '../../../../views/Stats/components/AppBar';
 import VisualizationAppbar from '../../../../views/Visualization/components/AppBar';
 import routes, {routeLabels} from '../../../../routes';
 import EstimationAppBar from '../../../../views/Estimation/components/AppBar';
@@ -50,6 +51,7 @@ export const AppBar = () => {
               element={<EstimationAppBar />}
               exact
             />
+            <Route path={routes.stats} element={<StatsAppBar />} exact />
           </Routes>
         </Toolbar>
       </MuiAppBar>

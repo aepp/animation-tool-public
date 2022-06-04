@@ -22,6 +22,9 @@ import estimationViewReducer, {
 import visualizationViewReducer, {
   reducerKey as visualizationViewReducerKey
 } from './views/Visualization/reducers';
+import statsReducer, {
+  reducerKey as statsReducerKey
+} from './views/Stats/reducers';
 
 export const initSagas = () => createSagaMiddleware();
 
@@ -38,7 +41,9 @@ export const initStore = sagaMiddleware =>
       [coordinatesChartKey]: coordinatesChartReducer,
       [coordinatesChartControlsReducerKey]: coordinatesChartControlsReducer,
       // estimation view
-      [estimationViewReducerKey]: estimationViewReducer
+      [estimationViewReducerKey]: estimationViewReducer,
+      // stats view
+      [statsReducerKey]: statsReducer
     },
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
