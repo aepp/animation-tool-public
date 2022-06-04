@@ -311,7 +311,7 @@ export class RenderHelper {
     return lineFrame;
   }
 
-  calculateFovDistance = ({fov = 45}) =>
+  calculateFovDistance = ({fov = 45} = {fov: 45}) =>
     (this.dataSetModel.extremes.yMax +
       0.01 -
       (this.dataSetModel.extremes.yMin - 0.01)) /

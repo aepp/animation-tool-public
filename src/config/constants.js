@@ -89,4 +89,5 @@ export const DataSourceType = {
 // three.js
 export const ORBIT_CONTROLS_Z_LIMIT_ADDITION = 5;
 
+// pre-processing
 export const MAX_JOINT_COORDINATE_DEVIATION = 25;

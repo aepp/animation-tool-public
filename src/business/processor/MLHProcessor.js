@@ -266,7 +266,9 @@ export class MLHProcessor extends CommonDataSetProcessor {
     return new Promise(resolve =>
       resolve({
         framesPerPerson,
-        personIndices: this.personIndices,
+        personIndices: this.personIndices.filter(
+          idx => typeof idx === 'number'
+        ),
         extremes: this.extremes,
         normalization: {
           scaleFactor: this.normalScaleFactor,

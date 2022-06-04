@@ -1,4 +1,4 @@
-import {fork, takeLatest, select} from 'redux-saga/effects';
+import {fork, takeLatest, select, call} from 'redux-saga/effects';
 import {intersect} from 'mathjs';
 import {DataSourceType} from '../../../../config/constants';
 import {MLHProcessor} from '../../../../business/processor/MLHProcessor';
@@ -44,7 +44,7 @@ function* handleDownloadResults(action) {
   let json;
 
   if (dataSource === DataSourceType.DATA_SOURCE_TF) {
-    json = JSON.stringify({
+    json = {
       source: {
         id: DataSourceType.DATA_SOURCE_TF,
         detectionFps: Math.floor(
@@ -61,12 +61,12 @@ function* handleDownloadResults(action) {
           frameStamp: millisecondsToTime(frameStamps[i] * 1000)
         };
       })
-    });
+    };
   } else {
     let prevSpineMidX = [];
     let prevSpineMidY = [];
 
-    json = JSON.stringify({
+    json = {
       RecordingID: new Date(Date.now()).toLocaleString(),
       ApplicationName: DataSourceType.DATA_SOURCE_TF_MOCK_LH,
       OenName: null,
@@ -302,21 +302,24 @@ function* handleDownloadResults(action) {
           };
         })
       ].filter(f => f !== false)
-    });
+    };
   }
 
-  // const blob = new Blob([jsonTF], {type: 'application/json'});
-  const blob = new Blob([json], {type: 'application/json'});
+  yield call(downloadJson, {json, fileName: `poses_${dataSource}`});
+}
+
+export const downloadJson = ({json, fileName = 'animation_tool'}) => {
+  const blob = new Blob([JSON.stringify(json)], {type: 'application/json'});
 
   const href = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = href;
-  link.download = `poses_${dataSource}.json`;
+  link.download = `${fileName}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(href);
-}
+};
 
 function* watchDownloadResults() {
   yield takeLatest(downloadEstimationResult.type, handleDownloadResults);

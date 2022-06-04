@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  new window.AnimationTool({
+  const animationToolInstance = new window.AnimationTool({
     container: document.getElementById('theVideo'),
     dataSetFileInput: document.getElementById('sessionFile'),
     appConfig: {
@@ -14,5 +14,5 @@ document.addEventListener('DOMContentLoaded', function () {
       ]);
     }
   });
-  window._AnimationToolInstance.create();
+  animationToolInstance.create();
 });

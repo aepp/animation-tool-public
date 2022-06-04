@@ -24,3 +24,6 @@ yarn-error.log*
 /src/demoData/video/
 /public/resources/
 /out
+
+
+/evaluation/manual_sessions/

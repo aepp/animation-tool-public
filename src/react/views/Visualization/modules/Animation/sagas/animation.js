@@ -26,8 +26,6 @@ import {
 } from '../actions/animation';
 import {updateFramesCount} from '../actions/animation';
 import {closeUiChannel, openUiChannel} from '../actions/uiChannel';
-import {frameStampToMilliseconds} from '../../../util/time';
-import {setDetectionFps} from '../../../../Estimation/actions/estimation';
 
 const fetchDataSet = async url => fetch(url).then(r => r.json());
 
@@ -78,6 +76,11 @@ function* handleStartAnimationInit(action) {
       return;
   }
 
+  const preProcessedDataSet = yield call({
+    context: ProcessorInstance,
+    fn: ProcessorInstance.preProcess
+  });
+
   const {
     framesPerPerson,
     personIndices,
@@ -85,10 +88,7 @@ function* handleStartAnimationInit(action) {
     normalization,
     jointNames,
     detectionFps
-  } = yield call({
-    context: ProcessorInstance,
-    fn: ProcessorInstance.preProcess
-  });
+  } = preProcessedDataSet;
 
   yield put(
     setDataSet({
