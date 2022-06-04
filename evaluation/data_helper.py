@@ -80,7 +80,7 @@ def sensor_file_to_array(data, offset):
         # retrieve the application name
         app_name = df[applicationNameKey].all()
         # remove the prefix 'frameAttributes.' from the column names
-        df.columns = df.columns.str.replace("frameAttributes", df[applicationNameKey].all(), regex=False)
+        # df.columns = df.columns.str.replace("frameAttributes", df[applicationNameKey].all(), regex=False)
 
         # set the timestamp as index
         df = df.set_index('frameStamp').iloc[:, 2:]
